@@ -1,68 +1,119 @@
 'use client';
-
 import Link from "next/link";
-import { useState } from "react";
+import { useState, FormEvent } from "react";
+import axios, { AxiosResponse } from 'axios';
+import toast, { Toaster } from 'react-hot-toast';
+import { SignUpResponse } from "@/utils/interface";
 
 export default function SignupPage() {
+  const [name, setName] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
 
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+  async function signUpUser(e: FormEvent<HTMLFormElement>): Promise<void> {
+    e.preventDefault();
+    setLoading(true);
 
-    function signUpUser() {
+    try {
+      const response: AxiosResponse<SignUpResponse> = await axios.post('http://localhost:8080/devconnect/auth/sign-up', {
+        name,
+        email,
+        password,
+      });
+
+      if (response.status === 201) {
+        toast.success(response.data.message || 'Signup successful!');
+        setName('');
+        setEmail('');
+        setPassword('');
+      } else {
+        toast.error(response.data.message || 'An error occurred.');
+      }
+    } catch (error: any) {
+      if (error.response) {
+        toast.error(error.response.data.message || 'An error occurred.');
+      } else if (error.request) {
+        toast.error('Network error. Please try again.');
+      } else {
+        toast.error('An unexpected error occurred.');
+      }
+    } finally {
+      setLoading(false);
     }
+  }
 
-    return (
-        <main className="flex min-h-screen items-center justify-center bg-blue-50">
-            <form className="bg-white shadow-md rounded-lg p-8 w-full max-w-sm space-y-6 text-black">
-                <h1 className="text-2xl font-bold text-blue-700 mb-2 text-center">Create Your Account</h1>
-                <div>
-                    <label htmlFor="name" className="block mb-1 font-medium text-blue-900">Name</label>
-                    <input
-                        id="name"
-                        type="text"
-                        required
-                        className="w-full border px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-300"
-                        value={name}
-                        onChange={e => setName(e.target.value)}
-                        autoComplete="name"
-                    />
-                </div>
-                <div>
-                    <label htmlFor="email" className="block mb-1 font-medium text-blue-900">Email</label>
-                    <input
-                        id="email"
-                        type="email"
-                        required
-                        className="w-full border px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-300"
-                        value={email}
-                        onChange={e => setEmail(e.target.value)}
-                        autoComplete="email"
-                    />
-                </div>
-                <div>
-                    <label htmlFor="password" className="block mb-1 font-medium text-blue-900">Password</label>
-                    <input
-                        id="password"
-                        type="password"
-                        required
-                        className="w-full border px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-300"
-                        value={password}
-                        onChange={e => setPassword(e.target.value)}
-                        autoComplete="new-password"
-                    />
-                </div>
-                <button
-                    onClick={()=>signUpUser()}
-                    className="w-full py-2 bg-blue-600 text-white rounded font-semibold hover:bg-blue-700 transition"
-                >
-                    Signup
-                </button>
-                <p className="text-sm text-center text-black">
-                    Already have an account?
-                    <Link href="/login" className="text-blue-600 hover:underline ml-1">Login</Link>
-                </p>
-            </form>
-        </main>
-    );
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 text-black">
+      <Toaster position="top-center" />
+      <form
+        className="bg-white shadow-xl rounded-xl p-8 w-full max-w-md space-y-6 border border-gray-100"
+        onSubmit={signUpUser}
+      >
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-blue-700 mb-2">Create Your Account</h1>
+          <p className="text-gray-600">Sign up to start using DevConnect</p>
+        </div>
+
+        <div>
+          <label htmlFor="name" className="block mb-2 font-medium text-gray-700">Name</label>
+          <input
+            id="name"
+            type="text"
+            required
+            className="w-full border border-gray-300 rounded-lg px-3 py-3 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            autoComplete="name"
+            placeholder="Enter your full name"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="email" className="block mb-2 font-medium text-gray-700">Email Address</label>
+          <input
+            id="email"
+            type="email"
+            required
+            className="w-full border border-gray-300 rounded-lg px-3 py-3 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            autoComplete="email"
+            placeholder="Enter your email"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="password" className="block mb-2 font-medium text-gray-700">Password</label>
+          <input
+            id="password"
+            type="password"
+            required
+            className="w-full border border-gray-300 rounded-lg px-3 py-3 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            autoComplete="new-password"
+            placeholder="Enter a secure password"
+          />
+        </div>
+
+        <button
+          type="submit"
+          className={`w-full cursor-pointer py-3 bg-blue-600 text-white rounded-lg font-semibold transition ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700 hover:shadow-md'}`}
+          disabled={loading}
+        >
+          {loading ? 'Signing up...' : 'Signup'}
+        </button>
+
+        <div className="text-center pt-4 border-t border-gray-200">
+          <p className="text-sm text-gray-600">
+            Already have an account?{' '}
+            <Link href="/login" className="text-blue-600 font-semibold hover:underline ml-1">
+              Login
+            </Link>
+          </p>
+        </div>
+      </form>
+    </main>
+  );
 }
