@@ -22,7 +22,7 @@ export default function SignupPage() {
         password,
       });
 
-      if (response.status === 201) {
+      if (response.status === 201 || response.status === 200) {
         toast.success(response.data.message || 'Signup successful!');
         setName('');
         setEmail('');

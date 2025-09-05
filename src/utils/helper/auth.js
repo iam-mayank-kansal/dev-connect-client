@@ -1,11 +1,10 @@
 import axios from "axios";
 
-export function getUserProfile() {
-    const user = axios.get('http://localhost:8080/devconnect/user/profile', { withCredentials: true });
-    console.log(user);
-    return user;
-}
+const API_BASE_URL = 'http://localhost:8080';
 
+export function getUserProfile() {
+    return axios.get(`${API_BASE_URL}/devconnect/user/profile`, { withCredentials: true });
+}
 const handleLogout = async () => {
     try {
         await axios.post('http://localhost:8080/devconnect/auth/logout', {}, { withCredentials: true });
