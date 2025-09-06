@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
-import axios from "axios";
+import axios, { AxiosError } from "axios"; // ✅ AxiosError imported
 import { Eye, EyeOff, Lock, KeyRound } from 'lucide-react';
 
 export default function SetNewPasswordPage() {
@@ -51,15 +51,17 @@ export default function SetNewPasswordPage() {
     try {
       const res = await axios.patch(
         "http://localhost:8080/devconnect/user/set-new-password",
-        { newPassword : password, resetToken : token },
+        { newPassword: password, resetToken: token },
         { withCredentials: true }
       );
 
       toast.success(res.data.message || "Password reset successfully!");
       setTimeout(() => router.push("/login"), 1500);
-    } catch (err: any) {
+    } catch (err: unknown) { // ✅ FIX: no 'any'
+      const error = err as AxiosError<{ message?: string }>; // ✅ cast to AxiosError
+
       toast.error(
-        err?.response?.data?.message || "Failed to reset password. Please try again."
+        error.response?.data?.message || "Failed to reset password. Please try again."
       );
     } finally {
       setLoading(false);
@@ -105,11 +107,10 @@ export default function SetNewPasswordPage() {
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
-                  if (errors.password) setErrors({...errors, password: undefined});
+                  if (errors.password) setErrors({ ...errors, password: undefined });
                 }}
-                className={`w-full border rounded-lg pl-10 pr-10 py-3 focus:outline-none ${
-                  errors.password ? "border-red-500" : "border-gray-300"
-                } focus:ring-2 focus:ring-blue-300`}
+                className={`w-full border rounded-lg pl-10 pr-10 py-3 focus:outline-none ${errors.password ? "border-red-500" : "border-gray-300"
+                  } focus:ring-2 focus:ring-blue-300`}
                 placeholder="Enter new password"
                 disabled={loading}
                 autoComplete="new-password"
@@ -149,11 +150,10 @@ export default function SetNewPasswordPage() {
                 value={confirmPassword}
                 onChange={(e) => {
                   setConfirmPassword(e.target.value);
-                  if (errors.confirmPassword) setErrors({...errors, confirmPassword: undefined});
+                  if (errors.confirmPassword) setErrors({ ...errors, confirmPassword: undefined });
                 }}
-                className={`w-full border rounded-lg pl-10 pr-10 py-3 focus:outline-none ${
-                  errors.confirmPassword ? "border-red-500" : "border-gray-300"
-                } focus:ring-2 focus:ring-blue-300`}
+                className={`w-full border rounded-lg pl-10 pr-10 py-3 focus:outline-none ${errors.confirmPassword ? "border-red-500" : "border-gray-300"
+                  } focus:ring-2 focus:ring-blue-300`}
                 placeholder="Confirm your new password"
                 disabled={loading}
                 autoComplete="new-password"
@@ -176,11 +176,10 @@ export default function SetNewPasswordPage() {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-3 rounded-lg font-semibold text-white transition flex items-center justify-center ${
-              loading 
-                ? "bg-blue-400 cursor-not-allowed" 
-                : "bg-blue-600 hover:bg-blue-700 hover:shadow-md"
-            }`}
+            className={`w-full py-3 rounded-lg font-semibold text-white transition flex items-center justify-center ${loading
+              ? "bg-blue-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700 hover:shadow-md"
+              }`}
           >
             {loading ? (
               <>

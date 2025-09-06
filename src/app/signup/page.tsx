@@ -1,7 +1,7 @@
 'use client';
 import Link from "next/link";
 import { useState, FormEvent } from "react";
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 import { SignUpResponse } from "@/utils/interface";
 
@@ -30,10 +30,12 @@ export default function SignupPage() {
       } else {
         toast.error(response.data.message || 'An error occurred.');
       }
-    } catch (error: any) {
-      if (error.response) {
-        toast.error(error.response.data.message || 'An error occurred.');
-      } else if (error.request) {
+    } catch (error: unknown) {
+      const err = error as AxiosError<{ message: string }>;
+
+      if (err.response) {
+        toast.error(err.response.data?.message || 'An error occurred.');
+      } else if (err.request) {
         toast.error('Network error. Please try again.');
       } else {
         toast.error('An unexpected error occurred.');

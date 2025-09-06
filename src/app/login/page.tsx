@@ -1,7 +1,7 @@
 'use client';
 import Link from "next/link";
 import { useState, FormEvent } from "react";
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosResponse, AxiosError } from 'axios'; // ✅ FIXED: Added AxiosError
 import toast from 'react-hot-toast';
 import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
 import { LoginResponse } from "@/utils/interface";
@@ -56,14 +56,15 @@ export default function LoginPage() {
         setEmail('');
         setPassword('');
         router.push('/');
-
       } else {
         toast.error(response.data.message || 'Login failed.');
       }
 
-    } catch (error: any) {
+    } catch (err: unknown) { // ✅ FIXED: Removed `any`, added `unknown`
+      const error = err as AxiosError<{ message?: string }>; // ✅ FIXED: Type assertion
+
       if (error.response) {
-        toast.error(error.response.data.message || 'Login error occurred.');
+        toast.error(error.response.data?.message || 'Login error occurred.');
       } else if (error.request) {
         toast.error('Network error. Please try again.');
       } else {

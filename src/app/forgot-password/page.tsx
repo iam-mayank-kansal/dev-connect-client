@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Mail, ArrowLeft, ShieldCheck } from 'lucide-react';
-import axios from "axios";
+import axios, { AxiosError } from "axios"; // ✅ Import AxiosError
 import { useRouter } from "next/navigation";
 
 export default function ForgotPasswordPage() {
@@ -24,10 +24,10 @@ export default function ForgotPasswordPage() {
         { withCredentials: true }
       );
 
-      // Assuming response confirms OTP sent successfully
       router.push(`/verify-otp?email=${encodeURIComponent(email)}`);
-    } catch (err :any  ) {
-      setError(err?.response?.data?.message || 'Failed to send OTP. Please try again.');
+    } catch (err: unknown) {
+      const error = err as AxiosError<{ message?: string }>; // ✅ Type-safe error handling
+      setError(error.response?.data?.message || 'Failed to send OTP. Please try again.');
     } finally {
       setIsLoading(false);
     }

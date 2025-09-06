@@ -64,8 +64,8 @@ export interface Endpoint {
   contentType?: string;
   requiredFields?: string[];
   optionalFields?: { [key: string]: string } | null;
-  requestExample: any;
-  responseExample: any;
+  requestExample: unknown;
+  responseExample: unknown;
 }
 
 export interface ApiGroup {

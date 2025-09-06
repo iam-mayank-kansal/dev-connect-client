@@ -2,9 +2,8 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { ShieldCheck, Mail, Key, ArrowLeft } from "lucide-react";
-import axios from "axios";
-import { useSearchParams } from "next/navigation";
-import { useRouter } from "next/navigation";
+import axios, { AxiosError } from "axios";
+import { useSearchParams, useRouter } from "next/navigation";
 
 export default function VerifyOtpPage() {
   const searchParams = useSearchParams();
@@ -33,12 +32,14 @@ export default function VerifyOtpPage() {
         { email, otp },
         { withCredentials: true }
       );
-      // Assuming response confirms OTP sent successfully
+
       console.log(response.data);
       setIsSubmitted(true);
-    router.push(`/new-password?token=${encodeURIComponent(response.data.data.token)}`);
-    } catch (err: any) {
-      setError(err?.response?.data?.message || 'OTP verification failed. Please try again.');
+      router.push(`/new-password?token=${encodeURIComponent(response.data.data.token)}`);
+    } catch (err: unknown) {
+      const error = err as AxiosError<{ message: string }>;
+
+      setError(error?.response?.data?.message || 'OTP verification failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -66,7 +67,7 @@ export default function VerifyOtpPage() {
 
         {!isSubmitted ? (
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Email Input (read only if present in query) */}
+            {/* Email Input */}
             <div>
               <label htmlFor="email" className="block mb-2 font-medium text-gray-700">Email Address</label>
               <div className="relative">
