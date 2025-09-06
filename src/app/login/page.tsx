@@ -3,8 +3,9 @@ import Link from "next/link";
 import { useState, FormEvent } from "react";
 import axios, { AxiosResponse } from 'axios';
 import toast from 'react-hot-toast';
-import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, AlertCircle, Router } from 'lucide-react';
 import { LoginResponse } from "@/utils/interface";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [email, setEmail] = useState<string>('iam.mayank.kansal.01@gmail.com');
@@ -12,6 +13,8 @@ export default function LoginPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [errors, setErrors] = useState<{ email?: string, password?: string }>({});
+
+  const router = useRouter()
 
   const validateForm = () => {
     const newErrors: { email?: string, password?: string } = {};
@@ -38,7 +41,6 @@ export default function LoginPage() {
     if (!validateForm()) {
       return;
     }
-
     setLoading(true);
 
     try {
@@ -53,6 +55,8 @@ export default function LoginPage() {
         toast.success(response.data.message || 'Login successful!');
         setEmail('');
         setPassword('');
+        router.push('/');
+
       } else {
         toast.error(response.data.message || 'Login failed.');
       }

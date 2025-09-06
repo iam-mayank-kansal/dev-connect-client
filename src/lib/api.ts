@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
 import { UserProfile } from './types';
 
-const API_BASE_URL = 'http://localhost:8080';
+export const API_BASE_URL = 'http://localhost:8080';
 
 export async function getUserProfile(): Promise<AxiosResponse<{ status: string; data: UserProfile }>> {
   return axios.get(`${API_BASE_URL}/devconnect/user/profile`, { withCredentials: true });

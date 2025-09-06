@@ -55,3 +55,20 @@ export interface UserProfile {
   mobile: Mobile;
   location: Location;
 }
+
+export interface Endpoint {
+  path: string;
+  method: string;
+  description: string;
+  authentication: string;
+  contentType?: string;
+  requiredFields?: string[];
+  optionalFields?: { [key: string]: string } | null;
+  requestExample: any;
+  responseExample: any;
+}
+
+export interface ApiGroup {
+  title: string;
+  endpoints: Endpoint[];
+}

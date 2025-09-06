@@ -7,15 +7,9 @@ import {
   ChevronDown,
   Code,
   BookOpen,
-  Users,
-  MessageSquare,
   Settings,
   LogOut,
   User,
-  Github,
-  Twitter,
-  Linkedin,
-  Mail
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
@@ -28,6 +22,7 @@ export default function Navbar() {
 
   const router = useRouter();
 
+  // Fetch user profile on mount  
   useEffect(() => {
     async function fetchUser() {
       try {
@@ -48,7 +43,7 @@ export default function Navbar() {
       // setUser(null);
       // setDropdownOpen(false);
       // You might also want to redirect the user
-      // router.push('/login');
+      router.push('/login');
     } catch (error) {
       console.error("Logout failed", error);
     }
