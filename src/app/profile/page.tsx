@@ -1,7 +1,7 @@
 "use client";
 import { API_BASE_URL, getUserProfile, updateUserProfile } from "@/lib/api";
-import { UserProfile, SocialLink } from "@/lib/types";
-import { useEffect, useState, useRef } from "react";
+import { UserProfile } from "@/lib/types";
+import { useEffect, useState } from "react";
 import {
   Edit,
   Save,
@@ -22,6 +22,7 @@ import {
   Plus,
   Trash2
 } from "lucide-react";
+import Image from "next/image";
 
 function ProfilePage() {
   const defaultUser: UserProfile = {
@@ -62,8 +63,6 @@ function ProfilePage() {
         setIsLoading(true);
         const response = await getUserProfile();
         setUser(response?.data?.data || defaultUser);
-        // setResumeFile(response?.data?.data?.resume as File || null);
-        // setProfilePictureFile(response?.data?.data?.profilePicture as File || null);
       } catch {
         setUser(defaultUser);
       } finally {
@@ -267,9 +266,11 @@ function ProfilePage() {
               <div className="flex-shrink-0">
                 <div className="relative">
                   {profileImageSrc ? (
-                    <img
+                    <Image
                       src={profileImageSrc}
                       alt="Profile"
+                      width={128}
+                      height={128}
                       className="w-32 h-32 rounded-full object-cover border-4 border-gray-100"
                     />
                   ) : (

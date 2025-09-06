@@ -18,7 +18,7 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(
+      await axios.post(
         'http://localhost:8080/devconnect/otp/send-otp',
         { email },
         { withCredentials: true }
@@ -26,7 +26,7 @@ export default function ForgotPasswordPage() {
 
       // Assuming response confirms OTP sent successfully
       router.push(`/verify-otp?email=${encodeURIComponent(email)}`);
-    } catch (err: any) {
+    } catch (err :any  ) {
       setError(err?.response?.data?.message || 'Failed to send OTP. Please try again.');
     } finally {
       setIsLoading(false);

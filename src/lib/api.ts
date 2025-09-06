@@ -7,7 +7,7 @@ export async function getUserProfile(): Promise<AxiosResponse<{ status: string; 
   return axios.get(`${API_BASE_URL}/devconnect/user/profile`, { withCredentials: true });
 }
 
-export async function updateUserProfile(profileData: Partial<UserProfile>): Promise<AxiosResponse<any>> {
+export async function updateUserProfile(profileData: Partial<UserProfile>): Promise<AxiosResponse<UserProfile>> {
   return axios.patch(`${API_BASE_URL}/devconnect/user/update-user`, profileData, {
     withCredentials: true,
      headers: {

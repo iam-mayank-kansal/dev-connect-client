@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useState, FormEvent } from "react";
 import axios, { AxiosResponse } from 'axios';
 import toast from 'react-hot-toast';
-import { Eye, EyeOff, Mail, Lock, AlertCircle, Router } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
 import { LoginResponse } from "@/utils/interface";
 import { useRouter } from "next/navigation";
 
