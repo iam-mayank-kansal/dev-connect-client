@@ -61,7 +61,7 @@ async function handleLogOut() {
         {/* Logo and Main Navigation */}
         <Link href="/" className="flex items-center text-blue-700 font-bold text-2xl mr-10">
           <Code size={28} className="mr-2" />
-          XYZ
+          Devconnect
         </Link>
 
         {/* Desktop Navigation */}
