@@ -39,7 +39,8 @@ function SetNewPasswordContent() {
     }
   }, [token]);
 
-  const validate = () => {
+  const validate = () => 
+    {
     const validationErrors: typeof errors = {};
     if (!password) validationErrors.password = "Password is required";
     else if (password.length < 6) validationErrors.password = "Password must be at least 6 characters";
