@@ -4,6 +4,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 import axios, { AxiosError } from "axios";
 import { Eye, EyeOff, Lock, KeyRound } from 'lucide-react';
+import { resetUserPassword } from "@/lib/api";
 
 // A wrapper component to handle the Suspense boundary.
 // This is required because useSearchParams is a client-side hook
@@ -54,22 +55,18 @@ function SetNewPasswordContent() {
     return Object.keys(validationErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
-    if (!token) {
+    if (!token || typeof token !== 'string') {
       toast.error("Token missing. Cannot reset password.");
       return;
     }
 
     setLoading(true);
     try {
-      const res = await axios.patch(
-        "http://localhost:8080/devconnect/user/set-new-password",
-        { newPassword: password, resetToken: token },
-        { withCredentials: true }
-      );
+      const res = await resetUserPassword(password, token);
 
       toast.success(res.data.message || "Password reset successfully!");
       setTimeout(() => router.push("/login"), 1500);

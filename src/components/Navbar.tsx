@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { logoutUser } from "@/lib/api";
 
 export default function Navbar() {
   const [user, setUser] = useState<{ name?: string; email?: string } | null>(null);
@@ -35,19 +36,14 @@ export default function Navbar() {
     fetchUser();
   }, []);
 
-
-  async function handleLogOut() {
-    try {
-      await axios.post('http://localhost:8080/devconnect/auth/logout', {}, { withCredentials: true });
-      // After a successful server response, update the UI state
-      // setUser(null);
-      // setDropdownOpen(false);
-      // You might also want to redirect the user
-      router.push('/login');
-    } catch (error) {
-      console.error("Logout failed", error);
-    }
+async function handleLogOut() {
+  try {
+    await logoutUser(); 
+    router.push("/login");
+  } catch (error) {
+    console.error("Logout failed", error);
   }
+}
   // Close dropdown on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {

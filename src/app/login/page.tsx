@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
 import { LoginResponse } from "@/utils/interface";
 import { useRouter } from "next/navigation";
+import { loginUser } from "@/lib/api";
 
 export default function LoginPage() {
   const [email, setEmail] = useState<string>('iam.mayank.kansal.01@gmail.com');
@@ -34,8 +35,7 @@ export default function LoginPage() {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
-  async function loginUser(e: FormEvent<HTMLFormElement>): Promise<void> {
+ async function handleSubmit(e: FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
 
     if (!validateForm()) {
@@ -44,12 +44,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response: AxiosResponse<LoginResponse> = await axios.post('http://localhost:8080/devconnect/auth/login', {
-        email,
-        password,
-      }, {
-        withCredentials: true,
-      });
+      const response = await loginUser(email, password);
 
       if (response.status === 200 || response.status === 201) {
         toast.success(response.data.message || 'Login successful!');
@@ -60,8 +55,8 @@ export default function LoginPage() {
         toast.error(response.data.message || 'Login failed.');
       }
 
-    } catch (err: unknown) { // ✅ FIXED: Removed `any`, added `unknown`
-      const error = err as AxiosError<{ message?: string }>; // ✅ FIXED: Type assertion
+    } catch (err: unknown) {
+      const error = err as AxiosError<{ message?: string }>;
 
       if (error.response) {
         toast.error(error.response.data?.message || 'Login error occurred.');
@@ -79,7 +74,7 @@ export default function LoginPage() {
     <main className="flex min-h-screen  items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 text-black">
       <form
         className="bg-white shadow-xl rounded-xl p-8 w-full max-w-md space-y-6 border border-gray-100"
-        onSubmit={loginUser}
+        onSubmit={handleSubmit}
       >
         <div className="text-center">
           <h1 className="text-3xl font-bold text-blue-700 mb-2">Welcome Back</h1>

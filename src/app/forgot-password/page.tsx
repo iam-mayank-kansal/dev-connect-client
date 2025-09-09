@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Mail, ArrowLeft, ShieldCheck } from 'lucide-react';
 import axios, { AxiosError } from "axios"; // ✅ Import AxiosError
 import { useRouter } from "next/navigation";
+import { sendOtp } from "@/lib/api";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -12,26 +13,21 @@ export default function ForgotPasswordPage() {
 
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setIsLoading(true);
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError(null);
+  setIsLoading(true);
 
-    try {
-      await axios.post(
-        'http://localhost:8080/devconnect/otp/send-otp',
-        { email },
-        { withCredentials: true }
-      );
-
-      router.push(`/verify-otp?email=${encodeURIComponent(email)}`);
-    } catch (err: unknown) {
-      const error = err as AxiosError<{ message?: string }>; // ✅ Type-safe error handling
-      setError(error.response?.data?.message || 'Failed to send OTP. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  try {
+    await sendOtp(email); 
+    router.push(`/verify-otp?email=${encodeURIComponent(email)}`);
+  } catch (err: unknown) {
+    const error = err as AxiosError<{ message?: string }>;
+    setError(error.response?.data?.message || "Failed to send OTP. Please try again.");
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <main className="min-h-screen text-black flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 p-4">

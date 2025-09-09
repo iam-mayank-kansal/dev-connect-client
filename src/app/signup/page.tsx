@@ -4,6 +4,7 @@ import { useState, FormEvent } from "react";
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 import { SignUpResponse } from "@/utils/interface";
+import { signUpUserApi } from "@/lib/api";
 
 export default function SignupPage() {
   const [name, setName] = useState<string>('');
@@ -12,38 +13,34 @@ export default function SignupPage() {
   const [loading, setLoading] = useState<boolean>(false);
 
   async function signUpUser(e: FormEvent<HTMLFormElement>): Promise<void> {
-    e.preventDefault();
-    setLoading(true);
+  e.preventDefault();
+  setLoading(true);
 
-    try {
-      const response: AxiosResponse<SignUpResponse> = await axios.post('http://localhost:8080/devconnect/auth/sign-up', {
-        name,
-        email,
-        password,
-      });
+  try {
+    const response = await signUpUserApi(name, email, password);
 
-      if (response.status === 201 || response.status === 200) {
-        toast.success(response.data.message || 'Signup successful!');
-        setName('');
-        setEmail('');
-        setPassword('');
-      } else {
-        toast.error(response.data.message || 'An error occurred.');
-      }
-    } catch (error: unknown) {
-      const err = error as AxiosError<{ message: string }>;
-
-      if (err.response) {
-        toast.error(err.response.data?.message || 'An error occurred.');
-      } else if (err.request) {
-        toast.error('Network error. Please try again.');
-      } else {
-        toast.error('An unexpected error occurred.');
-      }
-    } finally {
-      setLoading(false);
+    if (response.status === 201 || response.status === 200) {
+      toast.success(response.data.message || "Signup successful!");
+      setName("");
+      setEmail("");
+      setPassword("");
+    } else {
+      toast.error(response.data.message || "An error occurred.");
     }
+  } catch (error: unknown) {
+    const err = error as AxiosError<{ message: string }>;
+
+    if (err.response) {
+      toast.error(err.response.data?.message || "An error occurred.");
+    } else if (err.request) {
+      toast.error("Network error. Please try again.");
+    } else {
+      toast.error("An unexpected error occurred.");
+    }
+  } finally {
+    setLoading(false);
   }
+}
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 text-black">

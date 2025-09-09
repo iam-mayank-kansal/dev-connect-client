@@ -49,3 +49,74 @@ export async function updateUserProfile(profileData: Partial<UserProfile>): Prom
     }
   });
 }
+export async function resetUserPassword(
+  newPassword: string, 
+  resetToken: string
+): Promise<AxiosResponse<{ message: string }>> {
+  return axios.patch(
+    `${API_BASE_URL}/devconnect/user/set-new-password`,
+    { newPassword, resetToken },
+    { withCredentials: true }
+  );
+}
+export async function loginUser(
+  email: string, 
+  password: string
+): Promise<AxiosResponse<{ message: string }>> {
+  return axios.patch(
+    `${API_BASE_URL}/devconnect/auth/login`,
+    { email, password },
+    { withCredentials: true }
+  );
+}
+export async function sendOtp(
+  email: string
+): Promise<AxiosResponse<{ message: string }>> {
+  return axios.post(
+    `${API_BASE_URL}/devconnect/otp/send-otp`,
+    { email },
+    { withCredentials: true }
+  );
+}
+export interface SignUpResponse {
+  message: string;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+  };
+}
+export async function signUpUserApi(
+  name: string,
+  email: string,
+  password: string
+): Promise<AxiosResponse<SignUpResponse>> {
+  return axios.post(
+    `${API_BASE_URL}/devconnect/auth/sign-up`,
+    { name, email, password },
+    { withCredentials: true }
+  );
+}
+export interface VerifyOtpResponse {
+  message: string;
+  data: {
+    token: string; // token you’re passing to new-password
+  };
+}
+export async function verifyOtp(
+  email: string,
+  otp: string
+): Promise<AxiosResponse<VerifyOtpResponse>> {
+  return axios.post(
+    `${API_BASE_URL}/devconnect/otp/verify-otp`,
+    { email, otp },
+    { withCredentials: true }
+  );
+}
+export async function logoutUser(): Promise<AxiosResponse<{ message: string }>> {
+  return axios.post(
+    `${API_BASE_URL}/devconnect/auth/logout`,
+    {},
+    { withCredentials: true }
+  );
+}

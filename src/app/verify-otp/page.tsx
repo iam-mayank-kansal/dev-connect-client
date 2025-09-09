@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { ShieldCheck, Mail, Key, ArrowLeft } from "lucide-react";
 import axios, { AxiosError } from "axios";
 import { useSearchParams, useRouter } from "next/navigation";
+import { verifyOtp } from "@/lib/api";
 
 // This wrapper component and Suspense boundary fix the "useSearchParams" server-side rendering error.
 // The actual logic is moved to VerifyOtpContent.
@@ -38,30 +39,24 @@ function VerifyOtpContent() {
 
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setIsLoading(true);
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError(null);
+  setIsLoading(true);
 
-    try {
-      const response = await axios.post(
-        'http://localhost:8080/devconnect/otp/verify-otp',
-        { email, otp },
-        { withCredentials: true }
-      );
+  try {
+    const response = await verifyOtp(email, otp);
+    console.log(response.data);
 
-      console.log(response.data);
-      setIsSubmitted(true);
-      // Use the router for navigation, which works correctly with the Next.js routing system.
-      router.push(`/new-password?token=${encodeURIComponent(response.data.data.token)}`);
-    } catch (err: unknown) {
-      const error = err as AxiosError<{ message: string }>;
-
-      setError(error?.response?.data?.message || 'OTP verification failed. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    setIsSubmitted(true);
+    router.push(`/new-password?token=${encodeURIComponent(response.data.data.token)}`);
+  } catch (err: unknown) {
+    const error = err as AxiosError<{ message: string }>;
+    setError(error?.response?.data?.message || "OTP verification failed. Please try again.");
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <main className="min-h-screen text-black flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
