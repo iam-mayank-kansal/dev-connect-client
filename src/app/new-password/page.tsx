@@ -1,12 +1,27 @@
 'use client';
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
-import axios, { AxiosError } from "axios"; // ✅ AxiosError imported
+import axios, { AxiosError } from "axios";
 import { Eye, EyeOff, Lock, KeyRound } from 'lucide-react';
 
-export default function SetNewPasswordPage() {
+// A wrapper component to handle the Suspense boundary.
+// This is required because useSearchParams is a client-side hook
+// and Next.js's server-side rendering needs a fallback while it's hydrating.
+export default function Page() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-500">Loading...</p>
+      </div>
+    }>
+      <SetNewPasswordContent />
+    </Suspense>
+  );
+}
+
+// The main component containing the password reset logic.
+function SetNewPasswordContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token") || "";
   const router = useRouter();
@@ -57,8 +72,8 @@ export default function SetNewPasswordPage() {
 
       toast.success(res.data.message || "Password reset successfully!");
       setTimeout(() => router.push("/login"), 1500);
-    } catch (err: unknown) { // ✅ FIX: no 'any'
-      const error = err as AxiosError<{ message?: string }>; // ✅ cast to AxiosError
+    } catch (err: unknown) {
+      const error = err as AxiosError<{ message?: string }>;
 
       toast.error(
         error.response?.data?.message || "Failed to reset password. Please try again."

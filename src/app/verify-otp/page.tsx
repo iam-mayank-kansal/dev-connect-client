@@ -1,11 +1,28 @@
 'use client';
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { ShieldCheck, Mail, Key, ArrowLeft } from "lucide-react";
 import axios, { AxiosError } from "axios";
 import { useSearchParams, useRouter } from "next/navigation";
 
-export default function VerifyOtpPage() {
+// This wrapper component and Suspense boundary fix the "useSearchParams" server-side rendering error.
+// The actual logic is moved to VerifyOtpContent.
+export default function Page() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-500">Loading...</p>
+      </div>
+    }>
+      <VerifyOtpContent />
+    </Suspense>
+  );
+}
+
+// Your original component with fixes to use Next.js navigation hooks correctly.
+function VerifyOtpContent() {
+  // Use `useSearchParams` and `useRouter` hooks, as they are the correct way to handle client-side
+  // state and navigation within the Next.js App Router, particularly with the `Suspense` boundary.
   const searchParams = useSearchParams();
   const emailFromQuery = searchParams.get("email") || "";
 
@@ -35,6 +52,7 @@ export default function VerifyOtpPage() {
 
       console.log(response.data);
       setIsSubmitted(true);
+      // Use the router for navigation, which works correctly with the Next.js routing system.
       router.push(`/new-password?token=${encodeURIComponent(response.data.data.token)}`);
     } catch (err: unknown) {
       const error = err as AxiosError<{ message: string }>;
@@ -139,6 +157,7 @@ export default function VerifyOtpPage() {
             <p className="text-gray-600">
               Your OTP has been verified successfully. You can now proceed to reset your password.
             </p>
+            {/* Using Next.js Link for client-side navigation */}
             <Link href="/login" className="text-blue-600 hover:text-blue-800 font-medium">
               Back to Login
             </Link>
@@ -146,6 +165,7 @@ export default function VerifyOtpPage() {
         )}
 
         <div className="mt-8 text-center">
+          {/* Using Next.js Link for client-side navigation */}
           <Link href="/forgot-password" className="inline-flex items-center text-sm text-gray-600 hover:text-blue-600 transition-colors">
             <ArrowLeft size={16} className="mr-1" />
             Change Email

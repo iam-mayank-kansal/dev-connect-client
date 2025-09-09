@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Devconnect",
+  title: "XYZ",
   description: "A platform connecting developers",
 };
 
