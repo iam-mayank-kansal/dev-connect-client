@@ -1,72 +1,44 @@
 "use client";
 
-import { getUserProfile, updateUserProfile } from "@/lib/api";
+import { updateUserProfile } from "@/lib/api";
 import { Certification, Education, Experience, SocialLink, UserProfile } from "@/lib/types";
 import { useEffect, useState, useMemo } from "react";
 import { z, ZodError } from "zod";
 import { Edit, Save, X, Mail, Phone, MapPin, Briefcase, BookOpen, Award, Github, Linkedin, Download, User, Code, FileText, Globe, Plus, Trash2, Instagram, Twitter, Youtube } from "lucide-react";
 import Image from "next/image";
 import { userProfileSchema } from "@/lib/profile/zod-validation";
+import { useRouter } from "next/navigation";
+import { useUser } from "@/utils/context/user-context";
 
 function ProfilePage() {
+  const { user, isLoading, triggerRefresh } = useUser(); // Use the context hook
+  const router = useRouter();
 
-  // default user template for resetting state
-  const defaultUser = useMemo<UserProfile>(() => ({
-    _id: "",
-    email: "",
-    name: "",
-    bio: "",
-    skills: [],
-    education: [],
-    experience: [],
-    certification: [],
-    socialLinks: [],
-    profilePicture: "",
-    resume: "",
-    age: 0,
-    designation: "",
-    dob: "",
-    mobile: {
-      countryCode: "+91",
-      number: ""
-    },
-    location: {
-      country: "",
-      state: "",
-      city: "",
-      address: ""
-    },
-  }), []);
-
-
-  const [user, setUser] = useState<UserProfile>(defaultUser);
+  const [localUser, setLocalUser] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [skillInput, setSkillInput] = useState<string>("");
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<z.ZodError | null>(null);
 
-  // using to fetch api and store in user state 
+  // Sync context user with local state for editing
   useEffect(() => {
-    async function fetchUser() {
-      try {
-        setIsLoading(true);
-        const response = await getUserProfile();
-        setUser(response?.data?.data || defaultUser);
-      } catch {
-        setUser(defaultUser);
-      } finally {
-        setIsLoading(false);
-      }
+    if (user) {
+      setLocalUser(user);
     }
-    fetchUser();
-  }, [defaultUser]);
+  }, [user]);
 
-  // handle input change for text inputs
+  // Handle redirection if user is null after initial load
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push("/login");
+    }
+  }, [isLoading, user, router]);
+
+  // Handle input change for text inputs
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setUser((prev) => ({ ...prev, [name]: value }));
+    setLocalUser((prev) => (prev ? { ...prev, [name]: value } : prev));
   };
 
   // handle input change for file inputs
@@ -82,14 +54,14 @@ function ProfilePage() {
     }
   };
 
-
   const handleNestedChange = (
     section: keyof UserProfile,
     field: string,
     value: string,
     index?: number
   ) => {
-    setUser((prev) => {
+    setLocalUser((prev) => {
+      if (!prev) return null;
       if (typeof prev[section] === 'object' && prev[section] !== null && !Array.isArray(prev[section])) {
         // Handle nested objects like mobile and location
         return {
@@ -98,7 +70,7 @@ function ProfilePage() {
         };
       } else if (Array.isArray(prev[section]) && index !== undefined) {
         // Handle arrays of objects like education, experience, etc.
-        const updatedArray = (prev[section] as Education[] | Certification[] | Experience[] | SocialLink[] ).map((item, i) =>
+        const updatedArray = (prev[section] as Education[] | Certification[] | Experience[] | SocialLink[]).map((item, i) =>
           i === index ? { ...item, [field]: value } : item
         );
         return { ...prev, [section]: updatedArray };
@@ -109,15 +81,16 @@ function ProfilePage() {
 
   // add new item to array for education, experience, certification and socialLinks and also updating state
   const addArrayItem = (section: keyof UserProfile, template: Education | Certification | Experience | SocialLink) => {
-    setUser((prev) => ({
+    setLocalUser((prev) => (prev ? {
       ...prev,
       [section]: [...(prev[section] as Education[] | Certification[] | Experience[] | SocialLink[]), template],
-    }));
+    } : prev));
   };
 
   // remove items from array for education, experience, certification and socialLinks and also updating state on basis of index 
   const removeArrayItem = (section: keyof UserProfile, index: number) => {
-    setUser((prev) => {
+    setLocalUser((prev) => {
+      if (!prev) return null;
       const updatedArray = [...(prev[section] as Education[] | Certification[] | Experience[] | SocialLink[])];
       updatedArray.splice(index, 1);
       return { ...prev, [section]: updatedArray };
@@ -127,111 +100,97 @@ function ProfilePage() {
   // handle adding skills to skills array in user state
   const handleAddSkill = () => {
     if (skillInput.trim() !== "") {
-      setUser((prev) => ({
+      setLocalUser((prev) => (prev ? {
         ...prev,
         skills: [...prev.skills, skillInput.trim()],
-      }));
+      } : prev));
       setSkillInput("");
-    }
-    else {
+    } else {
       alert("Skill cannot be empty");
     }
   };
 
   // handle removing skills from skills array in user state on basis of index
   const handleRemoveSkill = (index: number) => {
-    setUser((prev) => {
+    setLocalUser((prev) => {
+      if (!prev) return null;
       const updatedSkills = [...prev.skills];
       updatedSkills.splice(index, 1);
       return { ...prev, skills: updatedSkills };
     });
   };
 
+  // when user save the profile change 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!localUser) return;
 
     try {
-        // Create a new object to hold the data to be sent to the backend.
-        // This will now include empty arrays.
-        const userUpdateData: Partial<UserProfile> = {
-            name: user.name,
-            bio: user.bio,
-            designation: user.designation,
-            mobile: {
-                countryCode: user.mobile.countryCode,
-                number: user.mobile.number,
-            },
-            location: {
-                country: user.location.country,
-                state: user.location.state,
-                city: user.location.city,
-                address: user.location.address,
-            },
-            skills: user.skills.filter((skill) => skill.trim() !== ""),
-            // Keep the empty array if the user deleted all items
-            education: user.education.filter(
-                (edu) => edu.degree || edu.institution
-            ),
-            experience: user.experience.filter(
-                (exp) => exp.position || exp.company
-            ),
-            certification: user.certification.filter(
-                (cert) => cert.certificate || cert.company
-            ),
-            socialLinks: user.socialLinks.filter(
-                (link) => link.platform && link.url
-            ),
-        };
+      const userUpdateData: Partial<UserProfile> = {
+        name: localUser.name,
+        bio: localUser.bio,
+        designation: localUser.designation,
+        mobile: {
+          countryCode: localUser.mobile.countryCode,
+          number: localUser.mobile.number,
+        },
+        location: {
+          country: localUser.location.country,
+          state: localUser.location.state,
+          city: localUser.location.city,
+          address: localUser.location.address,
+        },
+        skills: localUser.skills.filter((skill) => skill.trim() !== ""),
+        education: localUser.education.filter(
+          (edu) => edu.degree || edu.institution
+        ),
+        experience: localUser.experience.filter(
+          (exp) => exp.position || exp.company
+        ),
+        certification: localUser.certification.filter(
+          (cert) => cert.certificate || cert.company
+        ),
+        socialLinks: localUser.socialLinks.filter(
+          (link) => link.platform && link.url
+        ),
+      };
 
-        // Append files
-        if (profilePictureFile) {
-            userUpdateData.profilePicture = profilePictureFile;
-        }
-        if (resumeFile) {
-            userUpdateData.resume = resumeFile;
-        }
+      if (profilePictureFile) {
+        userUpdateData.profilePicture = profilePictureFile;
+      }
+      if (resumeFile) {
+        userUpdateData.resume = resumeFile;
+      }
 
-        // Zod validation on the updated data
-        userProfileSchema.parse(userUpdateData);
+      userProfileSchema.parse(userUpdateData);
 
-        setIsLoading(true);
-        
-        // Await the API call
-        await updateUserProfile(userUpdateData);
-
-        setIsEditing(false);
-        setErrors(null);
-
-        // Fetch the updated profile to reflect changes on the UI
-        const response = await getUserProfile();
-        setUser(response?.data?.data || user);
-    } catch (error ) {
-        console.error("Error updating profile:", error);
-        if (error instanceof z.ZodError) {
-            setErrors(error);
-            alert(
-                `Validation failed`);
-        } else {
-            alert("Failed to update profile. Please try again.");
-        }
-    } finally {
-        setIsLoading(false);
+      // You might need to add an `updateUser` function to your context to manage this
+      await updateUserProfile(userUpdateData);
+      
+      triggerRefresh(); // Trigger a refetch from the context
+      setIsEditing(false);
+      setErrors(null);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      if (error instanceof z.ZodError) {
+        setErrors(error);
+        alert(`Validation failed`);
+      } else {
+        alert("Failed to update profile. Please try again.");
+      }
     }
-};
+  };
+
   // handle cancel edits and revert to last saved state
   const handleCancel = () => {
     setIsEditing(false);
     setResumeFile(null);
     setProfilePictureFile(null);
     setErrors(null);
-    setIsLoading(true);
-    getUserProfile()
-      .then(response => setUser(response?.data?.data || defaultUser))
-      .catch(() => setUser(defaultUser))
-      .finally(() => setIsLoading(false));
+    setLocalUser(user); // Revert to the user data from context
   };
 
-  if (isLoading) {
+  if (isLoading || !localUser) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
@@ -242,29 +201,29 @@ function ProfilePage() {
   // determine profile image source
   const profileImageSrc = profilePictureFile
     ? URL.createObjectURL(profilePictureFile)
-    : user.profilePicture
-      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/profilePicture/${user.profilePicture}`
-      : "";
+    : localUser.profilePicture
+    ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/profilePicture/${localUser.profilePicture}`
+    : "";
 
   // determine resume file name
   const resumeFileName = resumeFile
     ? resumeFile.name
-    : user.resume
-      ? typeof user.resume === "string" ? user.resume.split("/").pop() : "N/A"
-      : "N/A";
+    : localUser.resume
+    ? typeof localUser.resume === "string" ? localUser.resume.split("/").pop() : "N/A"
+    : "N/A";
 
- const getErrorMessage = (field: string, errors: ZodError) => {
-  // Return an empty string if there are no errors
-  if (!errors || errors.issues.length === 0) {
-    return "";
-  }
-  // Find the first error in the issues array that matches the field
-  const error = errors.issues.find((e) =>
-    e.path.some((p) => typeof p === "string" && p === field)
-  );
-  // Return the error message or an empty string if no error is found
-  return error ? error.message : "";
-};
+  const getErrorMessage = (field: string, errors: ZodError) => {
+    // Return an empty string if there are no errors
+    if (!errors || errors.issues.length === 0) {
+      return "";
+    }
+    // Find the first error in the issues array that matches the field
+    const error = errors.issues.find((e) =>
+      e.path.some((p) => typeof p === "string" && p === field)
+    );
+    // Return the error message or an empty string if no error is found
+    return error ? error.message : "";
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 text-black">
@@ -339,18 +298,18 @@ function ProfilePage() {
                       <input
                         type="text"
                         name="name"
-                        value={user.name}
+                        value={localUser.name}
                         onChange={handleChange}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         required
                       />
-                      {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage('name',errors)}</p>}
+                      {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage('name', errors)}</p>}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
                       <textarea
                         name="bio"
-                        value={user.bio}
+                        value={localUser.bio}
                         onChange={handleChange}
                         rows={3}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -362,7 +321,7 @@ function ProfilePage() {
                       <input
                         type="text"
                         name="designation"
-                        value={user.designation}
+                        value={localUser.designation}
                         onChange={handleChange}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         placeholder="e.g., Software Engineer"
@@ -371,9 +330,9 @@ function ProfilePage() {
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <h2 className="text-2xl font-bold text-gray-900">{user.name}</h2>
-                    {user.designation && <p className="text-lg text-gray-600">{user.designation}</p>}
-                    {user.bio && <p className="text-gray-700 mt-2">{user.bio}</p>}
+                    <h2 className="text-2xl font-bold text-gray-900">{localUser.name}</h2>
+                    {localUser.designation && <p className="text-lg text-gray-600">{localUser.designation}</p>}
+                    {localUser.bio && <p className="text-gray-700 mt-2">{localUser.bio}</p>}
                   </div>
                 )}
               </div>
@@ -388,7 +347,7 @@ function ProfilePage() {
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-gray-600">
                     <Mail size={16} />
-                    <span>{user.email}</span>
+                    <span>{localUser.email}</span>
                   </div>
                   {isEditing ? (
                     <div className="space-y-2">
@@ -397,14 +356,14 @@ function ProfilePage() {
                         <div className="flex gap-2">
                           <input
                             type="text"
-                            value={user.mobile.countryCode}
+                            value={localUser.mobile.countryCode}
                             onChange={(e) => handleNestedChange("mobile", "countryCode", e.target.value)}
                             className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             placeholder="+91"
                           />
                           <input
                             type="tel"
-                            value={user.mobile.number}
+                            value={localUser.mobile.number}
                             onChange={(e) => handleNestedChange("mobile", "number", e.target.value)}
                             className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             placeholder="Phone number"
@@ -412,10 +371,10 @@ function ProfilePage() {
                         </div>
                       </div>
                     </div>
-                  ) : (user.mobile && user.mobile.number) ? (
+                  ) : (localUser.mobile && localUser.mobile.number) ? (
                     <div className="flex items-center gap-2 text-gray-600">
                       <Phone size={16} />
-                      <span>{user.mobile.countryCode} {user.mobile.number}</span>
+                      <span>{localUser.mobile.countryCode} {localUser.mobile.number}</span>
                     </div>
                   ) : null}
                 </div>
@@ -430,28 +389,28 @@ function ProfilePage() {
                   <div className="space-y-2">
                     <input
                       type="text"
-                      value={user.location.country}
+                      value={localUser.location.country}
                       onChange={(e) => handleNestedChange("location", "country", e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Country"
                     />
                     <input
                       type="text"
-                      value={user.location.state}
+                      value={localUser.location.state}
                       onChange={(e) => handleNestedChange("location", "state", e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="State"
                     />
                     <input
                       type="text"
-                      value={user.location.city}
+                      value={localUser.location.city}
                       onChange={(e) => handleNestedChange("location", "city", e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="City"
                     />
                     <input
                       type="text"
-                      value={user.location.address}
+                      value={localUser.location.address}
                       onChange={(e) => handleNestedChange("location", "address", e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Address"
@@ -459,10 +418,10 @@ function ProfilePage() {
                   </div>
                 ) : (
                   <div className="text-gray-600">
-                    {user.location.address && <p>{user.location.address}</p>}
-                    {user.location.city && <p>{user.location.city}</p>}
-                    {user.location.state && <p>{user.location.state}</p>}
-                    {user.location.country && <p>{user.location.country}</p>}
+                    {localUser.location.address && <p>{localUser.location.address}</p>}
+                    {localUser.location.city && <p>{localUser.location.city}</p>}
+                    {localUser.location.state && <p>{localUser.location.state}</p>}
+                    {localUser.location.country && <p>{localUser.location.country}</p>}
                   </div>
                 )}
               </div>
@@ -486,7 +445,7 @@ function ProfilePage() {
               </div>
               {isEditing ? (
                 <div className="space-y-3">
-                  {user.socialLinks.map((link, index) => (
+                  {localUser.socialLinks.map((link, index) => (
                     <div key={index} className="flex gap-2 items-center">
                       <select
                         value={link.platform}
@@ -522,13 +481,13 @@ function ProfilePage() {
                   ))}
                   {errors && (
                     <p className="text-red-500 text-sm mt-1">
-                      {getErrorMessage("socialLinks",errors)}
+                      {getErrorMessage("socialLinks", errors)}
                     </p>
                   )}
                 </div>
               ) : (
                 <div className="flex gap-4">
-                  {user.socialLinks.map(
+                  {localUser.socialLinks.map(
                     (link, index) =>
                       link.url && (
                         <a
@@ -579,7 +538,7 @@ function ProfilePage() {
                   </button>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {user.skills.map((skill, index) => (
+                  {localUser.skills.map((skill, index) => (
                     <div key={index} className="flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
                       <span>{skill}</span>
                       <button
@@ -593,9 +552,9 @@ function ProfilePage() {
                   ))}
                 </div>
               </div>
-            ) : user.skills.length > 0 ? (
+            ) : localUser.skills.length > 0 ? (
               <div className="flex flex-wrap gap-2">
-                {user.skills.map((skill, index) => (
+                {localUser.skills.map((skill, index) => (
                   <span key={index} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
                     {skill}
                   </span>
@@ -622,9 +581,9 @@ function ProfilePage() {
                 </button>
               )}
             </div>
-            {user.education.length > 0 ? (
+            {localUser.education.length > 0 ? (
               <div className="space-y-4">
-                {user.education.map((edu, index) => (
+                {localUser.education.map((edu, index) => (
                   <div key={index} className="p-4 border border-gray-200 rounded-lg">
                     {isEditing && (
                       <div className="flex justify-end mb-2">
@@ -648,7 +607,7 @@ function ProfilePage() {
                               onChange={(e) => handleNestedChange("education", "degree", e.target.value, index)}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
-                            {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage(`education.${index}.degree`,errors)}</p>}
+                            {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage(`education.${index}.degree`, errors)}</p>}
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Institution</label>
@@ -658,7 +617,7 @@ function ProfilePage() {
                               onChange={(e) => handleNestedChange("education", "institution", e.target.value, index)}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
-                            {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage(`education.${index}.institution`,errors)}</p>}
+                            {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage(`education.${index}.institution`, errors)}</p>}
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
@@ -668,7 +627,7 @@ function ProfilePage() {
                               onChange={(e) => handleNestedChange("education", "startDate", e.target.value, index)}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
-                            {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage(`education.${index}.startDate`,errors)}</p>}
+                            {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage(`education.${index}.startDate`, errors)}</p>}
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
@@ -718,9 +677,9 @@ function ProfilePage() {
                 </button>
               )}
             </div>
-            {user.experience.length > 0 ? (
+            {localUser.experience.length > 0 ? (
               <div className="space-y-4">
-                {user.experience.map((exp, index) => (
+                {localUser.experience.map((exp, index) => (
                   <div key={index} className="p-4 border border-gray-200 rounded-lg">
                     {isEditing && (
                       <div className="flex justify-end mb-2">
@@ -744,7 +703,7 @@ function ProfilePage() {
                               onChange={(e) => handleNestedChange("experience", "position", e.target.value, index)}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
-                            {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage(`experience.${index}.position`,errors)}</p>}
+                            {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage(`experience.${index}.position`, errors)}</p>}
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Company</label>
@@ -754,7 +713,7 @@ function ProfilePage() {
                               onChange={(e) => handleNestedChange("experience", "company", e.target.value, index)}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
-                            {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage(`experience.${index}.company`,errors)}</p>}
+                            {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage(`experience.${index}.company`, errors)}</p>}
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
@@ -764,7 +723,7 @@ function ProfilePage() {
                               onChange={(e) => handleNestedChange("experience", "startDate", e.target.value, index)}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
-                            {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage(`experience.${index}.startDate`,errors)}</p>}
+                            {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage(`experience.${index}.startDate`, errors)}</p>}
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
@@ -823,9 +782,9 @@ function ProfilePage() {
                 </button>
               )}
             </div>
-            {user.certification.length > 0 ? (
+            {localUser.certification.length > 0 ? (
               <div className="space-y-4">
-                {user.certification.map((cert, index) => (
+                {localUser.certification.map((cert, index) => (
                   <div key={index} className="p-4 border border-gray-200 rounded-lg">
                     {isEditing && (
                       <div className="flex justify-end mb-2">
@@ -848,7 +807,7 @@ function ProfilePage() {
                             onChange={(e) => handleNestedChange("certification", "certificate", e.target.value, index)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
-                          {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage(`certification.${index}.certificate`,errors)}</p>}
+                          {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage(`certification.${index}.certificate`, errors)}</p>}
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">Issuing Company</label>
@@ -858,7 +817,7 @@ function ProfilePage() {
                             onChange={(e) => handleNestedChange("certification", "company", e.target.value, index)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
-                          {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage(`certification.${index}.company`,errors)}</p>}
+                          {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage(`certification.${index}.company`, errors)}</p>}
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">Issued By</label>
@@ -868,7 +827,7 @@ function ProfilePage() {
                             onChange={(e) => handleNestedChange("certification", "issuedBy", e.target.value, index)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
-                          {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage(`certification.${index}.issuedBy`,errors)}</p>}
+                          {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage(`certification.${index}.issuedBy`, errors)}</p>}
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">Issue Date</label>
@@ -878,7 +837,7 @@ function ProfilePage() {
                             onChange={(e) => handleNestedChange("certification", "issueDate", e.target.value, index)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
-                          {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage(`certification.${index}.issueDate`,errors)}</p>}
+                          {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage(`certification.${index}.issueDate`, errors)}</p>}
                         </div>
                       </div>
                     ) : (
@@ -921,18 +880,18 @@ function ProfilePage() {
                 {resumeFile && (
                   <p className="text-sm text-gray-500 mt-2">New file selected: {resumeFile.name}</p>
                 )}
-                {user.resume && typeof user.resume === "string" && (
-                  <p className="text-sm text-gray-500 mt-2">Current file: {user.resume.split("/").pop()}</p>
+                {localUser.resume && typeof localUser.resume === "string" && (
+                  <p className="text-sm text-gray-500 mt-2">Current file: {localUser.resume.split("/").pop()}</p>
                 )}
               </div>
-            ) : (user.resume || resumeFile) ? (
+            ) : (localUser.resume || resumeFile) ? (
               <div className="flex items-center gap-2">
                 <FileText size={20} className="text-gray-600" />
                 <span className="text-gray-700">
                   {resumeFileName}
                 </span>
                 <a
-                  href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/resume/${user.resume}`}
+                  href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/resume/${localUser.resume}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="ml-4 flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
