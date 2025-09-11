@@ -1,16 +1,14 @@
 import axios, { AxiosResponse } from 'axios';
 import { UserProfile } from './types';
 
-export const API_BASE_URL = 'https://dev-connect-server-524e.onrender.com';
-
 export async function getUserProfile(): Promise<AxiosResponse<{ status: string; data: UserProfile }>> {
-  return axios.get(`${API_BASE_URL}/devconnect/user/profile`, { withCredentials: true });
+  return axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/devconnect/user/profile`, { withCredentials: true });
 }
 export async function updateUserProfile(profileData: Partial<UserProfile>): Promise<AxiosResponse<UserProfile>> {
   console.log("Data Before Updating User : ", profileData);
-  
+
   const formData = new FormData();
-  
+
   // Handle each field appropriately
   Object.entries(profileData).forEach(([key, value]) => {
     if (Array.isArray(value)) {
@@ -41,30 +39,40 @@ export async function updateUserProfile(profileData: Partial<UserProfile>): Prom
       formData.append(key, String(value));
     }
   });
-  
-  return axios.patch(`${API_BASE_URL}/devconnect/user/update-user`, formData, {
+
+  return axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/devconnect/user/update-user`, formData, {
     withCredentials: true,
     headers: {
       'Content-Type': 'multipart/form-data'
     }
   });
 }
-export async function resetUserPassword(
-  newPassword: string, 
+export async function setNewPassword(
+  newPassword: string,
   resetToken: string
 ): Promise<AxiosResponse<{ message: string }>> {
   return axios.patch(
-    `${API_BASE_URL}/devconnect/user/set-new-password`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/devconnect/user/set-new-password`,
     { newPassword, resetToken },
     { withCredentials: true }
   );
 }
-export async function loginUser(
-  email: string, 
-  password: string
+export async function resetUserPassword(
+  oldPassword: string,
+  newPassword: string
 ): Promise<AxiosResponse<{ message: string }>> {
   return axios.patch(
-    `${API_BASE_URL}/devconnect/auth/login`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/devconnect/user/reset-password`,
+    { oldPassword, newPassword },
+    { withCredentials: true }
+  );
+}
+export async function loginUser(
+  email: string,
+  password: string
+): Promise<AxiosResponse<{ message: string }>> {
+  return axios.post(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/devconnect/auth/login`,
     { email, password },
     { withCredentials: true }
   );
@@ -73,7 +81,7 @@ export async function sendOtp(
   email: string
 ): Promise<AxiosResponse<{ message: string }>> {
   return axios.post(
-    `${API_BASE_URL}/devconnect/otp/send-otp`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/devconnect/otp/send-otp`,
     { email },
     { withCredentials: true }
   );
@@ -92,7 +100,7 @@ export async function signUpUserApi(
   password: string
 ): Promise<AxiosResponse<SignUpResponse>> {
   return axios.post(
-    `${API_BASE_URL}/devconnect/auth/sign-up`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/devconnect/auth/sign-up`,
     { name, email, password },
     { withCredentials: true }
   );
@@ -108,15 +116,30 @@ export async function verifyOtp(
   otp: string
 ): Promise<AxiosResponse<VerifyOtpResponse>> {
   return axios.post(
-    `${API_BASE_URL}/devconnect/otp/verify-otp`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/devconnect/otp/verify-otp`,
     { email, otp },
     { withCredentials: true }
   );
 }
 export async function logoutUser(): Promise<AxiosResponse<{ message: string }>> {
   return axios.post(
-    `${API_BASE_URL}/devconnect/auth/logout`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/devconnect/auth/logout`,
     {},
     { withCredentials: true }
+  );
+}
+interface deleteUserResponse {
+  message: string;
+}
+
+export async function deleteUser(
+  password: string
+): Promise<AxiosResponse<deleteUserResponse>> {
+  return axios.delete(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/devconnect/user/delete`,
+    {
+      data: { password },
+      withCredentials: true
+    }
   );
 }

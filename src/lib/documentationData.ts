@@ -292,4 +292,87 @@ export const apiDocumentation: ApiGroup[] = [
       },
     ],
   },
+  {
+    title: 'Connections API',
+    endpoints: [
+      {
+        path: '/list-connections',
+        method: 'POST',
+        description: 'Retrieve connections based on their status.',
+        authentication: 'Bearer Token',
+        contentType: 'application/json',
+        requiredFields: [],
+        optionalFields: {
+          status: 'Filter connections by status. Values: `accepted`, `rejected`, `pending`, `blocked`. Default: `pending`'
+        },
+        requestExample: {
+          status: 'accepted'
+        },
+        responseExample: {
+          success: true,
+          connections: [
+            {
+              toUserId: '507f1f77bcf86cd799439011',
+              fromUserId: '507f191e810c19729de860ea',
+              status: 'accepted'
+            },
+            {
+              toUserId: '507f1f77bcf86cd799439012',
+              fromUserId: '507f191e810c19729de860eb',
+              status: 'accepted'
+            }
+          ]
+        }
+      },
+      {
+        path: '/send-connection-request',
+        method: 'POST',
+        description: 'Send a connection request to another user by their username.',
+        authentication: 'Bearer Token',
+        contentType: 'application/json',
+        requiredFields: ['toUserName'],
+        optionalFields: {},
+        requestExample: {
+          toUserName: 'john_doe'
+        },
+        responseExample: {
+          success: true,
+          message: 'Connection request sent to john_doe'
+        }
+      },
+      {
+        path: '/received-connection-request',
+        method: 'POST',
+        description: 'Accept, reject, or block a received connection request.',
+        authentication: 'Bearer Token',
+        contentType: 'application/json',
+        requiredFields: ['fromUserName', 'action'],
+        optionalFields: {},
+        requestExample: {
+          fromUserName: 'jane_doe',
+          action: 'accepted'
+        },
+        responseExample: {
+          success: true,
+          message: "You have accepted jane_doe's request"
+        }
+      },
+      {
+        path: '/block-connection',
+        method: 'POST',
+        description: 'Block a user to prevent any future connection requests.',
+        authentication: 'Bearer Token',
+        contentType: 'application/json',
+        requiredFields: ['userName'],
+        optionalFields: {},
+        requestExample: {
+          userName: 'spam_account'
+        },
+        responseExample: {
+          success: true,
+          message: 'User spam_account has been blocked'
+        }
+      }
+    ]
+  }
 ];

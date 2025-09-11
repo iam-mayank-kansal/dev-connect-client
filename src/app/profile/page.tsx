@@ -1,6 +1,6 @@
 "use client";
 
-import { API_BASE_URL, getUserProfile, updateUserProfile } from "@/lib/api";
+import { getUserProfile, updateUserProfile } from "@/lib/api";
 import { Certification, Education, Experience, SocialLink, UserProfile } from "@/lib/types";
 import { useEffect, useState, useMemo } from "react";
 import { z, ZodError } from "zod";
@@ -243,7 +243,7 @@ function ProfilePage() {
   const profileImageSrc = profilePictureFile
     ? URL.createObjectURL(profilePictureFile)
     : user.profilePicture
-      ? `${API_BASE_URL}/uploads/profilePicture/${user.profilePicture}`
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/profilePicture/${user.profilePicture}`
       : "";
 
   // determine resume file name
@@ -932,7 +932,7 @@ function ProfilePage() {
                   {resumeFileName}
                 </span>
                 <a
-                  href={`${API_BASE_URL}/uploads/resume/${user.resume}`}
+                  href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/resume/${user.resume}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="ml-4 flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"

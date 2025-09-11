@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Mail, ArrowLeft, ShieldCheck } from 'lucide-react';
-import axios, { AxiosError } from "axios"; // ✅ Import AxiosError
+import { AxiosError } from "axios"; 
 import { useRouter } from "next/navigation";
 import { sendOtp } from "@/lib/api";
 

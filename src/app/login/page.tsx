@@ -1,12 +1,12 @@
 'use client';
 import Link from "next/link";
 import { useState, FormEvent } from "react";
-import axios, { AxiosResponse, AxiosError } from 'axios'; // ✅ FIXED: Added AxiosError
+import { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
 import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
-import { LoginResponse } from "@/utils/interface";
 import { useRouter } from "next/navigation";
 import { loginUser } from "@/lib/api";
+import { useUser } from "@/utils/context/user-context";
 
 export default function LoginPage() {
   const [email, setEmail] = useState<string>('iam.mayank.kansal.01@gmail.com');
@@ -15,7 +15,8 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [errors, setErrors] = useState<{ email?: string, password?: string }>({});
 
-  const router = useRouter()
+  const router = useRouter();
+  const { triggerRefresh } = useUser(); 
 
   const validateForm = () => {
     const newErrors: { email?: string, password?: string } = {};
@@ -35,7 +36,8 @@ export default function LoginPage() {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
- async function handleSubmit(e: FormEvent<HTMLFormElement>): Promise<void> {
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
 
     if (!validateForm()) {
@@ -45,8 +47,12 @@ export default function LoginPage() {
 
     try {
       const response = await loginUser(email, password);
+      console.log(response)
 
       if (response.status === 200 || response.status === 201) {
+        // Trigger refresh to fetch user profile data
+        triggerRefresh();
+               
         toast.success(response.data.message || 'Login successful!');
         setEmail('');
         setPassword('');
@@ -71,7 +77,7 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen  items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 text-black">
+    <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 text-black">
       <form
         className="bg-white shadow-xl rounded-xl p-8 w-full max-w-md space-y-6 border border-gray-100"
         onSubmit={handleSubmit}

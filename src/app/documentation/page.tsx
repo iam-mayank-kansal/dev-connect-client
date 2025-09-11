@@ -128,7 +128,7 @@ export default function DocumentationPage() {
   return (
     <div className="bg-gray-100 min-h-screen">
       <main className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row gap-8">
-        <aside className="w-full lg:w-64 bg-white rounded-lg shadow-md p-6 sticky top-24 self-start">
+        <aside className="w-full lg:w-64 bg-white rounded-lg shadow-md p-6 sticky top-24 self-start h-[80vh] overflow-y-scroll">
           <h3 className="text-lg font-bold mb-4 text-gray-800">API Groups</h3>
           <nav>
             {apiDocumentation.map((group) => (

@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
-import { getUserProfile } from "@/utils/helper/auth";
 import {
   ChevronDown,
   Code,
@@ -12,42 +11,29 @@ import {
   User,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import { useUser } from "@/utils/context/user-context";
 import { logoutUser } from "@/lib/api";
 
 export default function Navbar() {
-  const [user, setUser] = useState<{ name?: string; email?: string } | null>(null);
+  const { user, logout, isLoading } = useUser();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
   const router = useRouter();
 
-  // Fetch user profile on mount  
-  useEffect(() => {
-    async function fetchUser() {
-      try {
-        const response = await getUserProfile();
-        setUser(response.data || null);
-      } catch {
-        setUser(null);
-      }
-    }
-    fetchUser();
-  }, []);
-
-async function handleLogOut() {
-  try {
-    await logoutUser(); 
+  async function handleLogOut() {
+    await logoutUser();
+    logout();
     router.push("/login");
-  } catch (error) {
-    console.error("Logout failed", error);
   }
-}
+
   // Close dropdown on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setDropdownOpen(false);
       }
     }
@@ -55,18 +41,40 @@ async function handleLogOut() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, [dropdownOpen]);
 
+  // Handle case where user state is still loading
+  if (isLoading) {
+    // Optionally return a loading state or a simpler navbar
+    return (
+      <nav className="w-full bg-white shadow-md border-b border-gray-100 flex justify-between items-center py-3 px-6 sticky top-0 z-50">
+        <Link href="/" className="flex items-center text-blue-700 font-bold text-2xl mr-10">
+          <Code size={28} className="mr-2" />
+          Devconnect
+        </Link>
+        <div className="flex items-center gap-4">
+          <div className="animate-pulse h-10 w-24 bg-gray-200 rounded-lg"></div>
+        </div>
+      </nav>
+    );
+  }
+
   return (
     <>
       <nav className="w-full bg-white shadow-md border-b border-gray-100 flex justify-between items-center py-3 px-6 sticky top-0 z-50">
         {/* Logo and Main Navigation */}
-        <Link href="/" className="flex items-center text-blue-700 font-bold text-2xl mr-10">
+        <Link
+          href="/"
+          className="flex items-center text-blue-700 font-bold text-2xl mr-10"
+        >
           <Code size={28} className="mr-2" />
           Devconnect
         </Link>
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-6">
-          <Link href="/documentation" className="text-gray-700 hover:text-blue-600 font-medium flex items-center transition">
+          <Link
+            href="/documentation"
+            className="text-gray-700 hover:text-blue-600 font-medium flex items-center transition"
+          >
             <BookOpen size={18} className="mr-1" />
             Documentation
           </Link>
@@ -102,14 +110,23 @@ async function handleLogOut() {
                 <span className="text-gray-700 font-medium hidden sm:block">
                   {user.name || "User"}
                 </span>
-                <ChevronDown size={16} className={`transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown
+                  size={16}
+                  className={`transition-transform ${
+                    dropdownOpen ? "rotate-180" : ""
+                  }`}
+                />
               </button>
 
               {dropdownOpen && (
                 <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg z-10 border border-gray-200 animate-fade-in">
                   <div className="px-4 py-3 border-b border-gray-100">
-                    <p className="font-semibold text-gray-800">{user.name || "User"}</p>
-                    <p className="text-sm text-gray-500 truncate">{user.email || ""}</p>
+                    <p className="font-semibold text-gray-800">
+                      {user.name || "User"}
+                    </p>
+                    <p className="text-sm text-gray-500 truncate">
+                      {user.email || ""}
+                    </p>
                   </div>
                   <div className="p-2">
                     <Link
@@ -132,7 +149,7 @@ async function handleLogOut() {
                   <div className="p-2 border-t border-gray-100">
                     <button
                       className="flex cursor-pointer items-center w-full px-3 py-2 text-red-600 hover:bg-red-50 rounded-md transition"
-                      onClick={() => handleLogOut()}
+                      onClick={handleLogOut}
                     >
                       <LogOut size={16} className="mr-2" />
                       Logout
@@ -149,11 +166,26 @@ async function handleLogOut() {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               {mobileMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
               )}
             </svg>
           </button>
@@ -221,7 +253,7 @@ async function handleLogOut() {
                     className="block py-2 text-red-600 font-medium"
                     onClick={() => {
                       setMobileMenuOpen(false);
-                      // handle logout
+                      handleLogOut();
                     }}
                   >
                     Logout
@@ -232,8 +264,6 @@ async function handleLogOut() {
           </div>
         )}
       </nav>
-
-
     </>
   );
 }

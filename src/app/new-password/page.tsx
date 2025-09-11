@@ -2,9 +2,9 @@
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import { Eye, EyeOff, Lock, KeyRound } from 'lucide-react';
-import { resetUserPassword } from "@/lib/api";
+import { setNewPassword } from "@/lib/api";
 
 // A wrapper component to handle the Suspense boundary.
 // This is required because useSearchParams is a client-side hook
@@ -66,7 +66,7 @@ function SetNewPasswordContent() {
 
     setLoading(true);
     try {
-      const res = await resetUserPassword(password, token);
+      const res = await setNewPassword(password, token);
 
       toast.success(res.data.message || "Password reset successfully!");
       setTimeout(() => router.push("/login"), 1500);
