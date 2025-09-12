@@ -9,6 +9,8 @@ import {
   Settings,
   LogOut,
   User,
+  Group,
+  Users,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/utils/context/user-context";
@@ -70,14 +72,28 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-6">
-          <Link
-            href="/documentation"
-            className="text-gray-700 hover:text-blue-600 font-medium flex items-center transition"
-          >
-            <BookOpen size={18} className="mr-1" />
-            Documentation
-          </Link>
+        <div className="flex items-center gap-10">
+          {/* documentation  */}
+          <div className="hidden md:flex items-center space-x-6">
+            <Link
+              href="/documentation"
+              className="text-gray-700 hover:text-blue-600 font-medium flex items-center transition"
+            >
+              <BookOpen size={18} className="mr-1" />
+              Documentation
+            </Link>
+          </div>
+
+          {/* connections  */}
+          <div className="hidden md:flex items-center space-x-6">
+            <Link
+              href="/connections"
+              className="text-gray-700 hover:text-blue-600 font-medium flex items-center transition"
+            >
+              <Users size={18} className="mr-1" />
+              Connections
+            </Link>
+          </div>
         </div>
 
         {/* Right side - Auth buttons or User dropdown */}
@@ -112,9 +128,8 @@ export default function Navbar() {
                 </span>
                 <ChevronDown
                   size={16}
-                  className={`transition-transform ${
-                    dropdownOpen ? "rotate-180" : ""
-                  }`}
+                  className={`transition-transform ${dropdownOpen ? "rotate-180" : ""
+                    }`}
                 />
               </button>
 
