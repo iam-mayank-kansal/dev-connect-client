@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import { UserProfile } from './types';
+import { deleteUserResponse, UserProfile } from './types';
 
 export async function getUserProfile(): Promise<AxiosResponse<{ status: string; data: UserProfile }>> {
   return axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/devconnect/user/profile`, { withCredentials: true });
@@ -128,10 +128,6 @@ export async function logoutUser(): Promise<AxiosResponse<{ message: string }>> 
     { withCredentials: true }
   );
 }
-interface deleteUserResponse {
-  message: string;
-}
-
 export async function deleteUser(
   password: string
 ): Promise<AxiosResponse<deleteUserResponse>> {

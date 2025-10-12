@@ -72,3 +72,7 @@ export interface ApiGroup {
   title: string;
   endpoints: Endpoint[];
 }
+
+export interface deleteUserResponse {
+  message: string;
+}

@@ -1,37 +1,22 @@
-// src/components/connections/UserFeedItem.tsx
-"use client"
+"use client";
 import React, { useState } from 'react';
 import { MoreVertical } from 'lucide-react';
-
-interface User {
-  id: number;
-  name: string;
-  title: string;
-  avatar: string;
-}
-
-interface Action {
-  label: string;
-  onClick: () => void;
-  primary?: boolean;
-}
-
-interface UserFeedItemProps {
-  user: User;
-  actions: Action[];
-  showMoreOptions?: boolean; // New optional prop
-}
+import { getImageUrl } from '@/lib/utils';
+import { UserFeedItemProps } from '@/lib/types/connection';
+import { useConnections } from '@/hooks/useConnections';
 
 const UserFeedItem: React.FC<UserFeedItemProps> = ({ user, actions, showMoreOptions = false }) => {
+
+  const {deleteConnection, handleBlockAndUnblock} = useConnections()
   const [showMenu, setShowMenu] = useState(false);
 
   return (
     <div className="relative flex items-center justify-between p-4 bg-white rounded-lg shadow-sm transition-shadow hover:shadow-md">
       <div className="flex items-center space-x-4">
         <img
-          src={user.avatar}
+          src={getImageUrl(user.avatar, "profilePicture")}
           alt={user.name}
-          className="w-12 h-12 rounded-full ring-2 ring-gray-200"
+          className="w-12 h-12 rounded-full object-cover ring-2 ring-gray-200"
         />
         <div>
           <h3 className="text-lg font-semibold text-gray-900">{user.name}</h3>
@@ -58,10 +43,10 @@ const UserFeedItem: React.FC<UserFeedItemProps> = ({ user, actions, showMoreOpti
               <MoreVertical size={20} />
             </button>
             {showMenu && (
-              <div className="absolute top-8 right-0 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-10">
+              <div className="absolute gettop-8 right-0 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-10">
                 <button
                   onClick={() => {
-                    console.log('User blocked');
+                    handleBlockAndUnblock(user.id, 'block');
                     setShowMenu(false);
                   }}
                   className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -70,7 +55,7 @@ const UserFeedItem: React.FC<UserFeedItemProps> = ({ user, actions, showMoreOpti
                 </button>
                 <button
                   onClick={() => {
-                    console.log('User removed');
+                    deleteConnection(user.id);
                     setShowMenu(false);
                   }}
                   className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"

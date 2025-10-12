@@ -2,13 +2,14 @@
 
 import { updateUserProfile } from "@/lib/api";
 import { Certification, Education, Experience, SocialLink, UserProfile } from "@/lib/types";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { z, ZodError } from "zod";
 import { Edit, Save, X, Mail, Phone, MapPin, Briefcase, BookOpen, Award, Github, Linkedin, Download, User, Code, FileText, Globe, Plus, Trash2, Instagram, Twitter, Youtube } from "lucide-react";
 import Image from "next/image";
 import { userProfileSchema } from "@/lib/profile/zod-validation";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/utils/context/user-context";
+import { getImageUrl } from "@/lib/utils";
 
 function ProfilePage() {
   const { user, isLoading, triggerRefresh } = useUser(); // Use the context hook
@@ -166,7 +167,7 @@ function ProfilePage() {
 
       // You might need to add an `updateUser` function to your context to manage this
       await updateUserProfile(userUpdateData);
-      
+
       triggerRefresh(); // Trigger a refetch from the context
       setIsEditing(false);
       setErrors(null);
@@ -202,15 +203,15 @@ function ProfilePage() {
   const profileImageSrc = profilePictureFile
     ? URL.createObjectURL(profilePictureFile)
     : localUser.profilePicture
-    ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/profilePicture/${localUser.profilePicture}`
-    : "";
+      ? getImageUrl(localUser.profilePicture, "profilePicture")
+      : "";
 
   // determine resume file name
   const resumeFileName = resumeFile
     ? resumeFile.name
     : localUser.resume
-    ? typeof localUser.resume === "string" ? localUser.resume.split("/").pop() : "N/A"
-    : "N/A";
+      ? typeof localUser.resume === "string" ? localUser.resume.split("/").pop() : "N/A"
+      : "N/A";
 
   const getErrorMessage = (field: string, errors: ZodError) => {
     // Return an empty string if there are no errors

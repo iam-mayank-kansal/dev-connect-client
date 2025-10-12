@@ -21,6 +21,6 @@ export const formatDatePeriod = (startDateString, endDateString) => {
     return `${start} - ${end}`;
 };
 
-export const getProfilePictureUrl = (fileName) => {
-    return `http://localhost:8080/devconnect/uploads/${fileName}`;
-};
+export const getImageUrl = (fileName, dir) => {
+    return `${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${dir}/${fileName}`;
+}

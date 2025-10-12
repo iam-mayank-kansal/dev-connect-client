@@ -1,22 +1,10 @@
-// src/components/connections/UserCard.tsx
 "use client";
 import React, { useState } from 'react';
 import { MoreVertical, UserPlus } from 'lucide-react';
+import { getImageUrl } from '@/lib/utils';
+import { UserCardProps } from '@/lib/types/connection';
 
-interface User {
-  id: number;
-  name: string;
-  title: string;
-  avatar: string;
-}
-
-interface UserCardProps {
-  user: User;
-  onConnect: (id: number) => void;
-  onNotInterested: (id: number) => void;
-}
-
-const UserCard: React.FC<UserCardProps> = ({ user, onConnect, onNotInterested }) => {
+const UserCard: React.FC<UserCardProps> = ({ user, onConnect, onNotInterested ,onHandleBlock}) => {
   const [showMenu, setShowMenu] = useState(false);
 
   return (
@@ -24,7 +12,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onConnect, onNotInterested })
       <div className="flex justify-between items-start">
         <div className="flex items-center space-x-4">
           <img
-            src={user.avatar}
+            src={getImageUrl(user.avatar, "profilePicture")}
             alt={user.name}
             className="w-16 h-16 rounded-full object-cover ring-2 ring-gray-200"
           />
@@ -34,7 +22,6 @@ const UserCard: React.FC<UserCardProps> = ({ user, onConnect, onNotInterested })
           </div>
         </div>
         
-        {/* 3-dot menu */}
         <div className="relative z-10">
           <button
             onClick={() => setShowMenu(!showMenu)}
@@ -46,7 +33,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onConnect, onNotInterested })
             <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
               <button
                 onClick={() => {
-                  console.log('User blocked');
+                  onHandleBlock(user.id);
                   setShowMenu(false);
                 }}
                 className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -69,7 +56,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onConnect, onNotInterested })
       
       <button
         onClick={() => onConnect(user.id)}
-        className="mt-5 w-full flex items-center justify-center px-4 py-2.5 rounded-full bg-blue-600 text-white font-semibold shadow-sm hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        className="mt-5 w-full flex items-center justify-center px-4 py-2.5 rounded-full bg-blue-600 text-white font-semibold shadow-sm hover:bg-blue-700 transition-colors"
       >
         <UserPlus size={18} className="mr-2" />
         Connect
