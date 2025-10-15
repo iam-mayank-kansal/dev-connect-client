@@ -10,8 +10,6 @@ import {
   LogOut,
   User,
   Users,
-  Upload,
-  UserPlus,
   CloudUpload,
 } from "lucide-react";
 import { useRouter } from "next/navigation";

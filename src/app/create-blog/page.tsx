@@ -11,7 +11,7 @@ import React,
   SetStateAction
 } from 'react';
 import axios, { AxiosResponse } from 'axios';
-import { UploadCloud, FileText, Video, X, Loader2, CheckCircle, AlertTriangle } from 'lucide-react';
+import { FileText, Video, X, Loader2, CheckCircle, AlertTriangle } from 'lucide-react';
 
 // --- Type Definitions ---
 

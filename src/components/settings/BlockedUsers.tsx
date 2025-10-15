@@ -1,20 +1,12 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { useConnections } from '@/hooks/useConnections';
 import { getImageUrl } from '@/lib/utils';
 import Image from 'next/image';
 
-interface BlockedUser {
-    _id: string;
-    name: string;
-    designation: string;
-    profilePicture: string;
-}
-
 export default function BlockedUsers() {
-    const { connectionData, handleBlockAndUnblock, fetchConnectionData } = useConnections();
+    const { connectionData, handleBlockAndUnblock } = useConnections();
     const [unblockingIds, setUnblockingIds] = useState<Set<string>>(new Set());
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
