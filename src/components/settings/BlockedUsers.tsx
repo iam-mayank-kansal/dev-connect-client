@@ -4,6 +4,7 @@ import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { useConnections } from '@/hooks/useConnections';
 import { getImageUrl } from '@/lib/utils';
+import Image from 'next/image';
 
 interface BlockedUser {
     _id: string;
@@ -110,9 +111,11 @@ export default function BlockedUsers() {
                                 className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                             >
                                 <div className="flex items-center space-x-3 min-w-0 flex-1">
-                                    <img
+                                    <Image
                                         src={getImageUrl(user.profilePicture, "profilePicture")}
                                         alt={user.name}
+                                         width={128}
+                      height={128}
                                         className="w-8 h-8 rounded-full object-cover flex-shrink-0"
                                     />
                                     <div className="min-w-0 flex-1">

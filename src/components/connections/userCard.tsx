@@ -3,17 +3,20 @@ import React, { useState } from 'react';
 import { MoreVertical, UserPlus } from 'lucide-react';
 import { getImageUrl } from '@/lib/utils';
 import { UserCardProps } from '@/lib/types/connection';
+import Image from 'next/image';
 
-const UserCard: React.FC<UserCardProps> = ({ user, onConnect, onNotInterested ,onHandleBlock}) => {
+const UserCard: React.FC<UserCardProps> = ({ user, onConnect, onNotInterested, onHandleBlock }) => {
   const [showMenu, setShowMenu] = useState(false);
 
   return (
     <div className="relative p-5 bg-white rounded-lg shadow-sm border border-gray-200 transition-all duration-300 hover:shadow-lg hover:border-gray-300">
       <div className="flex justify-between items-start">
         <div className="flex items-center space-x-4">
-          <img
+          <Image
             src={getImageUrl(user.avatar, "profilePicture")}
             alt={user.name}
+            width={128}
+            height={128}
             className="w-16 h-16 rounded-full object-cover ring-2 ring-gray-200"
           />
           <div>
@@ -21,7 +24,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onConnect, onNotInterested ,o
             <p className="text-sm text-gray-500 mt-1">{user.title}</p>
           </div>
         </div>
-        
+
         <div className="relative z-10">
           <button
             onClick={() => setShowMenu(!showMenu)}
@@ -53,7 +56,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onConnect, onNotInterested ,o
           )}
         </div>
       </div>
-      
+
       <button
         onClick={() => onConnect(user.id)}
         className="mt-5 w-full flex items-center justify-center px-4 py-2.5 rounded-full bg-blue-600 text-white font-semibold shadow-sm hover:bg-blue-700 transition-colors"

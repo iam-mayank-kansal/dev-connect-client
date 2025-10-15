@@ -9,8 +9,10 @@ import {
   Settings,
   LogOut,
   User,
-  Group,
   Users,
+  Upload,
+  UserPlus,
+  CloudUpload,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/utils/context/user-context";
@@ -94,8 +96,21 @@ export default function Navbar() {
               Connections
             </Link>
           </div>
+
+        {/* Blogs  */}
+        <div className="hidden md:flex items-center space-x-6">
+          <Link
+            href="/create-blog"
+            className="text-gray-700 hover:text-blue-600 font-medium flex items-center transition"
+          >
+            <CloudUpload size={18} className="mr-1" />
+            Upload Post
+          </Link>
         </div>
 
+        </div>
+
+        
         {/* Right side - Auth buttons or User dropdown */}
         <div className="flex items-center gap-4">
           {!user ? (
