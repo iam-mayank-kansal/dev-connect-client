@@ -1,11 +1,11 @@
-"use client";
-import React from "react";
-import { Toaster } from "react-hot-toast";
-import { useUser } from "@/utils/context/user-context";
-import ChangePassword from "@/components/settings/ChangePassword";
-import AccountDeactivation from "@/components/settings/AccountDeactivation";
-import BlockedUsers from "@/components/settings/BlockedUsers";
-import IgnoredUsers from "@/components/settings/IgnoredUsers";
+'use client';
+import React from 'react';
+import { Toaster } from 'react-hot-toast';
+import { useUser } from '@/utils/context/user-context';
+import ChangePassword from '@/components/settings/ChangePassword';
+import AccountDeactivation from '@/components/settings/AccountDeactivation';
+import BlockedUsers from '@/components/settings/BlockedUsers';
+import IgnoredUsers from '@/components/settings/IgnoredUsers';
 
 export default function SettingsPage() {
   const { user, isLoading } = useUser();
@@ -30,8 +30,10 @@ export default function SettingsPage() {
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 text-black">
       <Toaster position="top-center" />
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Account Settings</h1>
-        
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">
+          Account Settings
+        </h1>
+
         <div className="space-y-8">
           {/* Security Section */}
           <div className="bg-white shadow rounded-lg">
@@ -46,9 +48,12 @@ export default function SettingsPage() {
           {/* Blocked Users Section */}
           <div className="bg-white shadow rounded-lg">
             <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-800">Blocked Users</h2>
+              <h2 className="text-xl font-semibold text-gray-800">
+                Blocked Users
+              </h2>
               <p className="text-sm text-gray-600 mt-1">
-                Manage users you have blocked. Unblocking will allow them to send you connection requests and messages.
+                Manage users you have blocked. Unblocking will allow them to
+                send you connection requests and messages.
               </p>
             </div>
             <div className="p-6">
@@ -59,9 +64,12 @@ export default function SettingsPage() {
           {/* Ignored Users Section */}
           <div className="bg-white shadow rounded-lg">
             <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-800">Ignored Users</h2>
+              <h2 className="text-xl font-semibold text-gray-800">
+                Ignored Users
+              </h2>
               <p className="text-sm text-gray-600 mt-1">
-                Manage users you have ignored. Unignoring will allow you to send them connection requests.
+                Manage users you have ignored. Unignoring will allow you to send
+                them connection requests.
               </p>
             </div>
             <div className="p-6">
@@ -72,7 +80,9 @@ export default function SettingsPage() {
           {/* Account Management Section */}
           <div className="bg-white shadow rounded-lg">
             <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-800">Account Management</h2>
+              <h2 className="text-xl font-semibold text-gray-800">
+                Account Management
+              </h2>
             </div>
             <div className="p-6">
               <AccountDeactivation />

@@ -1,11 +1,11 @@
-"use client";
-import React, { useState } from "react";
-import { XCircle, ChevronDown, RotateCw } from "lucide-react";
-import toast from "react-hot-toast";
-import { deleteUser } from "@/lib/api";
-import { useUser } from "@/utils/context/user-context";
-import { useRouter } from "next/navigation";
-import ConfirmationModal from "./ConfirmationModal";
+'use client';
+import React, { useState } from 'react';
+import { XCircle, ChevronDown, RotateCw } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { deleteUser } from '@/lib/api';
+import { useUser } from '@/utils/context/user-context';
+import { useRouter } from 'next/navigation';
+import ConfirmationModal from './ConfirmationModal';
 
 export default function AccountDeactivation() {
   const { logout } = useUser();
@@ -16,17 +16,17 @@ export default function AccountDeactivation() {
 
   const handleDeleteAccount = async (password: string) => {
     if (!password) {
-      toast.error("Please enter your password.");
+      toast.error('Please enter your password.');
       return;
     }
     setLoading(true);
     try {
       await deleteUser(password);
       logout();
-      toast.success("Account deleted successfully!");
-      router.push("/");
+      toast.success('Account deleted successfully!');
+      router.push('/');
     } catch {
-      toast.error("Failed to delete account. Please try again.");
+      toast.error('Failed to delete account. Please try again.');
     } finally {
       setLoading(false);
       setShowModal(false);
@@ -44,7 +44,7 @@ export default function AccountDeactivation() {
         </span>
         <ChevronDown
           size={24}
-          className={`transform transition-transform ${open ? "rotate-180" : ""}`}
+          className={`transform transition-transform ${open ? 'rotate-180' : ''}`}
         />
       </button>
 
@@ -59,8 +59,8 @@ export default function AccountDeactivation() {
             disabled={loading}
             className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg text-white transition ${
               loading
-                ? "bg-red-400 cursor-not-allowed"
-                : "bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                ? 'bg-red-400 cursor-not-allowed'
+                : 'bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500'
             }`}
           >
             {loading ? (

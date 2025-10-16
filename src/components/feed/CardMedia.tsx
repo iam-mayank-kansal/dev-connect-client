@@ -12,12 +12,15 @@ interface CardMediaProps {
 }
 
 const CardMedia: FC<CardMediaProps> = ({ photos, videos, onImageClick }) => {
-  const hasMedia = (photos && photos.length > 0) || (videos && videos.length > 0);
+  const hasMedia =
+    (photos && photos.length > 0) || (videos && videos.length > 0);
 
   if (!hasMedia) return null;
 
   return (
-    <div className="w-full aspect-video bg-gray-100 border-2"> {/* <-- KEY FIX: Enforces a consistent aspect ratio */}
+    <div className="w-full aspect-video bg-gray-100 border-2">
+      {' '}
+      {/* <-- KEY FIX: Enforces a consistent aspect ratio */}
       <MediaCarousel>
         {photos?.map((photo) => (
           <div
@@ -25,7 +28,12 @@ const CardMedia: FC<CardMediaProps> = ({ photos, videos, onImageClick }) => {
             className="flex-shrink-0 w-full h-full snap-center cursor-pointer"
             onClick={() => onImageClick(getMediaUrl(photo, 'images'))}
           >
-            <Image src={getMediaUrl(photo, 'images')} alt="Blog content" className="w-full h-full object-cover" /> {/* <-- KEY FIX: Fills the container */}
+            <Image
+              src={getMediaUrl(photo, 'images')}
+              alt="Blog content"
+              className="w-full h-full object-cover"
+            />{' '}
+            {/* <-- KEY FIX: Fills the container */}
           </div>
         ))}
         {videos?.map((video) => (

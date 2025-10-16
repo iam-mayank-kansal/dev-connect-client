@@ -1,25 +1,27 @@
 'use client';
-import Link from "next/link";
-import { useState, FormEvent } from "react";
+import Link from 'next/link';
+import { useState, FormEvent } from 'react';
 import { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
 import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
-import { useRouter } from "next/navigation";
-import { loginUser } from "@/lib/api";
-import { useUser } from "@/utils/context/user-context";
+import { useRouter } from 'next/navigation';
+import { loginUser } from '@/lib/api';
+import { useUser } from '@/utils/context/user-context';
 
 export default function LoginPage() {
   const [email, setEmail] = useState<string>('iam.mayank.kansal.01@gmail.com');
   const [password, setPassword] = useState<string>('Mayank@1234');
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [errors, setErrors] = useState<{ email?: string, password?: string }>({});
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>(
+    {}
+  );
 
   const router = useRouter();
-  const { triggerRefresh } = useUser(); 
+  const { triggerRefresh } = useUser();
 
   const validateForm = () => {
-    const newErrors: { email?: string, password?: string } = {};
+    const newErrors: { email?: string; password?: string } = {};
 
     if (!email) {
       newErrors.email = 'Email is required';
@@ -47,12 +49,12 @@ export default function LoginPage() {
 
     try {
       const response = await loginUser(email, password);
-      console.log(response)
+      console.log(response);
 
       if (response.status === 200 || response.status === 201) {
         // Trigger refresh to fetch user profile data
         triggerRefresh();
-               
+
         toast.success(response.data.message || 'Login successful!');
         setEmail('');
         setPassword('');
@@ -60,7 +62,6 @@ export default function LoginPage() {
       } else {
         toast.error(response.data.message || 'Login failed.');
       }
-
     } catch (err: unknown) {
       const error = err as AxiosError<{ message?: string }>;
 
@@ -83,12 +84,19 @@ export default function LoginPage() {
         onSubmit={handleSubmit}
       >
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-blue-700 mb-2">Welcome Back</h1>
+          <h1 className="text-3xl font-bold text-blue-700 mb-2">
+            Welcome Back
+          </h1>
           <p className="text-gray-600">Sign in to your DevConnect account</p>
         </div>
 
         <div>
-          <label htmlFor="email" className="block mb-2 font-medium text-gray-700">Email</label>
+          <label
+            htmlFor="email"
+            className="block mb-2 font-medium text-gray-700"
+          >
+            Email
+          </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Mail size={18} className="text-gray-400" />
@@ -99,7 +107,7 @@ export default function LoginPage() {
               required
               className={`w-full border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-lg pl-10 pr-3 py-3 focus:outline-none focus:ring-2 focus:ring-blue-300`}
               value={email}
-              onChange={e => {
+              onChange={(e) => {
                 setEmail(e.target.value);
                 if (errors.email) setErrors({ ...errors, email: undefined });
               }}
@@ -116,7 +124,12 @@ export default function LoginPage() {
         </div>
 
         <div>
-          <label htmlFor="password" className="block mb-2 font-medium text-gray-700">Password</label>
+          <label
+            htmlFor="password"
+            className="block mb-2 font-medium text-gray-700"
+          >
+            Password
+          </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Lock size={18} className="text-gray-400" />
@@ -127,9 +140,10 @@ export default function LoginPage() {
               required
               className={`w-full border ${errors.password ? 'border-red-500' : 'border-gray-300'} rounded-lg pl-10 pr-10 py-3 focus:outline-none focus:ring-2 focus:ring-blue-300`}
               value={password}
-              onChange={e => {
+              onChange={(e) => {
                 setPassword(e.target.value);
-                if (errors.password) setErrors({ ...errors, password: undefined });
+                if (errors.password)
+                  setErrors({ ...errors, password: undefined });
               }}
               autoComplete="current-password"
               placeholder="Enter your password"
@@ -139,7 +153,7 @@ export default function LoginPage() {
               className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500 hover:text-blue-700 focus:outline-none"
               onClick={() => setShowPassword((prev) => !prev)}
               tabIndex={-1}
-              aria-label={showPassword ? "Hide password" : "Show password"}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
@@ -173,7 +187,10 @@ export default function LoginPage() {
         <div className="text-center pt-4 border-t border-gray-200">
           <p className="text-sm text-gray-600">
             Don&apos;t have an account?{' '}
-            <Link href="/signup" className="text-blue-600 font-semibold hover:underline ml-1">
+            <Link
+              href="/signup"
+              className="text-blue-600 font-semibold hover:underline ml-1"
+            >
               Sign up
             </Link>
           </p>

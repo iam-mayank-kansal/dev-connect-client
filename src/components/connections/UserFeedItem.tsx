@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import React, { useState } from 'react';
 import { MoreVertical } from 'lucide-react';
 import { getImageUrl } from '@/lib/utils';
@@ -6,19 +6,22 @@ import { UserFeedItemProps } from '@/lib/types/connection';
 import { useConnections } from '@/hooks/useConnections';
 import Image from 'next/image';
 
-const UserFeedItem: React.FC<UserFeedItemProps> = ({ user, actions, showMoreOptions = false }) => {
-
-  const {deleteConnection, handleBlockAndUnblock} = useConnections()
+const UserFeedItem: React.FC<UserFeedItemProps> = ({
+  user,
+  actions,
+  showMoreOptions = false,
+}) => {
+  const { deleteConnection, handleBlockAndUnblock } = useConnections();
   const [showMenu, setShowMenu] = useState(false);
 
   return (
     <div className="relative flex items-center justify-between p-4 bg-white rounded-lg shadow-sm transition-shadow hover:shadow-md">
       <div className="flex items-center space-x-4">
         <Image
-          src={getImageUrl(user.avatar, "profilePicture")}
+          src={getImageUrl(user.avatar, 'profilePicture')}
           alt={user.name}
-           width={128}
-                      height={128}
+          width={128}
+          height={128}
           className="w-12 h-12 rounded-full object-cover ring-2 ring-gray-200"
         />
         <div>
@@ -42,7 +45,10 @@ const UserFeedItem: React.FC<UserFeedItemProps> = ({ user, actions, showMoreOpti
         ))}
         {showMoreOptions && (
           <div className="relative">
-            <button onClick={() => setShowMenu(!showMenu)} className="p-2 text-gray-500 hover:text-gray-800 transition-colors">
+            <button
+              onClick={() => setShowMenu(!showMenu)}
+              className="p-2 text-gray-500 hover:text-gray-800 transition-colors"
+            >
               <MoreVertical size={20} />
             </button>
             {showMenu && (

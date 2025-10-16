@@ -42,7 +42,8 @@ const CodeBlock = ({ title, code }: { title: string; code: string }) => {
           onClick={handleCopy}
           className="text-gray-400 cursor-pointer hover:text-white transition-colors duration-200"
         >
-          <Copy className="inline-block mr-1" size={16} /> {copied ? 'Copied!' : 'Copy'}
+          <Copy className="inline-block mr-1" size={16} />{' '}
+          {copied ? 'Copied!' : 'Copy'}
         </button>
       </div>
       <pre className="p-4 overflow-x-auto text-sm font-mono">
@@ -70,35 +71,50 @@ export default function DocumentationPage() {
         ? JSON.stringify(activeEndpoint.requestExample, null, 2)
         : '// No request body required';
 
-    const responseExampleString = JSON.stringify(activeEndpoint.responseExample, null, 2);
+    const responseExampleString = JSON.stringify(
+      activeEndpoint.responseExample,
+      null,
+      2
+    );
 
     return (
       <div className="flex-1 bg-white rounded-lg shadow-lg p-8">
         <div className="flex items-center gap-4 mb-4">
           <MethodBadge method={activeEndpoint.method} />
-          <h3 className="text-3xl font-bold text-gray-800">{activeEndpoint.path}</h3>
+          <h3 className="text-3xl font-bold text-gray-800">
+            {activeEndpoint.path}
+          </h3>
         </div>
-        <p className="text-gray-600 leading-relaxed mb-6">{activeEndpoint.description}</p>
+        <p className="text-gray-600 leading-relaxed mb-6">
+          {activeEndpoint.description}
+        </p>
         <div className="mb-6 space-y-2">
           <p>
             <span className="font-semibold text-gray-700">Authentication:</span>{' '}
-            <span className="font-semibold text-blue-700">{activeEndpoint.authentication}</span>
-            
+            <span className="font-semibold text-blue-700">
+              {activeEndpoint.authentication}
+            </span>
           </p>
           {activeEndpoint.contentType && (
             <p>
               <span className="font-semibold text-gray-700">Content Type:</span>{' '}
-              <span className="font-semibold text-blue-700">{activeEndpoint.contentType}</span>
+              <span className="font-semibold text-blue-700">
+                {activeEndpoint.contentType}
+              </span>
             </p>
           )}
         </div>
         {activeEndpoint.requiredFields && (
           <>
-            <h4 className="text-xl font-semibold text-gray-700 mt-6 mb-2">Required Fields</h4>
+            <h4 className="text-xl font-semibold text-gray-700 mt-6 mb-2">
+              Required Fields
+            </h4>
             <ul className="list-disc list-inside text-gray-600 mb-6">
               {activeEndpoint.requiredFields.map((field) => (
                 <li key={field}>
-                  <span className="font-mono bg-gray-100 p-1 rounded text-sm">{field}</span>
+                  <span className="font-mono bg-gray-100 p-1 rounded text-sm">
+                    {field}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -106,20 +122,31 @@ export default function DocumentationPage() {
         )}
         {activeEndpoint.optionalFields && (
           <>
-            <h4 className="text-xl font-semibold text-gray-700 mt-6 mb-2">Optional Fields</h4>
+            <h4 className="text-xl font-semibold text-gray-700 mt-6 mb-2">
+              Optional Fields
+            </h4>
             <ul className="list-disc list-inside text-gray-600 mb-6">
-              {Object.entries(activeEndpoint.optionalFields).map(([field, desc]) => (
-                <li key={field}>
-                  <span className="font-mono bg-gray-100 p-1 rounded text-sm">{field}</span>: {desc}
-                </li>
-              ))}
+              {Object.entries(activeEndpoint.optionalFields).map(
+                ([field, desc]) => (
+                  <li key={field}>
+                    <span className="font-mono bg-gray-100 p-1 rounded text-sm">
+                      {field}
+                    </span>
+                    : {desc}
+                  </li>
+                )
+              )}
             </ul>
           </>
         )}
-        <h4 className="text-xl font-semibold text-gray-700 mb-2">Request Body Example</h4>
+        <h4 className="text-xl font-semibold text-gray-700 mb-2">
+          Request Body Example
+        </h4>
         <CodeBlock title="JSON" code={requestExampleString} />
 
-        <h4 className="text-xl font-semibold text-gray-700 mb-2">Response Example</h4>
+        <h4 className="text-xl font-semibold text-gray-700 mb-2">
+          Response Example
+        </h4>
         <CodeBlock title="JSON" code={responseExampleString} />
       </div>
     );
@@ -148,7 +175,9 @@ export default function DocumentationPage() {
                         }`}
                       >
                         <ChevronRight className="text-blue-500" size={16} />
-                        <span className="font-mono text-sm">{endpoint.path}</span>
+                        <span className="font-mono text-sm">
+                          {endpoint.path}
+                        </span>
                       </button>
                     </li>
                   ))}
@@ -159,9 +188,12 @@ export default function DocumentationPage() {
         </aside>
 
         <div className="flex-1">
-          <h1 className="text-4xl font-extrabold text-gray-900 mb-2">DevConnect API Reference</h1>
+          <h1 className="text-4xl font-extrabold text-gray-900 mb-2">
+            DevConnect API Reference
+          </h1>
           <p className="text-gray-500 mb-8 text-xl font-medium">
-            Comprehensive REST API for developer networking and profile management.
+            Comprehensive REST API for developer networking and profile
+            management.
           </p>
           {renderEndpointDetails()}
         </div>

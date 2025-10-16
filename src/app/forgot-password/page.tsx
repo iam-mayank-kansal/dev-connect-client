@@ -1,10 +1,10 @@
 'use client';
-import Link from "next/link";
-import { useState } from "react";
+import Link from 'next/link';
+import { useState } from 'react';
 import { Mail, ArrowLeft, ShieldCheck } from 'lucide-react';
-import { AxiosError } from "axios"; 
-import { useRouter } from "next/navigation";
-import { sendOtp } from "@/lib/api";
+import { AxiosError } from 'axios';
+import { useRouter } from 'next/navigation';
+import { sendOtp } from '@/lib/api';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -13,21 +13,23 @@ export default function ForgotPasswordPage() {
 
   const router = useRouter();
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setError(null);
-  setIsLoading(true);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
 
-  try {
-    await sendOtp(email); 
-    router.push(`/verify-otp?email=${encodeURIComponent(email)}`);
-  } catch (err: unknown) {
-    const error = err as AxiosError<{ message?: string }>;
-    setError(error.response?.data?.message || "Failed to send OTP. Please try again.");
-  } finally {
-    setIsLoading(false);
-  }
-};
+    try {
+      await sendOtp(email);
+      router.push(`/verify-otp?email=${encodeURIComponent(email)}`);
+    } catch (err: unknown) {
+      const error = err as AxiosError<{ message?: string }>;
+      setError(
+        error.response?.data?.message || 'Failed to send OTP. Please try again.'
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <main className="min-h-screen text-black flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
@@ -39,16 +41,22 @@ const handleSubmit = async (e: React.FormEvent) => {
               <ShieldCheck size={32} className="text-blue-600" />
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">Reset Your Password</h1>
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">
+            Reset Your Password
+          </h1>
           <p className="text-gray-600">
-            Enter your email address and we will send you an OTP to reset your password.
+            Enter your email address and we will send you an OTP to reset your
+            password.
           </p>
           {error && <p className="text-red-600 mt-3 font-semibold">{error}</p>}
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="email" className="block mb-2 font-medium text-gray-700">
+            <label
+              htmlFor="email"
+              className="block mb-2 font-medium text-gray-700"
+            >
               Email Address
             </label>
             <div className="relative">
@@ -85,8 +93,11 @@ const handleSubmit = async (e: React.FormEvent) => {
                 >
                   <circle
                     className="opacity-25"
-                    cx="12" cy="12" r="10"
-                    stroke="currentColor" strokeWidth="4"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
                   ></circle>
                   <path
                     className="opacity-75"
@@ -96,7 +107,9 @@ const handleSubmit = async (e: React.FormEvent) => {
                 </svg>
                 Sending OTP...
               </>
-            ) : 'Send OTP'}
+            ) : (
+              'Send OTP'
+            )}
           </button>
         </form>
 

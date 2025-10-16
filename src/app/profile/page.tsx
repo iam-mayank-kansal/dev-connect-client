@@ -1,15 +1,43 @@
-"use client";
+'use client';
 
-import { updateUserProfile } from "@/lib/api";
-import { Certification, Education, Experience, SocialLink, UserProfile } from "@/lib/types";
-import { useEffect, useState } from "react";
-import { z, ZodError } from "zod";
-import { Edit, Save, X, Mail, Phone, MapPin, Briefcase, BookOpen, Award, Github, Linkedin, Download, User, Code, FileText, Globe, Plus, Trash2, Instagram, Twitter, Youtube } from "lucide-react";
-import Image from "next/image";
-import { userProfileSchema } from "@/lib/profile/zod-validation";
-import { useRouter } from "next/navigation";
-import { useUser } from "@/utils/context/user-context";
-import { getImageUrl } from "@/lib/utils";
+import { updateUserProfile } from '@/lib/api';
+import {
+  Certification,
+  Education,
+  Experience,
+  SocialLink,
+  UserProfile,
+} from '@/lib/types';
+import { useEffect, useState } from 'react';
+import { z, ZodError } from 'zod';
+import {
+  Edit,
+  Save,
+  X,
+  Mail,
+  Phone,
+  MapPin,
+  Briefcase,
+  BookOpen,
+  Award,
+  Github,
+  Linkedin,
+  Download,
+  User,
+  Code,
+  FileText,
+  Globe,
+  Plus,
+  Trash2,
+  Instagram,
+  Twitter,
+  Youtube,
+} from 'lucide-react';
+import Image from 'next/image';
+import { userProfileSchema } from '@/lib/profile/zod-validation';
+import { useRouter } from 'next/navigation';
+import { useUser } from '@/utils/context/user-context';
+import { getImageUrl } from '@/lib/utils';
 
 function ProfilePage() {
   const { user, isLoading, triggerRefresh } = useUser(); // Use the context hook
@@ -17,9 +45,11 @@ function ProfilePage() {
 
   const [localUser, setLocalUser] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [skillInput, setSkillInput] = useState<string>("");
+  const [skillInput, setSkillInput] = useState<string>('');
   const [resumeFile, setResumeFile] = useState<File | null>(null);
-  const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
+  const [profilePictureFile, setProfilePictureFile] = useState<File | null>(
+    null
+  );
   const [errors, setErrors] = useState<z.ZodError | null>(null);
 
   // Sync context user with local state for editing
@@ -32,12 +62,14 @@ function ProfilePage() {
   // Handle redirection if user is null after initial load
   useEffect(() => {
     if (!isLoading && !user) {
-      router.push("/login");
+      router.push('/login');
     }
   }, [isLoading, user, router]);
 
   // Handle input change for text inputs
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setLocalUser((prev) => (prev ? { ...prev, [name]: value } : prev));
   };
@@ -47,9 +79,9 @@ function ProfilePage() {
     const { name, files } = e.target;
     if (files && files[0]) {
       const file = files[0];
-      if (name === "profilePicture") {
+      if (name === 'profilePicture') {
         setProfilePictureFile(file);
-      } else if (name === "resume") {
+      } else if (name === 'resume') {
         setResumeFile(file);
       }
     }
@@ -63,7 +95,11 @@ function ProfilePage() {
   ) => {
     setLocalUser((prev) => {
       if (!prev) return null;
-      if (typeof prev[section] === 'object' && prev[section] !== null && !Array.isArray(prev[section])) {
+      if (
+        typeof prev[section] === 'object' &&
+        prev[section] !== null &&
+        !Array.isArray(prev[section])
+      ) {
         // Handle nested objects like mobile and location
         return {
           ...prev,
@@ -71,9 +107,13 @@ function ProfilePage() {
         };
       } else if (Array.isArray(prev[section]) && index !== undefined) {
         // Handle arrays of objects like education, experience, etc.
-        const updatedArray = (prev[section] as Education[] | Certification[] | Experience[] | SocialLink[]).map((item, i) =>
-          i === index ? { ...item, [field]: value } : item
-        );
+        const updatedArray = (
+          prev[section] as
+            | Education[]
+            | Certification[]
+            | Experience[]
+            | SocialLink[]
+        ).map((item, i) => (i === index ? { ...item, [field]: value } : item));
         return { ...prev, [section]: updatedArray };
       }
       return prev;
@@ -81,18 +121,38 @@ function ProfilePage() {
   };
 
   // add new item to array for education, experience, certification and socialLinks and also updating state
-  const addArrayItem = (section: keyof UserProfile, template: Education | Certification | Experience | SocialLink) => {
-    setLocalUser((prev) => (prev ? {
-      ...prev,
-      [section]: [...(prev[section] as Education[] | Certification[] | Experience[] | SocialLink[]), template],
-    } : prev));
+  const addArrayItem = (
+    section: keyof UserProfile,
+    template: Education | Certification | Experience | SocialLink
+  ) => {
+    setLocalUser((prev) =>
+      prev
+        ? {
+            ...prev,
+            [section]: [
+              ...(prev[section] as
+                | Education[]
+                | Certification[]
+                | Experience[]
+                | SocialLink[]),
+              template,
+            ],
+          }
+        : prev
+    );
   };
 
-  // remove items from array for education, experience, certification and socialLinks and also updating state on basis of index 
+  // remove items from array for education, experience, certification and socialLinks and also updating state on basis of index
   const removeArrayItem = (section: keyof UserProfile, index: number) => {
     setLocalUser((prev) => {
       if (!prev) return null;
-      const updatedArray = [...(prev[section] as Education[] | Certification[] | Experience[] | SocialLink[])];
+      const updatedArray = [
+        ...(prev[section] as
+          | Education[]
+          | Certification[]
+          | Experience[]
+          | SocialLink[]),
+      ];
       updatedArray.splice(index, 1);
       return { ...prev, [section]: updatedArray };
     });
@@ -100,14 +160,18 @@ function ProfilePage() {
 
   // handle adding skills to skills array in user state
   const handleAddSkill = () => {
-    if (skillInput.trim() !== "") {
-      setLocalUser((prev) => (prev ? {
-        ...prev,
-        skills: [...prev.skills, skillInput.trim()],
-      } : prev));
-      setSkillInput("");
+    if (skillInput.trim() !== '') {
+      setLocalUser((prev) =>
+        prev
+          ? {
+              ...prev,
+              skills: [...prev.skills, skillInput.trim()],
+            }
+          : prev
+      );
+      setSkillInput('');
     } else {
-      alert("Skill cannot be empty");
+      alert('Skill cannot be empty');
     }
   };
 
@@ -121,7 +185,7 @@ function ProfilePage() {
     });
   };
 
-  // when user save the profile change 
+  // when user save the profile change
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!localUser) return;
@@ -141,7 +205,7 @@ function ProfilePage() {
           city: localUser.location.city,
           address: localUser.location.address,
         },
-        skills: localUser.skills.filter((skill) => skill.trim() !== ""),
+        skills: localUser.skills.filter((skill) => skill.trim() !== ''),
         education: localUser.education.filter(
           (edu) => edu.degree || edu.institution
         ),
@@ -172,12 +236,12 @@ function ProfilePage() {
       setIsEditing(false);
       setErrors(null);
     } catch (error) {
-      console.error("Error updating profile:", error);
+      console.error('Error updating profile:', error);
       if (error instanceof z.ZodError) {
         setErrors(error);
         alert(`Validation failed`);
       } else {
-        alert("Failed to update profile. Please try again.");
+        alert('Failed to update profile. Please try again.');
       }
     }
   };
@@ -203,27 +267,29 @@ function ProfilePage() {
   const profileImageSrc = profilePictureFile
     ? URL.createObjectURL(profilePictureFile)
     : localUser.profilePicture
-      ? getImageUrl(localUser.profilePicture, "profilePicture")
-      : "";
+      ? getImageUrl(localUser.profilePicture, 'profilePicture')
+      : '';
 
   // determine resume file name
   const resumeFileName = resumeFile
     ? resumeFile.name
     : localUser.resume
-      ? typeof localUser.resume === "string" ? localUser.resume.split("/").pop() : "N/A"
-      : "N/A";
+      ? typeof localUser.resume === 'string'
+        ? localUser.resume.split('/').pop()
+        : 'N/A'
+      : 'N/A';
 
   const getErrorMessage = (field: string, errors: ZodError) => {
     // Return an empty string if there are no errors
     if (!errors || errors.issues.length === 0) {
-      return "";
+      return '';
     }
     // Find the first error in the issues array that matches the field
     const error = errors.issues.find((e) =>
-      e.path.some((p) => typeof p === "string" && p === field)
+      e.path.some((p) => typeof p === 'string' && p === field)
     );
     // Return the error message or an empty string if no error is found
-    return error ? error.message : "";
+    return error ? error.message : '';
   };
 
   return (
@@ -295,7 +361,9 @@ function ProfilePage() {
                 {isEditing ? (
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Full Name
+                      </label>
                       <input
                         type="text"
                         name="name"
@@ -304,10 +372,16 @@ function ProfilePage() {
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         required
                       />
-                      {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage('name', errors)}</p>}
+                      {errors && (
+                        <p className="text-red-500 text-sm mt-1">
+                          {getErrorMessage('name', errors)}
+                        </p>
+                      )}
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Bio
+                      </label>
                       <textarea
                         name="bio"
                         value={localUser.bio}
@@ -318,7 +392,9 @@ function ProfilePage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Designation</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Designation
+                      </label>
                       <input
                         type="text"
                         name="designation"
@@ -331,9 +407,17 @@ function ProfilePage() {
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <h2 className="text-2xl font-bold text-gray-900">{localUser.name}</h2>
-                    {localUser.designation && <p className="text-lg text-gray-600">{localUser.designation}</p>}
-                    {localUser.bio && <p className="text-gray-700 mt-2">{localUser.bio}</p>}
+                    <h2 className="text-2xl font-bold text-gray-900">
+                      {localUser.name}
+                    </h2>
+                    {localUser.designation && (
+                      <p className="text-lg text-gray-600">
+                        {localUser.designation}
+                      </p>
+                    )}
+                    {localUser.bio && (
+                      <p className="text-gray-700 mt-2">{localUser.bio}</p>
+                    )}
                   </div>
                 )}
               </div>
@@ -353,29 +437,45 @@ function ProfilePage() {
                   {isEditing ? (
                     <div className="space-y-2">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Mobile</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Mobile
+                        </label>
                         <div className="flex gap-2">
                           <input
                             type="text"
                             value={localUser.mobile.countryCode}
-                            onChange={(e) => handleNestedChange("mobile", "countryCode", e.target.value)}
+                            onChange={(e) =>
+                              handleNestedChange(
+                                'mobile',
+                                'countryCode',
+                                e.target.value
+                              )
+                            }
                             className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             placeholder="+91"
                           />
                           <input
                             type="tel"
                             value={localUser.mobile.number}
-                            onChange={(e) => handleNestedChange("mobile", "number", e.target.value)}
+                            onChange={(e) =>
+                              handleNestedChange(
+                                'mobile',
+                                'number',
+                                e.target.value
+                              )
+                            }
                             className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             placeholder="Phone number"
                           />
                         </div>
                       </div>
                     </div>
-                  ) : (localUser.mobile && localUser.mobile.number) ? (
+                  ) : localUser.mobile && localUser.mobile.number ? (
                     <div className="flex items-center gap-2 text-gray-600">
                       <Phone size={16} />
-                      <span>{localUser.mobile.countryCode} {localUser.mobile.number}</span>
+                      <span>
+                        {localUser.mobile.countryCode} {localUser.mobile.number}
+                      </span>
                     </div>
                   ) : null}
                 </div>
@@ -391,38 +491,62 @@ function ProfilePage() {
                     <input
                       type="text"
                       value={localUser.location.country}
-                      onChange={(e) => handleNestedChange("location", "country", e.target.value)}
+                      onChange={(e) =>
+                        handleNestedChange(
+                          'location',
+                          'country',
+                          e.target.value
+                        )
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Country"
                     />
                     <input
                       type="text"
                       value={localUser.location.state}
-                      onChange={(e) => handleNestedChange("location", "state", e.target.value)}
+                      onChange={(e) =>
+                        handleNestedChange('location', 'state', e.target.value)
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="State"
                     />
                     <input
                       type="text"
                       value={localUser.location.city}
-                      onChange={(e) => handleNestedChange("location", "city", e.target.value)}
+                      onChange={(e) =>
+                        handleNestedChange('location', 'city', e.target.value)
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="City"
                     />
                     <input
                       type="text"
                       value={localUser.location.address}
-                      onChange={(e) => handleNestedChange("location", "address", e.target.value)}
+                      onChange={(e) =>
+                        handleNestedChange(
+                          'location',
+                          'address',
+                          e.target.value
+                        )
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Address"
                     />
                   </div>
                 ) : (
                   <div className="text-gray-600">
-                    {localUser.location.address && <p>{localUser.location.address}</p>}
-                    {localUser.location.city && <p>{localUser.location.city}</p>}
-                    {localUser.location.state && <p>{localUser.location.state}</p>}
-                    {localUser.location.country && <p>{localUser.location.country}</p>}
+                    {localUser.location.address && (
+                      <p>{localUser.location.address}</p>
+                    )}
+                    {localUser.location.city && (
+                      <p>{localUser.location.city}</p>
+                    )}
+                    {localUser.location.state && (
+                      <p>{localUser.location.state}</p>
+                    )}
+                    {localUser.location.country && (
+                      <p>{localUser.location.country}</p>
+                    )}
                   </div>
                 )}
               </div>
@@ -437,7 +561,9 @@ function ProfilePage() {
                 {isEditing && (
                   <button
                     type="button"
-                    onClick={() => addArrayItem("socialLinks", { platform: "", url: "" })}
+                    onClick={() =>
+                      addArrayItem('socialLinks', { platform: '', url: '' })
+                    }
                     className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm font-medium"
                   >
                     <Plus size={16} /> Add Link
@@ -451,7 +577,12 @@ function ProfilePage() {
                       <select
                         value={link.platform}
                         onChange={(e) =>
-                          handleNestedChange("socialLinks", "platform", e.target.value, index)
+                          handleNestedChange(
+                            'socialLinks',
+                            'platform',
+                            e.target.value,
+                            index
+                          )
                         }
                         className="w-40 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       >
@@ -466,14 +597,19 @@ function ProfilePage() {
                         type="url"
                         value={link.url}
                         onChange={(e) =>
-                          handleNestedChange("socialLinks", "url", e.target.value, index)
+                          handleNestedChange(
+                            'socialLinks',
+                            'url',
+                            e.target.value,
+                            index
+                          )
                         }
                         className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         placeholder="https://"
                       />
                       <button
                         type="button"
-                        onClick={() => removeArrayItem("socialLinks", index)}
+                        onClick={() => removeArrayItem('socialLinks', index)}
                         className="p-2 text-red-600 hover:text-red-800 transition-colors"
                       >
                         <Trash2 size={20} />
@@ -482,7 +618,7 @@ function ProfilePage() {
                   ))}
                   {errors && (
                     <p className="text-red-500 text-sm mt-1">
-                      {getErrorMessage("socialLinks", errors)}
+                      {getErrorMessage('socialLinks', errors)}
                     </p>
                   )}
                 </div>
@@ -498,14 +634,22 @@ function ProfilePage() {
                           rel="noopener noreferrer"
                           className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
                         >
-                          {link.platform === "GitHub" && <Github size={20} />}
-                          {link.platform === "LinkedIn" && <Linkedin size={20} />}
-                          {link.platform === "Instagram" && <Instagram size={20} />}
-                          {link.platform === "Twitter" && <Twitter size={20} />}
-                          {link.platform === "Youtube" && <Youtube size={20} />}
-                          {!["GitHub", "LinkedIn", "Instagram", "Twitter", "Youtube"].includes(
-                            link.platform
-                          ) && <Globe size={20} />}
+                          {link.platform === 'GitHub' && <Github size={20} />}
+                          {link.platform === 'LinkedIn' && (
+                            <Linkedin size={20} />
+                          )}
+                          {link.platform === 'Instagram' && (
+                            <Instagram size={20} />
+                          )}
+                          {link.platform === 'Twitter' && <Twitter size={20} />}
+                          {link.platform === 'Youtube' && <Youtube size={20} />}
+                          {![
+                            'GitHub',
+                            'LinkedIn',
+                            'Instagram',
+                            'Twitter',
+                            'Youtube',
+                          ].includes(link.platform) && <Globe size={20} />}
                         </a>
                       )
                   )}
@@ -526,7 +670,7 @@ function ProfilePage() {
                     type="text"
                     value={skillInput}
                     onChange={(e) => setSkillInput(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleAddSkill()}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAddSkill()}
                     className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Type a skill and press Enter"
                   />
@@ -540,7 +684,10 @@ function ProfilePage() {
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {localUser.skills.map((skill, index) => (
-                    <div key={index} className="flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                    <div
+                      key={index}
+                      className="flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                    >
                       <span>{skill}</span>
                       <button
                         type="button"
@@ -556,7 +703,10 @@ function ProfilePage() {
             ) : localUser.skills.length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {localUser.skills.map((skill, index) => (
-                  <span key={index} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                  <span
+                    key={index}
+                    className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                  >
                     {skill}
                   </span>
                 ))}
@@ -575,7 +725,14 @@ function ProfilePage() {
               {isEditing && (
                 <button
                   type="button"
-                  onClick={() => addArrayItem("education", { degree: "", institution: "", startDate: "", endDate: "" })}
+                  onClick={() =>
+                    addArrayItem('education', {
+                      degree: '',
+                      institution: '',
+                      startDate: '',
+                      endDate: '',
+                    })
+                  }
                   className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                 >
                   + Add Education
@@ -585,12 +742,15 @@ function ProfilePage() {
             {localUser.education.length > 0 ? (
               <div className="space-y-4">
                 {localUser.education.map((edu, index) => (
-                  <div key={index} className="p-4 border border-gray-200 rounded-lg">
+                  <div
+                    key={index}
+                    className="p-4 border border-gray-200 rounded-lg"
+                  >
                     {isEditing && (
                       <div className="flex justify-end mb-2">
                         <button
                           type="button"
-                          onClick={() => removeArrayItem("education", index)}
+                          onClick={() => removeArrayItem('education', index)}
                           className="text-red-600 hover:text-red-800 text-sm"
                         >
                           Remove
@@ -601,41 +761,110 @@ function ProfilePage() {
                       {isEditing ? (
                         <>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Degree</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Degree
+                            </label>
                             <input
                               type="text"
                               value={edu.degree}
-                              onChange={(e) => handleNestedChange("education", "degree", e.target.value, index)}
+                              onChange={(e) =>
+                                handleNestedChange(
+                                  'education',
+                                  'degree',
+                                  e.target.value,
+                                  index
+                                )
+                              }
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
-                            {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage(`education.${index}.degree`, errors)}</p>}
+                            {errors && (
+                              <p className="text-red-500 text-sm mt-1">
+                                {getErrorMessage(
+                                  `education.${index}.degree`,
+                                  errors
+                                )}
+                              </p>
+                            )}
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Institution</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Institution
+                            </label>
                             <input
                               type="text"
                               value={edu.institution}
-                              onChange={(e) => handleNestedChange("education", "institution", e.target.value, index)}
+                              onChange={(e) =>
+                                handleNestedChange(
+                                  'education',
+                                  'institution',
+                                  e.target.value,
+                                  index
+                                )
+                              }
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
-                            {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage(`education.${index}.institution`, errors)}</p>}
+                            {errors && (
+                              <p className="text-red-500 text-sm mt-1">
+                                {getErrorMessage(
+                                  `education.${index}.institution`,
+                                  errors
+                                )}
+                              </p>
+                            )}
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Start Date
+                            </label>
                             <input
                               type="date"
-                              value={edu.startDate ? new Date(edu.startDate).toISOString().split("T")[0] : ""}
-                              onChange={(e) => handleNestedChange("education", "startDate", e.target.value, index)}
+                              value={
+                                edu.startDate
+                                  ? new Date(edu.startDate)
+                                      .toISOString()
+                                      .split('T')[0]
+                                  : ''
+                              }
+                              onChange={(e) =>
+                                handleNestedChange(
+                                  'education',
+                                  'startDate',
+                                  e.target.value,
+                                  index
+                                )
+                              }
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
-                            {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage(`education.${index}.startDate`, errors)}</p>}
+                            {errors && (
+                              <p className="text-red-500 text-sm mt-1">
+                                {getErrorMessage(
+                                  `education.${index}.startDate`,
+                                  errors
+                                )}
+                              </p>
+                            )}
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              End Date
+                            </label>
                             <input
                               type="date"
-                              value={edu.endDate ? new Date(edu.endDate).toISOString().split("T")[0] : ""}
-                              onChange={(e) => handleNestedChange("education", "endDate", e.target.value, index)}
+                              value={
+                                edu.endDate
+                                  ? new Date(edu.endDate)
+                                      .toISOString()
+                                      .split('T')[0]
+                                  : ''
+                              }
+                              onChange={(e) =>
+                                handleNestedChange(
+                                  'education',
+                                  'endDate',
+                                  e.target.value,
+                                  index
+                                )
+                              }
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
                           </div>
@@ -643,12 +872,19 @@ function ProfilePage() {
                       ) : (
                         <>
                           <div>
-                            <h4 className="font-medium text-gray-900">{edu.degree}</h4>
+                            <h4 className="font-medium text-gray-900">
+                              {edu.degree}
+                            </h4>
                             <p className="text-gray-600">{edu.institution}</p>
                           </div>
                           <div className="text-gray-600">
                             {edu.startDate && (
-                              <p>{new Date(edu.startDate).toLocaleDateString()} - {edu.endDate ? new Date(edu.endDate).toLocaleDateString() : "Present"}</p>
+                              <p>
+                                {new Date(edu.startDate).toLocaleDateString()} -{' '}
+                                {edu.endDate
+                                  ? new Date(edu.endDate).toLocaleDateString()
+                                  : 'Present'}
+                              </p>
                             )}
                           </div>
                         </>
@@ -658,7 +894,9 @@ function ProfilePage() {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500">No education information added yet.</p>
+              <p className="text-gray-500">
+                No education information added yet.
+              </p>
             )}
           </div>
 
@@ -671,7 +909,15 @@ function ProfilePage() {
               {isEditing && (
                 <button
                   type="button"
-                  onClick={() => addArrayItem("experience", { position: "", company: "", startDate: "", endDate: "", description: "" })}
+                  onClick={() =>
+                    addArrayItem('experience', {
+                      position: '',
+                      company: '',
+                      startDate: '',
+                      endDate: '',
+                      description: '',
+                    })
+                  }
                   className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                 >
                   + Add Experience
@@ -681,12 +927,15 @@ function ProfilePage() {
             {localUser.experience.length > 0 ? (
               <div className="space-y-4">
                 {localUser.experience.map((exp, index) => (
-                  <div key={index} className="p-4 border border-gray-200 rounded-lg">
+                  <div
+                    key={index}
+                    className="p-4 border border-gray-200 rounded-lg"
+                  >
                     {isEditing && (
                       <div className="flex justify-end mb-2">
                         <button
                           type="button"
-                          onClick={() => removeArrayItem("experience", index)}
+                          onClick={() => removeArrayItem('experience', index)}
                           className="text-red-600 hover:text-red-800 text-sm"
                         >
                           Remove
@@ -697,51 +946,129 @@ function ProfilePage() {
                       <div className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Position</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Position
+                            </label>
                             <input
                               type="text"
                               value={exp.position}
-                              onChange={(e) => handleNestedChange("experience", "position", e.target.value, index)}
+                              onChange={(e) =>
+                                handleNestedChange(
+                                  'experience',
+                                  'position',
+                                  e.target.value,
+                                  index
+                                )
+                              }
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
-                            {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage(`experience.${index}.position`, errors)}</p>}
+                            {errors && (
+                              <p className="text-red-500 text-sm mt-1">
+                                {getErrorMessage(
+                                  `experience.${index}.position`,
+                                  errors
+                                )}
+                              </p>
+                            )}
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Company</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Company
+                            </label>
                             <input
                               type="text"
                               value={exp.company}
-                              onChange={(e) => handleNestedChange("experience", "company", e.target.value, index)}
+                              onChange={(e) =>
+                                handleNestedChange(
+                                  'experience',
+                                  'company',
+                                  e.target.value,
+                                  index
+                                )
+                              }
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
-                            {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage(`experience.${index}.company`, errors)}</p>}
+                            {errors && (
+                              <p className="text-red-500 text-sm mt-1">
+                                {getErrorMessage(
+                                  `experience.${index}.company`,
+                                  errors
+                                )}
+                              </p>
+                            )}
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Start Date
+                            </label>
                             <input
                               type="date"
-                              value={exp.startDate ? new Date(exp.startDate).toISOString().split("T")[0] : ""}
-                              onChange={(e) => handleNestedChange("experience", "startDate", e.target.value, index)}
+                              value={
+                                exp.startDate
+                                  ? new Date(exp.startDate)
+                                      .toISOString()
+                                      .split('T')[0]
+                                  : ''
+                              }
+                              onChange={(e) =>
+                                handleNestedChange(
+                                  'experience',
+                                  'startDate',
+                                  e.target.value,
+                                  index
+                                )
+                              }
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
-                            {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage(`experience.${index}.startDate`, errors)}</p>}
+                            {errors && (
+                              <p className="text-red-500 text-sm mt-1">
+                                {getErrorMessage(
+                                  `experience.${index}.startDate`,
+                                  errors
+                                )}
+                              </p>
+                            )}
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              End Date
+                            </label>
                             <input
                               type="date"
-                              value={exp.endDate ? new Date(exp.endDate).toISOString().split("T")[0] : ""}
-                              onChange={(e) => handleNestedChange("experience", "endDate", e.target.value, index)}
+                              value={
+                                exp.endDate
+                                  ? new Date(exp.endDate)
+                                      .toISOString()
+                                      .split('T')[0]
+                                  : ''
+                              }
+                              onChange={(e) =>
+                                handleNestedChange(
+                                  'experience',
+                                  'endDate',
+                                  e.target.value,
+                                  index
+                                )
+                              }
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                               placeholder="Leave empty if current"
                             />
                           </div>
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Description
+                          </label>
                           <textarea
                             value={exp.description}
-                            onChange={(e) => handleNestedChange("experience", "description", e.target.value, index)}
+                            onChange={(e) =>
+                              handleNestedChange(
+                                'experience',
+                                'description',
+                                e.target.value,
+                                index
+                              )
+                            }
                             rows={3}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
@@ -749,21 +1076,32 @@ function ProfilePage() {
                       </div>
                     ) : (
                       <div>
-                        <h4 className="font-medium text-gray-900">{exp.position}</h4>
+                        <h4 className="font-medium text-gray-900">
+                          {exp.position}
+                        </h4>
                         <p className="text-gray-600">{exp.company}</p>
                         {exp.startDate && (
                           <p className="text-gray-500 text-sm mt-1">
-                            {new Date(exp.startDate).toLocaleDateString()} - {exp.endDate ? new Date(exp.endDate).toLocaleDateString() : "Present"}
+                            {new Date(exp.startDate).toLocaleDateString()} -{' '}
+                            {exp.endDate
+                              ? new Date(exp.endDate).toLocaleDateString()
+                              : 'Present'}
                           </p>
                         )}
-                        {exp.description && <p className="text-gray-700 mt-2">{exp.description}</p>}
+                        {exp.description && (
+                          <p className="text-gray-700 mt-2">
+                            {exp.description}
+                          </p>
+                        )}
                       </div>
                     )}
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500">No experience information added yet.</p>
+              <p className="text-gray-500">
+                No experience information added yet.
+              </p>
             )}
           </div>
 
@@ -776,7 +1114,14 @@ function ProfilePage() {
               {isEditing && (
                 <button
                   type="button"
-                  onClick={() => addArrayItem("certification", { company: "", certificate: "", issuedBy: "", issueDate: "" })}
+                  onClick={() =>
+                    addArrayItem('certification', {
+                      company: '',
+                      certificate: '',
+                      issuedBy: '',
+                      issueDate: '',
+                    })
+                  }
                   className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                 >
                   + Add Certification
@@ -786,12 +1131,17 @@ function ProfilePage() {
             {localUser.certification.length > 0 ? (
               <div className="space-y-4">
                 {localUser.certification.map((cert, index) => (
-                  <div key={index} className="p-4 border border-gray-200 rounded-lg">
+                  <div
+                    key={index}
+                    className="p-4 border border-gray-200 rounded-lg"
+                  >
                     {isEditing && (
                       <div className="flex justify-end mb-2">
                         <button
                           type="button"
-                          onClick={() => removeArrayItem("certification", index)}
+                          onClick={() =>
+                            removeArrayItem('certification', index)
+                          }
                           className="text-red-600 hover:text-red-800 text-sm"
                         >
                           Remove
@@ -801,56 +1151,131 @@ function ProfilePage() {
                     {isEditing ? (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Certificate</label>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Certificate
+                          </label>
                           <input
                             type="text"
                             value={cert.certificate}
-                            onChange={(e) => handleNestedChange("certification", "certificate", e.target.value, index)}
+                            onChange={(e) =>
+                              handleNestedChange(
+                                'certification',
+                                'certificate',
+                                e.target.value,
+                                index
+                              )
+                            }
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
-                          {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage(`certification.${index}.certificate`, errors)}</p>}
+                          {errors && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {getErrorMessage(
+                                `certification.${index}.certificate`,
+                                errors
+                              )}
+                            </p>
+                          )}
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Issuing Company</label>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Issuing Company
+                          </label>
                           <input
                             type="text"
                             value={cert.company}
-                            onChange={(e) => handleNestedChange("certification", "company", e.target.value, index)}
+                            onChange={(e) =>
+                              handleNestedChange(
+                                'certification',
+                                'company',
+                                e.target.value,
+                                index
+                              )
+                            }
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
-                          {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage(`certification.${index}.company`, errors)}</p>}
+                          {errors && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {getErrorMessage(
+                                `certification.${index}.company`,
+                                errors
+                              )}
+                            </p>
+                          )}
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Issued By</label>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Issued By
+                          </label>
                           <input
                             type="text"
                             value={cert.issuedBy}
-                            onChange={(e) => handleNestedChange("certification", "issuedBy", e.target.value, index)}
+                            onChange={(e) =>
+                              handleNestedChange(
+                                'certification',
+                                'issuedBy',
+                                e.target.value,
+                                index
+                              )
+                            }
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
-                          {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage(`certification.${index}.issuedBy`, errors)}</p>}
+                          {errors && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {getErrorMessage(
+                                `certification.${index}.issuedBy`,
+                                errors
+                              )}
+                            </p>
+                          )}
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Issue Date</label>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Issue Date
+                          </label>
                           <input
                             type="date"
-                            value={cert.issueDate ? new Date(cert.issueDate).toISOString().split("T")[0] : ""}
-                            onChange={(e) => handleNestedChange("certification", "issueDate", e.target.value, index)}
+                            value={
+                              cert.issueDate
+                                ? new Date(cert.issueDate)
+                                    .toISOString()
+                                    .split('T')[0]
+                                : ''
+                            }
+                            onChange={(e) =>
+                              handleNestedChange(
+                                'certification',
+                                'issueDate',
+                                e.target.value,
+                                index
+                              )
+                            }
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
-                          {errors && <p className="text-red-500 text-sm mt-1">{getErrorMessage(`certification.${index}.issueDate`, errors)}</p>}
+                          {errors && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {getErrorMessage(
+                                `certification.${index}.issueDate`,
+                                errors
+                              )}
+                            </p>
+                          )}
                         </div>
                       </div>
                     ) : (
                       <div>
-                        <h4 className="font-medium text-gray-900">{cert.certificate}</h4>
+                        <h4 className="font-medium text-gray-900">
+                          {cert.certificate}
+                        </h4>
                         <p className="text-gray-600">{cert.company}</p>
                         {cert.issuedBy && (
-                          <p className="text-gray-500 text-sm mt-1">Issued by: {cert.issuedBy}</p>
+                          <p className="text-gray-500 text-sm mt-1">
+                            Issued by: {cert.issuedBy}
+                          </p>
                         )}
                         {cert.issueDate && (
                           <p className="text-gray-500 text-sm mt-1">
-                            Issued on: {new Date(cert.issueDate).toLocaleDateString()}
+                            Issued on:{' '}
+                            {new Date(cert.issueDate).toLocaleDateString()}
                           </p>
                         )}
                       </div>
@@ -870,7 +1295,9 @@ function ProfilePage() {
             </h3>
             {isEditing ? (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Upload Resume (PDF)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Upload Resume (PDF)
+                </label>
                 <input
                   type="file"
                   name="resume"
@@ -879,18 +1306,20 @@ function ProfilePage() {
                   accept=".pdf"
                 />
                 {resumeFile && (
-                  <p className="text-sm text-gray-500 mt-2">New file selected: {resumeFile.name}</p>
+                  <p className="text-sm text-gray-500 mt-2">
+                    New file selected: {resumeFile.name}
+                  </p>
                 )}
-                {localUser.resume && typeof localUser.resume === "string" && (
-                  <p className="text-sm text-gray-500 mt-2">Current file: {localUser.resume.split("/").pop()}</p>
+                {localUser.resume && typeof localUser.resume === 'string' && (
+                  <p className="text-sm text-gray-500 mt-2">
+                    Current file: {localUser.resume.split('/').pop()}
+                  </p>
                 )}
               </div>
-            ) : (localUser.resume || resumeFile) ? (
+            ) : localUser.resume || resumeFile ? (
               <div className="flex items-center gap-2">
                 <FileText size={20} className="text-gray-600" />
-                <span className="text-gray-700">
-                  {resumeFileName}
-                </span>
+                <span className="text-gray-700">{resumeFileName}</span>
                 <a
                   href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/resume/${localUser.resume}`}
                   target="_blank"

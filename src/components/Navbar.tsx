@@ -1,7 +1,7 @@
 'use client';
 
-import Link from "next/link";
-import { useState, useEffect, useRef } from "react";
+import Link from 'next/link';
+import { useState, useEffect, useRef } from 'react';
 import {
   ChevronDown,
   Code,
@@ -11,10 +11,10 @@ import {
   User,
   Users,
   CloudUpload,
-} from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useUser } from "@/utils/context/user-context";
-import { logoutUser } from "@/lib/api";
+} from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useUser } from '@/utils/context/user-context';
+import { logoutUser } from '@/lib/api';
 
 export default function Navbar() {
   const { user, logout, isLoading } = useUser();
@@ -26,7 +26,7 @@ export default function Navbar() {
   async function handleLogOut() {
     await logoutUser();
     logout();
-    router.push("/login");
+    router.push('/login');
   }
 
   // Close dropdown on outside click
@@ -39,8 +39,8 @@ export default function Navbar() {
         setDropdownOpen(false);
       }
     }
-    if (dropdownOpen) document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
+    if (dropdownOpen) document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
   }, [dropdownOpen]);
 
   // Handle case where user state is still loading
@@ -48,7 +48,10 @@ export default function Navbar() {
     // Optionally return a loading state or a simpler navbar
     return (
       <nav className="w-full bg-white shadow-md border-b border-gray-100 flex justify-between items-center py-3 px-6 sticky top-0 z-50">
-        <Link href="/" className="flex items-center text-blue-700 font-bold text-2xl mr-10">
+        <Link
+          href="/"
+          className="flex items-center text-blue-700 font-bold text-2xl mr-10"
+        >
           <Code size={28} className="mr-2" />
           Devconnect
         </Link>
@@ -95,20 +98,18 @@ export default function Navbar() {
             </Link>
           </div>
 
-        {/* Blogs  */}
-        <div className="hidden md:flex items-center space-x-6">
-          <Link
-            href="/create-blog"
-            className="text-gray-700 hover:text-blue-600 font-medium flex items-center transition"
-          >
-            <CloudUpload size={18} className="mr-1" />
-            Upload Post
-          </Link>
+          {/* Blogs  */}
+          <div className="hidden md:flex items-center space-x-6">
+            <Link
+              href="/create-blog"
+              className="text-gray-700 hover:text-blue-600 font-medium flex items-center transition"
+            >
+              <CloudUpload size={18} className="mr-1" />
+              Upload Post
+            </Link>
+          </div>
         </div>
 
-        </div>
-
-        
         {/* Right side - Auth buttons or User dropdown */}
         <div className="flex items-center gap-4">
           {!user ? (
@@ -134,15 +135,16 @@ export default function Navbar() {
                 aria-label="User menu"
               >
                 <div className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-medium">
-                  {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+                  {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
                 </div>
                 <span className="text-gray-700 font-medium hidden sm:block">
-                  {user.name || "User"}
+                  {user.name || 'User'}
                 </span>
                 <ChevronDown
                   size={16}
-                  className={`transition-transform ${dropdownOpen ? "rotate-180" : ""
-                    }`}
+                  className={`transition-transform ${
+                    dropdownOpen ? 'rotate-180' : ''
+                  }`}
                 />
               </button>
 
@@ -150,10 +152,10 @@ export default function Navbar() {
                 <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg z-10 border border-gray-200 animate-fade-in">
                   <div className="px-4 py-3 border-b border-gray-100">
                     <p className="font-semibold text-gray-800">
-                      {user.name || "User"}
+                      {user.name || 'User'}
                     </p>
                     <p className="text-sm text-gray-500 truncate">
-                      {user.email || ""}
+                      {user.email || ''}
                     </p>
                   </div>
                   <div className="p-2">

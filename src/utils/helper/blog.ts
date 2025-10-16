@@ -6,7 +6,10 @@
  * @param type - The category of the media ('images', 'videos', 'profilePicture').
  * @returns The complete URL to the asset.
  */
-export const getMediaUrl = (filename: string, type: 'images' | 'videos' | 'profilePicture'): string => {
+export const getMediaUrl = (
+  filename: string,
+  type: 'images' | 'videos' | 'profilePicture'
+): string => {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || '';
   if (type === 'profilePicture') {
     return `${baseUrl}/uploads/profilePicture/${filename}`;
@@ -26,18 +29,18 @@ export const formatDate = (dateString: string): string => {
 
   let interval = seconds / 31536000;
   if (interval > 1) return `${Math.floor(interval)}y`;
-  
+
   interval = seconds / 2592000;
   if (interval > 1) return `${Math.floor(interval)}mo`;
-  
+
   interval = seconds / 86400;
   if (interval > 1) return `${Math.floor(interval)}d`;
-  
+
   interval = seconds / 3600;
   if (interval > 1) return `${Math.floor(interval)}h`;
-  
+
   interval = seconds / 60;
   if (interval > 1) return `${Math.floor(interval)}m`;
-  
+
   return `${Math.floor(seconds)}s`;
 };

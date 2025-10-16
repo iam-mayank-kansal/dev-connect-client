@@ -1,11 +1,18 @@
 import axios, { AxiosResponse } from 'axios';
 import { deleteUserResponse, UserProfile } from './types';
 
-export async function getUserProfile(): Promise<AxiosResponse<{ status: string; data: UserProfile }>> {
-  return axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/devconnect/user/profile`, { withCredentials: true });
+export async function getUserProfile(): Promise<
+  AxiosResponse<{ status: string; data: UserProfile }>
+> {
+  return axios.get(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/devconnect/user/profile`,
+    { withCredentials: true }
+  );
 }
-export async function updateUserProfile(profileData: Partial<UserProfile>): Promise<AxiosResponse<UserProfile>> {
-  console.log("Data Before Updating User : ", profileData);
+export async function updateUserProfile(
+  profileData: Partial<UserProfile>
+): Promise<AxiosResponse<UserProfile>> {
+  console.log('Data Before Updating User : ', profileData);
 
   const formData = new FormData();
 
@@ -40,12 +47,16 @@ export async function updateUserProfile(profileData: Partial<UserProfile>): Prom
     }
   });
 
-  return axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/devconnect/user/update-user`, formData, {
-    withCredentials: true,
-    headers: {
-      'Content-Type': 'multipart/form-data'
+  return axios.patch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/devconnect/user/update-user`,
+    formData,
+    {
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     }
-  });
+  );
 }
 export async function setNewPassword(
   newPassword: string,
@@ -121,7 +132,9 @@ export async function verifyOtp(
     { withCredentials: true }
   );
 }
-export async function logoutUser(): Promise<AxiosResponse<{ message: string }>> {
+export async function logoutUser(): Promise<
+  AxiosResponse<{ message: string }>
+> {
   return axios.post(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/devconnect/auth/logout`,
     {},
@@ -135,7 +148,7 @@ export async function deleteUser(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/devconnect/user/delete`,
     {
       data: { password },
-      withCredentials: true
+      withCredentials: true,
     }
   );
 }

@@ -1,10 +1,10 @@
-import { UserProfile } from "@/lib/types";
-import { ReactNode } from "react";
+import { UserProfile } from '@/lib/types';
+import { ReactNode } from 'react';
 
 // This interface defines the shape of your context's value
 export interface UserContextType {
   user: UserProfile | null;
-  isLoading : boolean;
+  isLoading: boolean;
   login: (userData: UserProfile) => void;
   logout: () => void;
   triggerRefresh: () => void;
@@ -12,5 +12,5 @@ export interface UserContextType {
 
 // Define the props for the provider component
 export interface UserProviderProps {
-    children: ReactNode;
+  children: ReactNode;
 }

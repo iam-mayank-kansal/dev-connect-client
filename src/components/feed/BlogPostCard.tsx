@@ -27,19 +27,22 @@ const BlogPostCard: FC<BlogPostCardProps> = ({ blog }) => {
   });
 
   // Function to open the modal from a specific image
-  const openImageModal = useCallback((startingImageUrl: string) => {
-    const allPhotos = blog.blogPhoto || [];
-    const initialIndex = allPhotos.findIndex(
-      (photo) => getMediaUrl(photo, 'images') === startingImageUrl
-    );
-    if (initialIndex !== -1) {
-      setModalState({
-        isOpen: true,
-        images: allPhotos.map((photo) => getMediaUrl(photo, 'images')),
-        currentIndex: initialIndex,
-      });
-    }
-  }, [blog.blogPhoto]);
+  const openImageModal = useCallback(
+    (startingImageUrl: string) => {
+      const allPhotos = blog.blogPhoto || [];
+      const initialIndex = allPhotos.findIndex(
+        (photo) => getMediaUrl(photo, 'images') === startingImageUrl
+      );
+      if (initialIndex !== -1) {
+        setModalState({
+          isOpen: true,
+          images: allPhotos.map((photo) => getMediaUrl(photo, 'images')),
+          currentIndex: initialIndex,
+        });
+      }
+    },
+    [blog.blogPhoto]
+  );
 
   // Function to close the modal
   const closeImageModal = useCallback(() => {
@@ -70,9 +73,18 @@ const BlogPostCard: FC<BlogPostCardProps> = ({ blog }) => {
           <div className="mt-1">
             <MediaCarousel>
               {blog.blogViedo.map((video) => (
-                <div key={video} className="flex-shrink-0 w-full h-full snap-center aspect-video">
-                  <video controls className="w-full h-full object-cover bg-black">
-                    <source src={getMediaUrl(video, 'videos')} type="video/mp4" />
+                <div
+                  key={video}
+                  className="flex-shrink-0 w-full h-full snap-center aspect-video"
+                >
+                  <video
+                    controls
+                    className="w-full h-full object-cover bg-black"
+                  >
+                    <source
+                      src={getMediaUrl(video, 'videos')}
+                      type="video/mp4"
+                    />
                   </video>
                 </div>
               ))}
@@ -80,7 +92,10 @@ const BlogPostCard: FC<BlogPostCardProps> = ({ blog }) => {
           </div>
         )}
 
-        <CardFooter likesCount={blog.likesCount} commentsCount={blog.commentsCount} />
+        <CardFooter
+          likesCount={blog.likesCount}
+          commentsCount={blog.commentsCount}
+        />
       </article>
 
       {/* Conditionally render the modal with navigation */}

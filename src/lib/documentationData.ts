@@ -1,4 +1,4 @@
-import { ApiGroup } from "./types";
+import { ApiGroup } from './types';
 
 export const apiDocumentation: ApiGroup[] = [
   {
@@ -22,7 +22,8 @@ export const apiDocumentation: ApiGroup[] = [
           message: 'Kartik Bhatt User created Successfully',
           data: {
             email: 'kartikwork@gmail.com',
-            password: '$2b$10$p/1iXs7UZk5NAQHwsw/Ev.WU8wGfMieOU7QcqVIvjB65Vf6pc7Y4i',
+            password:
+              '$2b$10$p/1iXs7UZk5NAQHwsw/Ev.WU8wGfMieOU7QcqVIvjB65Vf6pc7Y4i',
             name: 'Kartik Bhatt',
           },
         },
@@ -100,11 +101,13 @@ export const apiDocumentation: ApiGroup[] = [
       {
         path: '/user/set-new-password',
         method: 'PATCH',
-        description: 'Set a new password using reset token from OTP verification.',
+        description:
+          'Set a new password using reset token from OTP verification.',
         authentication: 'Not Required',
         requiredFields: ['resetToken', 'newPassword'],
         requestExample: {
-          resetToken: '852074e5c5e70bc364cf2e3ae244ce0e88da4133de1afffd10430f66151d7c6d',
+          resetToken:
+            '852074e5c5e70bc364cf2e3ae244ce0e88da4133de1afffd10430f66151d7c6d',
           newPassword: 'Mayank@123',
         },
         responseExample: {
@@ -151,7 +154,10 @@ export const apiDocumentation: ApiGroup[] = [
           },
           socialLinks: [
             { platform: 'GitHub', url: 'https://github.com/kartikeybhatt' },
-            { platform: 'LinkedIn', url: 'https://linkedin.com/in/kartikeybhatt' },
+            {
+              platform: 'LinkedIn',
+              url: 'https://linkedin.com/in/kartikeybhatt',
+            },
           ],
           skills: ['Node.js', 'Express.js', 'MongoDB', 'Docker', 'Kubernetes'],
           education: [
@@ -168,7 +174,8 @@ export const apiDocumentation: ApiGroup[] = [
               company: 'TechNova Solutions',
               startDate: '2023-06-01T00:00:00.000Z',
               endDate: '2024-03-01T00:00:00.000Z',
-              description: 'Worked on REST APIs, authentication, and containerized services using Docker.',
+              description:
+                'Worked on REST APIs, authentication, and containerized services using Docker.',
             },
           ],
           certification: [
@@ -200,10 +207,17 @@ export const apiDocumentation: ApiGroup[] = [
             },
             _id: '68bb294a15f5f4ef346dce71',
             email: 'kartikwork@gmail.com',
-            password: '$2b$10$1XaoEp/AUVc3VznriDTB..JaTsKhk8hryCuAJUtRTeYP/T64KPgCm',
+            password:
+              '$2b$10$1XaoEp/AUVc3VznriDTB..JaTsKhk8hryCuAJUtRTeYP/T64KPgCm',
             name: 'Kartikey Bhatt',
             bio: 'Backend developer passionate about building scalable APIs ⚡',
-            skills: ['Node.js', 'Express.js', 'MongoDB', 'Docker', 'Kubernetes'],
+            skills: [
+              'Node.js',
+              'Express.js',
+              'MongoDB',
+              'Docker',
+              'Kubernetes',
+            ],
             role: 'user',
             education: [
               {
@@ -219,7 +233,8 @@ export const apiDocumentation: ApiGroup[] = [
                 company: 'TechNova Solutions',
                 startDate: '2023-06-01T00:00:00.000Z',
                 endDate: '2024-03-01T00:00:00.000Z',
-                description: 'Worked on REST APIs, authentication, and containerized services using Docker.',
+                description:
+                  'Worked on REST APIs, authentication, and containerized services using Docker.',
               },
             ],
             certification: [
@@ -238,7 +253,10 @@ export const apiDocumentation: ApiGroup[] = [
             ],
             socialLinks: [
               { platform: 'GitHub', url: 'https://github.com/kartikeybhatt' },
-              { platform: 'LinkedIn', url: 'https://linkedin.com/in/kartikeybhatt' },
+              {
+                platform: 'LinkedIn',
+                url: 'https://linkedin.com/in/kartikeybhatt',
+              },
             ],
             createdAt: '2025-09-05T18:17:46.017Z',
             updatedAt: '2025-09-05T18:19:10.630Z',
@@ -246,7 +264,8 @@ export const apiDocumentation: ApiGroup[] = [
             age: 22,
             designation: 'Backend Engineer',
             dob: '2003-05-06T00:00:00.000Z',
-            profilePicture: 'DevConnect-user-profilePicture.68bb294a15f5f4ef346dce71.jpg',
+            profilePicture:
+              'DevConnect-user-profilePicture.68bb294a15f5f4ef346dce71.jpg',
             resume: 'DevConnect-user-resume.68bb294a15f5f4ef346dce71.pdf',
           },
         },
@@ -259,7 +278,8 @@ export const apiDocumentation: ApiGroup[] = [
       {
         path: '/otp/send-otp',
         method: 'POST',
-        description: "Send verification code to user's email for password recovery.",
+        description:
+          "Send verification code to user's email for password recovery.",
         authentication: 'Not Required',
         requiredFields: ['email'],
         requestExample: {
@@ -283,9 +303,11 @@ export const apiDocumentation: ApiGroup[] = [
         },
         responseExample: {
           status: 200,
-          message: 'OTP verified successfully. Use the provided token to set a new password.',
+          message:
+            'OTP verified successfully. Use the provided token to set a new password.',
           data: {
-            token: '4a62cfb1dcce6447c75fd810d6314b4ec620d392cc3353f21263479a347bd2d8',
+            token:
+              '4a62cfb1dcce6447c75fd810d6314b4ec620d392cc3353f21263479a347bd2d8',
             contact: 'kartikwork@gmail.com',
           },
         },
@@ -303,10 +325,11 @@ export const apiDocumentation: ApiGroup[] = [
         contentType: 'application/json',
         requiredFields: [],
         optionalFields: {
-          status: 'Filter connections by status. Values: `accepted`, `rejected`, `pending`, `blocked`. Default: `pending`'
+          status:
+            'Filter connections by status. Values: `accepted`, `rejected`, `pending`, `blocked`. Default: `pending`',
         },
         requestExample: {
-          status: 'accepted'
+          status: 'accepted',
         },
         responseExample: {
           success: true,
@@ -314,31 +337,32 @@ export const apiDocumentation: ApiGroup[] = [
             {
               toUserId: '507f1f77bcf86cd799439011',
               fromUserId: '507f191e810c19729de860ea',
-              status: 'accepted'
+              status: 'accepted',
             },
             {
               toUserId: '507f1f77bcf86cd799439012',
               fromUserId: '507f191e810c19729de860eb',
-              status: 'accepted'
-            }
-          ]
-        }
+              status: 'accepted',
+            },
+          ],
+        },
       },
       {
         path: '/send-connection-request',
         method: 'POST',
-        description: 'Send a connection request to another user by their username.',
+        description:
+          'Send a connection request to another user by their username.',
         authentication: 'Bearer Token',
         contentType: 'application/json',
         requiredFields: ['toUserName'],
         optionalFields: {},
         requestExample: {
-          toUserName: 'john_doe'
+          toUserName: 'john_doe',
         },
         responseExample: {
           success: true,
-          message: 'Connection request sent to john_doe'
-        }
+          message: 'Connection request sent to john_doe',
+        },
       },
       {
         path: '/received-connection-request',
@@ -350,12 +374,12 @@ export const apiDocumentation: ApiGroup[] = [
         optionalFields: {},
         requestExample: {
           fromUserName: 'jane_doe',
-          action: 'accepted'
+          action: 'accepted',
         },
         responseExample: {
           success: true,
-          message: "You have accepted jane_doe's request"
-        }
+          message: "You have accepted jane_doe's request",
+        },
       },
       {
         path: '/block-connection',
@@ -366,13 +390,13 @@ export const apiDocumentation: ApiGroup[] = [
         requiredFields: ['userName'],
         optionalFields: {},
         requestExample: {
-          userName: 'spam_account'
+          userName: 'spam_account',
         },
         responseExample: {
           success: true,
-          message: 'User spam_account has been blocked'
-        }
-      }
-    ]
-  }
+          message: 'User spam_account has been blocked',
+        },
+      },
+    ],
+  },
 ];

@@ -24,14 +24,14 @@ const Home: FC = () => {
         setLoading(true);
         setError(null);
         const response = await getAllBlogs();
-        
+
         // Sort the blogs by the 'createdAt' date in descending order (newest first)
-        const sortedBlogs = response.data.data.sort((a, b) => 
+        const sortedBlogs = response.data.data.sort(
+          (a, b) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
-        
-        setBlogs(sortedBlogs);
 
+        setBlogs(sortedBlogs);
       } catch (err) {
         if (axios.isAxiosError(err) && err.response) {
           setError(err.response.data.message || 'Failed to fetch blogs.');
@@ -46,25 +46,30 @@ const Home: FC = () => {
   }, []);
 
   const renderContent = () => {
-    if (loading) return (
-      <div className="text-center text-gray-500 mt-16">
-        <Loader2 className="w-8 h-8 animate-spin mx-auto mb-3" />
-        <p>Loading Feed...</p>
-      </div>
-    );
-    if (error) return (
-      <div className="text-center text-red-600 bg-red-50 p-6 rounded-lg mt-16">
-        <ServerCrash className="w-10 h-10 mx-auto mb-3" />
-        <p className="font-semibold">Error Loading Posts</p>
-        <p className="text-sm">{error}</p>
-      </div>
-    );
-    if (!blogs || blogs.length === 0) return (
-      <div className="text-center text-gray-500 mt-16 border-2 border-dashed p-10 rounded-lg">
-        <h2 className="text-xl font-bold text-gray-700 mb-2">The Feed is Quiet</h2>
-        <p>Be the first to share your story!</p>
-      </div>
-    );
+    if (loading)
+      return (
+        <div className="text-center text-gray-500 mt-16">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-3" />
+          <p>Loading Feed...</p>
+        </div>
+      );
+    if (error)
+      return (
+        <div className="text-center text-red-600 bg-red-50 p-6 rounded-lg mt-16">
+          <ServerCrash className="w-10 h-10 mx-auto mb-3" />
+          <p className="font-semibold">Error Loading Posts</p>
+          <p className="text-sm">{error}</p>
+        </div>
+      );
+    if (!blogs || blogs.length === 0)
+      return (
+        <div className="text-center text-gray-500 mt-16 border-2 border-dashed p-10 rounded-lg">
+          <h2 className="text-xl font-bold text-gray-700 mb-2">
+            The Feed is Quiet
+          </h2>
+          <p>Be the first to share your story!</p>
+        </div>
+      );
     return (
       <div className="w-full max-w-xl mx-auto space-y-5">
         {/* KEY FIX: Use a combination of the blog's ID and its index as a fallback.
@@ -79,8 +84,7 @@ const Home: FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 text-gray-800 font-sans flex flex-col items-center p-4">
-      <header className="w-full max-w-xl text-center my-8">
-      </header>
+      <header className="w-full max-w-xl text-center my-8"></header>
       <main className="w-full">{renderContent()}</main>
     </div>
   );

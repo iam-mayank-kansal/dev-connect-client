@@ -19,10 +19,20 @@ const CardHeader: FC<CardHeaderProps> = ({ user, createdAt }) => {
   return (
     <div className="p-4 flex items-center justify-between">
       <div className="flex items-center space-x-3">
-        <Image src={userProfilePic} width={44} height={44} alt={`${user.name}'s profile`} className="w-11 h-11 rounded-full object-cover" />
+        <Image
+          src={userProfilePic}
+          width={44}
+          height={44}
+          alt={`${user.name}'s profile`}
+          className="w-11 h-11 rounded-full object-cover"
+        />
         <div>
-          <p className="font-semibold text-gray-800">{user.name || 'Anonymous'}</p>
-          <p className="text-sm text-gray-500">{user.designation || 'Developer'}</p>
+          <p className="font-semibold text-gray-800">
+            {user.name || 'Anonymous'}
+          </p>
+          <p className="text-sm text-gray-500">
+            {user.designation || 'Developer'}
+          </p>
         </div>
       </div>
       <div className="flex items-center space-x-2 text-gray-500">

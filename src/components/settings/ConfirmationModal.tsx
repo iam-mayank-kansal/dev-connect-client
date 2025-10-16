@@ -1,6 +1,6 @@
-"use client";
-import React, { useState } from "react";
-import { AlertCircle, RotateCw, Eye, EyeOff } from "lucide-react";
+'use client';
+import React, { useState } from 'react';
+import { AlertCircle, RotateCw, Eye, EyeOff } from 'lucide-react';
 
 interface Props {
   title: string;
@@ -17,7 +17,7 @@ export default function ConfirmationModal({
   onConfirm,
   loading,
 }: Props) {
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   const handleConfirm = () => {
@@ -39,7 +39,7 @@ export default function ConfirmationModal({
         <div className="mb-4">
           <div className="relative">
             <input
-              type={showPassword ? "text" : "password"}
+              type={showPassword ? 'text' : 'password'}
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -50,7 +50,7 @@ export default function ConfirmationModal({
               className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500 hover:text-blue-700 focus:outline-none"
               onClick={() => setShowPassword((prev) => !prev)}
               tabIndex={-1} // Prevents tabbing to this button for better accessibility flow
-              aria-label={showPassword ? "Hide password" : "Show password"}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
@@ -72,17 +72,17 @@ export default function ConfirmationModal({
           </button>
           <button
             onClick={handleConfirm}
-            disabled={loading || !password} 
+            disabled={loading || !password}
             className={`px-4 py-2 text-sm font-medium rounded-lg text-white transition ${
               loading || !password
-                ? "bg-red-400 cursor-not-allowed"
-                : "bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                ? 'bg-red-400 cursor-not-allowed'
+                : 'bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500'
             }`}
           >
             {loading ? (
               <RotateCw size={16} className="animate-spin" />
             ) : (
-              "Confirm"
+              'Confirm'
             )}
           </button>
         </div>

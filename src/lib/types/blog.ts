@@ -2,18 +2,18 @@
 
 export interface PopulatedUser {
   name: string;
-  profilePicture?: string; 
-  designation?: string; 
+  profilePicture?: string;
+  designation?: string;
 }
 
 export interface Blog {
-  _id: string; 
+  _id: string;
   blogTitle: string;
   blogBody: string;
   blogPhoto: string[];
   blogViedo: string[]; // Note: This matches the typo from your API
   userId: PopulatedUser;
-  createdAt: string; 
+  createdAt: string;
   likesCount: number;
   commentsCount: number;
 }

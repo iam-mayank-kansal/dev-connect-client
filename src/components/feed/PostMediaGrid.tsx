@@ -15,7 +15,15 @@ const PostMediaGrid: FC<PostMediaGridProps> = ({ photos, onImageClick }) => {
   if (photoCount === 0) return null;
 
   // Reusable Image Component - this already has the onClick logic
-  const GridImage = ({ src, className = '', children }: { src: string; className?: string; children?: React.ReactNode }) => (
+  const GridImage = ({
+    src,
+    className = '',
+    children,
+  }: {
+    src: string;
+    className?: string;
+    children?: React.ReactNode;
+  }) => (
     <div
       className={`relative cursor-pointer overflow-hidden bg-gray-100 ${className}`}
       onClick={() => onImageClick(getMediaUrl(src, 'images'))}
@@ -37,16 +45,16 @@ const PostMediaGrid: FC<PostMediaGridProps> = ({ photos, onImageClick }) => {
     return (
       // FIX: Ensure the GridImage component is used here.
       // The 'object-contain' is better for single images to show the whole picture without cropping.
-      <div 
+      <div
         className="max-h-[550px] w-full overflow-hidden bg-gray-100 flex justify-center items-center cursor-pointer"
         onClick={() => onImageClick(getMediaUrl(photos[0], 'images'))}
       >
-        <Image 
-          src={getMediaUrl(photos[0], 'images')} 
-          alt="Post content" 
-            width={800}
-            height={550}
-          className="max-w-full max-h-[550px] h-auto object-contain" 
+        <Image
+          src={getMediaUrl(photos[0], 'images')}
+          alt="Post content"
+          width={800}
+          height={550}
+          className="max-w-full max-h-[550px] h-auto object-contain"
         />
       </div>
     );
@@ -84,7 +92,9 @@ const PostMediaGrid: FC<PostMediaGridProps> = ({ photos, onImageClick }) => {
         <GridImage src={photos[3]}>
           {remainingCount > 0 && (
             <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-              <span className="text-white text-3xl font-bold">+{remainingCount}</span>
+              <span className="text-white text-3xl font-bold">
+                +{remainingCount}
+              </span>
             </div>
           )}
         </GridImage>

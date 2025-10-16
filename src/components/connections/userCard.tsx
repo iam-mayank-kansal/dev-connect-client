@@ -1,11 +1,16 @@
-"use client";
+'use client';
 import React, { useState } from 'react';
 import { MoreVertical, UserPlus } from 'lucide-react';
 import { getImageUrl } from '@/lib/utils';
 import { UserCardProps } from '@/lib/types/connection';
 import Image from 'next/image';
 
-const UserCard: React.FC<UserCardProps> = ({ user, onConnect, onNotInterested, onHandleBlock }) => {
+const UserCard: React.FC<UserCardProps> = ({
+  user,
+  onConnect,
+  onNotInterested,
+  onHandleBlock,
+}) => {
   const [showMenu, setShowMenu] = useState(false);
 
   return (
@@ -13,7 +18,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onConnect, onNotInterested, o
       <div className="flex justify-between items-start">
         <div className="flex items-center space-x-4">
           <Image
-            src={getImageUrl(user.avatar, "profilePicture")}
+            src={getImageUrl(user.avatar, 'profilePicture')}
             alt={user.name}
             width={128}
             height={128}

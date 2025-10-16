@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import { ConnectionSidebar } from '@/components/connections/ConnectionSidebar';
@@ -9,7 +9,9 @@ import { LoadingState } from '@/components/connections/LoadingState';
 import { useConnections } from '@/hooks/useConnections';
 
 const ConnectionPage: React.FC = () => {
-  const [activeView, setActiveView] = useState<'connections' | 'pending' | 'find'>('connections');
+  const [activeView, setActiveView] = useState<
+    'connections' | 'pending' | 'find'
+  >('connections');
   const [pendingTab, setPendingTab] = useState<'received' | 'sent'>('received');
   const [searchTerm, setSearchTerm] = useState<string>('');
 
@@ -23,15 +25,24 @@ const ConnectionPage: React.FC = () => {
     handleIgnoreAndUnignore,
     handleBlockAndUnblock,
     suspendSentRequest,
-    connectionResponse
+    connectionResponse,
   } = useConnections();
 
   // Fetch suggested connections only when "Find" tab becomes active and we haven't loaded them yet
   useEffect(() => {
-    if (activeView === 'find' && suggestedUsers.length === 0 && !isLoadingSuggested) {
+    if (
+      activeView === 'find' &&
+      suggestedUsers.length === 0 &&
+      !isLoadingSuggested
+    ) {
       fetchSuggestedConnections();
     }
-  }, [activeView, suggestedUsers.length, isLoadingSuggested, fetchSuggestedConnections]);
+  }, [
+    activeView,
+    suggestedUsers.length,
+    isLoadingSuggested,
+    fetchSuggestedConnections,
+  ]);
 
   const handleViewChange = (view: 'connections' | 'pending' | 'find') => {
     setActiveView(view);
@@ -100,7 +111,9 @@ const ConnectionPage: React.FC = () => {
 
       {/* Main content - scrollable area */}
       <main className="flex-1 p-8 overflow-auto">
-        <h1 className="text-4xl font-extrabold text-gray-900 mb-8">My Network</h1>
+        <h1 className="text-4xl font-extrabold text-gray-900 mb-8">
+          My Network
+        </h1>
         {renderContent()}
       </main>
     </div>

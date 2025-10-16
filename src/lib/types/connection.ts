@@ -43,5 +43,5 @@ export interface UserCardProps {
   user: User;
   onConnect: (id: string) => void;
   onNotInterested: (id: string) => void;
-  onHandleBlock : (id: string) => void;
+  onHandleBlock: (id: string) => void;
 }

@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import UserFeedItem from '../UserFeedItem';
 import { ApiUser } from '@/lib/types/connection';
 
@@ -13,10 +13,11 @@ export const ConnectionsView: React.FC<ConnectionsViewProps> = ({
   searchTerm,
   onSearchChange,
 }) => {
-  const filteredConnections = connections.filter(user =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.designation.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredConnections = connections.filter(
+    (user) =>
+      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.designation.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -30,16 +31,21 @@ export const ConnectionsView: React.FC<ConnectionsViewProps> = ({
       />
       {filteredConnections.length > 0 ? (
         <div className="space-y-4">
-          {filteredConnections.map(user => (
+          {filteredConnections.map((user) => (
             <UserFeedItem
-              key={user._id} 
-              user={{ 
-                id: user._id, 
-                name: user.name, 
-                title: user.designation, 
-                avatar: user.profilePicture 
+              key={user._id}
+              user={{
+                id: user._id,
+                name: user.name,
+                title: user.designation,
+                avatar: user.profilePicture,
               }}
-              actions={[{ label: 'Message', onClick: () => console.log(`Message ${user._id}`) }]}
+              actions={[
+                {
+                  label: 'Message',
+                  onClick: () => console.log(`Message ${user._id}`),
+                },
+              ]}
               showMoreOptions={true}
             />
           ))}

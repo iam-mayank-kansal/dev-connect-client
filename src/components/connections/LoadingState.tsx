@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 export const LoadingState: React.FC = () => {
   return (
