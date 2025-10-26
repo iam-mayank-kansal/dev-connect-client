@@ -9,7 +9,7 @@ import {
   FC,
 } from 'react';
 import { UserContextType, UserProviderProps } from './user-context.type';
-import { UserProfile } from '@/lib/types';
+import { UserProfile } from '@/lib/types/user';
 import { getUserProfile } from '@/lib/api';
 
 const UserContext = createContext<UserContextType | undefined>(undefined);

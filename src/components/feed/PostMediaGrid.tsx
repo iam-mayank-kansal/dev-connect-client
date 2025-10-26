@@ -1,6 +1,6 @@
 'use client';
 
-import { getMediaUrl } from '@/utils/helper/blog';
+import { getMediaUrl } from '@/utils/helper/getMediaUrl-blog';
 import Image from 'next/image';
 import React, { FC } from 'react';
 

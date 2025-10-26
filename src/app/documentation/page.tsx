@@ -1,8 +1,8 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { ChevronRight, Copy } from 'lucide-react';
-import { Endpoint } from '@/lib/types';
-import { apiDocumentation } from '@/lib/documentationData';
+import { Endpoint } from '@/lib/types/documentation';
+import { apiDocumentation } from '@/lib/data/documentationData';
 
 const getMethodColor = (method: string) => {
   switch (method) {

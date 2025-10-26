@@ -1,4 +1,4 @@
-import { ApiGroup } from './types';
+import { ApiGroup } from '../types/documentation';
 
 export const apiDocumentation: ApiGroup[] = [
   {

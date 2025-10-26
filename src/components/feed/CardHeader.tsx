@@ -1,10 +1,11 @@
 'use client';
 
 import React, { FC } from 'react';
-import { MoreHorizontal } from 'lucide-react';
+// Removed MoreHorizontal import
 import { PopulatedUser } from '@/lib/types/blog';
-import { formatDate, getMediaUrl } from '@/utils/helper/blog';
 import Image from 'next/image';
+import { getMediaUrl } from '@/utils/helper/getMediaUrl-blog';
+import { formatDate } from '@/utils/helper/formDate';
 
 interface CardHeaderProps {
   user: PopulatedUser;
@@ -37,9 +38,7 @@ const CardHeader: FC<CardHeaderProps> = ({ user, createdAt }) => {
       </div>
       <div className="flex items-center space-x-2 text-gray-500">
         <time className="text-xs">{formatDate(createdAt)}</time>
-        <button className="hover:bg-gray-100 p-2 rounded-full text-gray-400 hover:text-gray-600">
-          <MoreHorizontal size={20} />
-        </button>
+        {/* --- Removed 3-dot menu button --- */}
       </div>
     </div>
   );

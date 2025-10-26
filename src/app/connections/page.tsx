@@ -1,52 +1,42 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ConnectionSidebar } from '@/components/connections/ConnectionSidebar';
-import { ConnectionsView } from '@/components/connections/views/ConnectionsView';
-import { PendingView } from '@/components/connections/views/PendingView';
-import { FindConnectionsView } from '@/components/connections/views/FindConnectionsView';
-import { LoadingState } from '@/components/connections/LoadingState';
-import { useConnections } from '@/hooks/useConnections';
+// Attempting to fix path resolution errors by using relative paths
+import { ConnectionSidebar } from '../../components/connections/ConnectionSidebar';
+import { ConnectionsView } from '../../components/connections/views/ConnectionsView';
+import { PendingView } from '../../components/connections/views/PendingView';
+import { FindConnectionsView } from '../../components/connections/views/FindConnectionsView';
+import { useConnections } from '../../hooks/useConnections';
+import { useUser } from '../../utils/context/user-context';
+import { useRouter } from 'next/navigation';
+import DevconnectLoader from '../../components/loadingSpinner';
 
 const ConnectionPage: React.FC = () => {
+  const router = useRouter();
   const [activeView, setActiveView] = useState<
     'connections' | 'pending' | 'find'
   >('connections');
   const [pendingTab, setPendingTab] = useState<'received' | 'sent'>('received');
   const [searchTerm, setSearchTerm] = useState<string>('');
 
+  // The hook is now called ONLY ONCE here. This is our single source of truth.
   const {
     connectionData,
     suggestedUsers,
     isLoading,
     isLoadingSuggested,
-    fetchSuggestedConnections,
     handleConnect,
     handleIgnoreAndUnignore,
     handleBlockAndUnblock,
     suspendSentRequest,
     connectionResponse,
+    deleteConnection, // Get the delete function from the hook
   } = useConnections();
 
-  // Fetch suggested connections only when "Find" tab becomes active and we haven't loaded them yet
-  useEffect(() => {
-    if (
-      activeView === 'find' &&
-      suggestedUsers.length === 0 &&
-      !isLoadingSuggested
-    ) {
-      fetchSuggestedConnections();
-    }
-  }, [
-    activeView,
-    suggestedUsers.length,
-    isLoadingSuggested,
-    fetchSuggestedConnections,
-  ]);
+  const { user, isLoading: userIsLoading } = useUser();
 
   const handleViewChange = (view: 'connections' | 'pending' | 'find') => {
     setActiveView(view);
-    // Clear search when switching views
     if (view !== 'connections') {
       setSearchTerm('');
     }
@@ -54,7 +44,8 @@ const ConnectionPage: React.FC = () => {
 
   const renderContent = () => {
     if (isLoading) {
-      return <LoadingState />;
+      // Use the main loader while the initial data is loading
+      return <DevconnectLoader />;
     }
 
     switch (activeView) {
@@ -64,6 +55,9 @@ const ConnectionPage: React.FC = () => {
             connections={connectionData.connected}
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
+            // Pass the functions down as props
+            deleteConnection={deleteConnection}
+            handleBlockAndUnblock={handleBlockAndUnblock}
           />
         );
       case 'pending':
@@ -98,9 +92,20 @@ const ConnectionPage: React.FC = () => {
     sent: connectionData.requestSent.length,
   };
 
+  useEffect(() => {
+    if (!userIsLoading && !user) {
+      router.push('/login');
+    }
+    // Fixed the missing dependency warning by adding 'userIsLoading'
+  }, [user, router, userIsLoading]);
+
+  // A simpler check for the initial loading state.
+  if (!user) {
+    return <DevconnectLoader />;
+  }
+
   return (
     <div className="flex bg-gray-50 min-h-screen">
-      {/* Sidebar - fixed and non-scrollable */}
       <div className="flex-shrink-0">
         <ConnectionSidebar
           activeView={activeView}
@@ -108,8 +113,6 @@ const ConnectionPage: React.FC = () => {
           connectionCounts={connectionCounts}
         />
       </div>
-
-      {/* Main content - scrollable area */}
       <main className="flex-1 p-8 overflow-auto">
         <h1 className="text-4xl font-extrabold text-gray-900 mb-8">
           My Network

@@ -2,8 +2,20 @@
 import React, { useState } from 'react';
 import { MoreVertical, UserPlus } from 'lucide-react';
 import { getImageUrl } from '@/lib/utils';
-import { UserCardProps } from '@/lib/types/connection';
 import Image from 'next/image';
+
+// No changes needed to props here as they were already passed correctly
+interface UserCardProps {
+  user: {
+    id: string;
+    name: string;
+    title: string;
+    avatar: string;
+  };
+  onConnect: (userId: string) => void;
+  onNotInterested: (userId: string) => void;
+  onHandleBlock: (userId: string) => void;
+}
 
 const UserCard: React.FC<UserCardProps> = ({
   user,
@@ -12,6 +24,8 @@ const UserCard: React.FC<UserCardProps> = ({
   onHandleBlock,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
+
+  // REMOVED: const { ... } = useConnections(); NO hook call here.
 
   return (
     <div className="relative p-5 bg-white rounded-lg shadow-sm border border-gray-200 transition-all duration-300 hover:shadow-lg hover:border-gray-300">

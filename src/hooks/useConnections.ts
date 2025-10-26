@@ -17,7 +17,7 @@ export const useConnections = () => {
   const [isLoadingSuggested, setIsLoadingSuggested] = useState(false);
 
   const fetchConnectionData = async () => {
-    setIsLoading(true);
+    // No setIsLoading here to allow background refresh without a full loader
     try {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/devconnect/userconnection/get-user-connections`,
@@ -34,8 +34,6 @@ export const useConnections = () => {
       });
     } catch (error) {
       console.error('Failed to fetch connection data:', error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -55,6 +53,20 @@ export const useConnections = () => {
     }
   };
 
+  // A helper to refetch everything concurrently
+  const refetchAll = async () => {
+    await Promise.all([fetchConnectionData(), fetchSuggestedConnections()]);
+  };
+
+  useEffect(() => {
+    const initialFetch = async () => {
+      setIsLoading(true);
+      await Promise.all([fetchConnectionData(), fetchSuggestedConnections()]);
+      setIsLoading(false);
+    };
+    initialFetch();
+  }, []);
+
   const handleConnect = async (userId: string) => {
     try {
       await axios.post(
@@ -63,9 +75,7 @@ export const useConnections = () => {
         { withCredentials: true }
       );
       console.log('Connection request sent to:', userId);
-
-      // Refetch both connection data and suggested users
-      await Promise.all([fetchConnectionData(), fetchSuggestedConnections()]);
+      await refetchAll(); // Refetch everything
     } catch (error) {
       console.error('Failed to send connection request:', error);
     }
@@ -81,11 +91,10 @@ export const useConnections = () => {
         { toUserId: userId, status: action },
         { withCredentials: true }
       );
-
-      console.log('User Ignored:', userId);
-      await fetchConnectionData(); // Refetch to update lists
+      console.log(`User ${action}d:`, userId);
+      await refetchAll(); // Refetch everything
     } catch (error) {
-      console.error('Failed to Ignore user:', error);
+      console.error(`Failed to ${action} user:`, error);
     }
   };
 
@@ -96,14 +105,13 @@ export const useConnections = () => {
         { toUserId: userId },
         { withCredentials: true }
       );
-      console.log('Connection request drawn back for:', userId);
-
-      // Refetch connection data to update the lists
-      await fetchConnectionData();
+      console.log('Connection request suspended for:', userId);
+      await refetchAll(); // Refetch everything
     } catch (error) {
-      console.error('Failed to draw back connection request:', error);
+      console.error('Failed to suspend connection request:', error);
     }
   };
+
   const deleteConnection = async (userId: string) => {
     try {
       await axios.post(
@@ -111,14 +119,13 @@ export const useConnections = () => {
         { toUserId: userId },
         { withCredentials: true }
       );
-      console.log('Connection request drawn back for:', userId);
-
-      // Refetch connection data to update the lists
-      await fetchConnectionData();
+      console.log('Connection deleted for:', userId);
+      await refetchAll(); // Refetch everything
     } catch (error) {
-      console.error('Failed to draw back connection request:', error);
+      console.error('Failed to delete connection:', error);
     }
   };
+
   const connectionResponse = async (
     userId: string,
     action: 'accept' | 'reject'
@@ -132,17 +139,13 @@ export const useConnections = () => {
         },
         { withCredentials: true }
       );
-
       console.log(`Connection request ${action}ed for:`, userId);
-
-      // Refetch connection data to update the lists
-      await fetchConnectionData();
+      await refetchAll(); // Refetch everything
     } catch (error) {
       console.error(`Failed to ${action} connection request:`, error);
     }
   };
 
-  // Add other connection actions as needed
   const handleBlockAndUnblock = async (
     userId: string,
     action: 'block' | 'unblock'
@@ -153,25 +156,18 @@ export const useConnections = () => {
         { toUserId: userId, status: action },
         { withCredentials: true }
       );
-
-      console.log('User blocked:', userId);
-      await fetchConnectionData(); // Refetch to update lists
+      console.log(`User ${action}ed:`, userId);
+      await refetchAll(); // Refetch everything
     } catch (error) {
-      console.error('Failed to block user:', error);
+      console.error(`Failed to ${action} user:`, error);
     }
   };
-
-  useEffect(() => {
-    fetchConnectionData();
-  }, []);
 
   return {
     connectionData,
     suggestedUsers,
     isLoading,
     isLoadingSuggested,
-    fetchConnectionData,
-    fetchSuggestedConnections,
     handleConnect,
     suspendSentRequest,
     handleIgnoreAndUnignore,
@@ -180,3 +176,4 @@ export const useConnections = () => {
     deleteConnection,
   };
 };
+export default useConnections;

@@ -1,4 +1,4 @@
-import { UserProfile } from '@/lib/types';
+import { UserProfile } from '@/lib/types/user';
 import { ReactNode } from 'react';
 
 // This interface defines the shape of your context's value

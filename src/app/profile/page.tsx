@@ -7,7 +7,7 @@ import {
   Experience,
   SocialLink,
   UserProfile,
-} from '@/lib/types';
+} from '@/lib/types/user';
 import { useEffect, useState } from 'react';
 import { z, ZodError } from 'zod';
 import {

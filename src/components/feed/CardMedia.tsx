@@ -2,8 +2,8 @@
 
 import React, { FC } from 'react';
 import MediaCarousel from './MediaCarousel';
-import { getMediaUrl } from '@/utils/helper/blog';
 import Image from 'next/image';
+import { getMediaUrl } from '@/utils/helper/getMediaUrl-blog';
 
 interface CardMediaProps {
   photos: string[];

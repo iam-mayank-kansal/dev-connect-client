@@ -6,12 +6,17 @@ interface ConnectionsViewProps {
   connections: ApiUser[];
   searchTerm: string;
   onSearchChange: (term: string) => void;
+  // Accept functions as props
+  deleteConnection: (userId: string) => void;
+  handleBlockAndUnblock: (userId: string, action: 'block' | 'unblock') => void;
 }
 
 export const ConnectionsView: React.FC<ConnectionsViewProps> = ({
   connections,
   searchTerm,
   onSearchChange,
+  deleteConnection,
+  handleBlockAndUnblock,
 }) => {
   const filteredConnections = connections.filter(
     (user) =>
@@ -47,6 +52,9 @@ export const ConnectionsView: React.FC<ConnectionsViewProps> = ({
                 },
               ]}
               showMoreOptions={true}
+              // Pass the functions down to the item
+              deleteConnection={deleteConnection}
+              handleBlockAndUnblock={handleBlockAndUnblock}
             />
           ))}
         </div>

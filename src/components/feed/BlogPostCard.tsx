@@ -1,21 +1,26 @@
 'use client';
 
-import React, { FC, useState, useCallback } from 'react';
+import React, { FC, useState, useCallback, useEffect } from 'react';
+import axios from 'axios';
 import CardHeader from './CardHeader';
 import CardBody from './CardBody';
 import CardFooter from './CardFooter';
 import PostMediaGrid from './PostMediaGrid';
 import MediaCarousel from './MediaCarousel';
-import ImageModal from './ImageModal'; // Updated import
-import { getMediaUrl } from '@/utils/helper/blog';
+import ImageModal from './ImageModal';
 import { Blog } from '@/lib/types/blog';
+import { useUser } from '@/utils/context/user-context';
+import { getMediaUrl } from '@/utils/helper/getMediaUrl-blog';
 
 interface BlogPostCardProps {
   blog: Blog;
 }
 
 const BlogPostCard: FC<BlogPostCardProps> = ({ blog }) => {
-  // State to manage the modal visibility and which image is currently selected
+  console.log('Blog : ', blog);
+  const { user } = useUser();
+
+  // --- Image Modal State ---
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
     images: string[];
@@ -26,7 +31,85 @@ const BlogPostCard: FC<BlogPostCardProps> = ({ blog }) => {
     currentIndex: 0,
   });
 
-  // Function to open the modal from a specific image
+  // --- Reaction State ---
+  const [likes, setLikes] = useState(blog.reactions?.agreed?.length || 0);
+  const [dislikes, setDislikes] = useState(
+    blog.reactions?.disagreed?.length || 0
+  );
+
+  const getInitialUserReaction = useCallback(() => {
+    if (!user?._id || !blog.reactions) return null;
+    if (blog.reactions.agreed.includes(user._id)) return 'like';
+    if (blog.reactions.disagreed.includes(user._id)) return 'dislike';
+    return null;
+  }, [user?._id, blog.reactions]);
+
+  const [userReaction, setUserReaction] = useState<'like' | 'dislike' | null>(
+    getInitialUserReaction
+  );
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Sync state if the user logs in/out or the blog data changes
+  useEffect(() => {
+    setUserReaction(getInitialUserReaction());
+  }, [getInitialUserReaction]);
+
+  // --- Reaction API Call Handler ---
+  const handleReaction = async (reactionType: 'like' | 'dislike') => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
+    const apiUrl = `${
+      process.env.NEXT_PUBLIC_API_BASE_URL || ''
+    }/devconnect/blog/react-blog`;
+
+    // We capture the UI's state *before* the API call to correctly determine if it's an undo action.
+    const currentReactionState = userReaction;
+    let apiReactionToSend;
+
+    // If the user clicks the same button again, they are taking back their reaction.
+    if (currentReactionState === reactionType) {
+      // We will send an empty string to signify this.
+      // NOTE: This requires a change in the backend validation to accept an empty 'reaction' field.
+      apiReactionToSend = '';
+    } else {
+      // Otherwise, it's a new reaction or a switch from like to dislike.
+      apiReactionToSend = reactionType === 'like' ? 'agree' : 'disagree';
+    }
+
+    try {
+      // The backend needs to handle the case where 'reaction' is an empty string.
+      const response = await axios.put(
+        apiUrl,
+        {
+          blogId: blog._id,
+          reaction: apiReactionToSend,
+        },
+        { withCredentials: true }
+      );
+
+      // The backend is the single source of truth for the counts.
+      const { agreedCount, disagreedCount } = response.data.data;
+      setLikes(agreedCount);
+      setDislikes(disagreedCount);
+
+      // After a successful API call, we update the UI state.
+      // If the user clicked the button that was already active, it's an "undo".
+      if (currentReactionState === reactionType) {
+        setUserReaction(null); // This clears the reaction, making the button "empty".
+      } else {
+        // Otherwise, it's a new reaction or a switch from like to dislike (or vice versa).
+        setUserReaction(reactionType);
+      }
+    } catch (error) {
+      console.error('Failed to submit reaction:', error);
+      // Optional: Add logic here to revert the UI state on API failure.
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // --- Image Modal Functions ---
   const openImageModal = useCallback(
     (startingImageUrl: string) => {
       const allPhotos = blog.blogPhoto || [];
@@ -44,12 +127,10 @@ const BlogPostCard: FC<BlogPostCardProps> = ({ blog }) => {
     [blog.blogPhoto]
   );
 
-  // Function to close the modal
   const closeImageModal = useCallback(() => {
     setModalState((prev) => ({ ...prev, isOpen: false }));
   }, []);
 
-  // Function to navigate within the modal
   const navigateImageModal = useCallback((newIndex: number) => {
     setModalState((prev) => ({ ...prev, currentIndex: newIndex }));
   }, []);
@@ -62,13 +143,11 @@ const BlogPostCard: FC<BlogPostCardProps> = ({ blog }) => {
         <CardHeader user={blog.userId} createdAt={blog.createdAt} />
         <CardBody title={blog.blogTitle} body={blog.blogBody} />
 
-        {/* --- Intelligent Media Rendering (for photos) --- */}
         <PostMediaGrid
           photos={blog.blogPhoto || []}
-          onImageClick={openImageModal} // Pass the new open modal function
+          onImageClick={openImageModal}
         />
 
-        {/* Videos get their own carousel if they exist */}
         {hasVideos && (
           <div className="mt-1">
             <MediaCarousel>
@@ -93,12 +172,14 @@ const BlogPostCard: FC<BlogPostCardProps> = ({ blog }) => {
         )}
 
         <CardFooter
-          likesCount={blog.likesCount}
-          commentsCount={blog.commentsCount}
+          likesCount={likes}
+          dislikesCount={dislikes}
+          userReaction={userReaction}
+          onReact={handleReaction}
+          isSubmitting={isSubmitting}
         />
       </article>
 
-      {/* Conditionally render the modal with navigation */}
       {modalState.isOpen && (
         <ImageModal
           images={modalState.images}

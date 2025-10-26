@@ -1,11 +1,19 @@
 import axios, { AxiosResponse } from 'axios';
-import { deleteUserResponse, UserProfile } from './types';
+import { deleteUserResponse, UserProfile } from './types/user';
 
 export async function getUserProfile(): Promise<
   AxiosResponse<{ status: string; data: UserProfile }>
 > {
   return axios.get(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/devconnect/user/profile`,
+    { withCredentials: true }
+  );
+}
+export async function getPublicUserProfile(
+  userId: string
+): Promise<AxiosResponse<{ status: string; data: UserProfile }>> {
+  return axios.get(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/devconnect/user/profile/${userId}`,
     { withCredentials: true }
   );
 }

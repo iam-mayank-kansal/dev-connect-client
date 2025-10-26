@@ -14,8 +14,12 @@ export interface Blog {
   blogViedo: string[]; // Note: This matches the typo from your API
   userId: PopulatedUser;
   createdAt: string;
-  likesCount: number;
-  commentsCount: number;
+  reactions: BlogReactions;
+}
+
+export interface BlogReactions {
+  agreed: string[];
+  disagreed: string[];
 }
 
 export interface BlogListApiResponse {
