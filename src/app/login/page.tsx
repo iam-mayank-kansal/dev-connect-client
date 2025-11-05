@@ -9,8 +9,8 @@ import { loginUser } from '@/lib/api';
 import { useUser } from '@/utils/context/user-context';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState<string>('iam.mayank.kansal.01@gmail.com');
-  const [password, setPassword] = useState<string>('Mayank@1234');
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>(

@@ -1,8 +1,8 @@
 'use client';
 import React, { useState } from 'react';
 import { MoreVertical, UserPlus } from 'lucide-react';
-import { getImageUrl } from '@/lib/utils';
 import Image from 'next/image';
+import { getImageUrl } from '@/utils/helper/getImageUrl';
 
 // No changes needed to props here as they were already passed correctly
 interface UserCardProps {

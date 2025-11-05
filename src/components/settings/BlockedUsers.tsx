@@ -2,8 +2,8 @@
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { useConnections } from '@/hooks/useConnections';
-import { getImageUrl } from '@/lib/utils';
 import Image from 'next/image';
+import { getImageUrl } from '@/utils/helper/getImageUrl';
 
 export default function BlockedUsers() {
   const { connectionData, handleBlockAndUnblock } = useConnections();

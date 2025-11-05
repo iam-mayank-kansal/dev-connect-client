@@ -1,8 +1,8 @@
 'use client';
 import React, { useState } from 'react';
 import { MoreVertical } from 'lucide-react';
-import { getImageUrl } from '@/lib/utils';
 import Image from 'next/image';
+import { getImageUrl } from '@/utils/helper/getImageUrl';
 
 // Update props to accept functions
 interface UserFeedItemProps {

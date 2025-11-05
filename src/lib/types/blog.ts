@@ -1,6 +1,7 @@
 // --- TypeScript Type Definitions ---
 
 export interface PopulatedUser {
+  _id: string;
   name: string;
   profilePicture?: string;
   designation?: string;

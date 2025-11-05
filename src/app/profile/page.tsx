@@ -37,10 +37,10 @@ import Image from 'next/image';
 import { userProfileSchema } from '@/lib/profile/zod-validation';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/utils/context/user-context';
-import { getImageUrl } from '@/lib/utils';
+import { getImageUrl } from '@/utils/helper/getImageUrl';
 
 function ProfilePage() {
-  const { user, isLoading, triggerRefresh } = useUser(); // Use the context hook
+  const { user, isLoading, triggerRefresh } = useUser();
   const router = useRouter();
 
   const [localUser, setLocalUser] = useState<UserProfile | null>(null);
@@ -264,11 +264,14 @@ function ProfilePage() {
   }
 
   // determine profile image source
+  // determine profile image source
   const profileImageSrc = profilePictureFile
-    ? URL.createObjectURL(profilePictureFile)
-    : localUser.profilePicture
-      ? getImageUrl(localUser.profilePicture, 'profilePicture')
-      : '';
+    ? URL.createObjectURL(profilePictureFile) // 1. Priority: Show the new file preview
+    : typeof localUser.profilePicture === 'string' // 2. Check if the existing data is a string
+      ? getImageUrl(localUser.profilePicture, 'profilePicture') // 3. If string, use getImageUrl
+      : localUser.profilePicture instanceof File // 4. Check if existing data is a File
+        ? URL.createObjectURL(localUser.profilePicture) // 5. If File, create a preview
+        : ''; // 6. Otherwise, no image
 
   // determine resume file name
   const resumeFileName = resumeFile

@@ -1,3 +1,5 @@
+import { ConnectionData } from './connection';
+
 export interface Mobile {
   countryCode: string;
   number: string;
@@ -54,6 +56,7 @@ export interface UserProfile {
   dob: string;
   mobile: Mobile;
   location: Location;
+  connections: ConnectionData;
 }
 
 export interface deleteUserResponse {

@@ -9,7 +9,7 @@ export async function getUserProfile(): Promise<
     { withCredentials: true }
   );
 }
-export async function getPublicUserProfile(
+export async function getUserProfileById(
   userId: string
 ): Promise<AxiosResponse<{ status: string; data: UserProfile }>> {
   return axios.get(

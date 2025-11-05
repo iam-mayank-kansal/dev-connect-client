@@ -13,10 +13,31 @@ const CardBody: FC<CardBodyProps> = ({ title, body }) => {
   const textRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
-    if (textRef.current) {
-      setIsClamped(textRef.current.scrollHeight > textRef.current.clientHeight);
-    }
-  }, [body]);
+    // This function checks if the text is overflowing
+    const checkClamping = () => {
+      if (textRef.current) {
+        // Check if the full height of the content (scrollHeight)
+        // is greater than the visible height (clientHeight)
+        // This is checked while 'line-clamp-2' is active (when isExpanded is false)
+        const hasOverflow =
+          textRef.current.scrollHeight > textRef.current.clientHeight;
+        setIsClamped(hasOverflow);
+      }
+    };
+
+    // Run the check on mount and when the body text changes
+    // Using a small timeout to allow for rendering
+    const timer = setTimeout(checkClamping, 50);
+
+    // Re-check on window resize, as this can change the text flow
+    window.addEventListener('resize', checkClamping);
+
+    // Cleanup listener and timer
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', checkClamping);
+    };
+  }, [body]); // Re-run effect if the 'body' prop changes
 
   if (!title && !body) return null;
 
@@ -29,16 +50,30 @@ const CardBody: FC<CardBodyProps> = ({ title, body }) => {
         <>
           <p
             ref={textRef}
-            className={`text-gray-700 whitespace-pre-wrap text-sm ${!isExpanded && 'line-clamp-3'}`}
+            className={`text-gray-700 whitespace-pre-wrap text-sm ${
+              !isExpanded ? 'line-clamp-2' : ''
+            }`}
           >
             {body}
           </p>
+
+          {/* Show "Show More" only if it's clamped AND not expanded */}
           {isClamped && !isExpanded && (
             <button
               onClick={() => setIsExpanded(true)}
-              className="text-indigo-600 hover:underline font-semibold text-sm mt-1"
+              className="text-indigo-600 hover:underline font-semibold text-sm mt-1 cursor-pointer"
             >
               ...Show More
+            </button>
+          )}
+
+          {/* Show "Show Less" only if it's clamped AND expanded */}
+          {isClamped && isExpanded && (
+            <button
+              onClick={() => setIsExpanded(false)}
+              className="text-indigo-600 hover:underline font-semibold text-sm mt-1 cursor-pointer"
+            >
+              Show Less
             </button>
           )}
         </>

@@ -72,13 +72,13 @@ const ImageModal: FC<ImageModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black flex items-center justify-center p-4 sm:p-6 md:p-8 z-[9999]"
+      className="fixed inset-0 h-screen  bg-black flex items-center justify-center p-4 sm:p-6 md:p-8 z-[9999]"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
     >
       <button
-        className="absolute top-4 right-4 text-white p-2 rounded-full bg-black/40 hover:bg-black/60 transition"
+        className="absolute top-4 right-4 text-white p-2 rounded-full bg-black/40 hover:bg-black/60 transition cursor-pointer"
         onClick={onClose}
         aria-label="Close image viewer"
       >
@@ -88,7 +88,7 @@ const ImageModal: FC<ImageModalProps> = ({
       {hasMultipleImages && (
         <>
           <button
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-white p-2 rounded-full bg-black/40 hover:bg-black/60 transition"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-white p-2 rounded-full bg-black/40 hover:bg-black/60 transition cursor-pointer"
             onClick={(e) => {
               e.stopPropagation();
               goToPrevious();
@@ -98,7 +98,7 @@ const ImageModal: FC<ImageModalProps> = ({
             <ChevronLeft size={32} />
           </button>
           <button
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-white p-2 rounded-full bg-black/40 hover:bg-black/60 transition"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-white p-2 rounded-full bg-black/40 hover:bg-black/60 transition cursor-pointer"
             onClick={(e) => {
               e.stopPropagation();
               goToNext();

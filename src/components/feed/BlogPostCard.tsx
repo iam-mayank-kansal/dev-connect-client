@@ -17,7 +17,6 @@ interface BlogPostCardProps {
 }
 
 const BlogPostCard: FC<BlogPostCardProps> = ({ blog }) => {
-  console.log('Blog : ', blog);
   const { user } = useUser();
 
   // --- Image Modal State ---

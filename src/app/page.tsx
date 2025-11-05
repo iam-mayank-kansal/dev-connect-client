@@ -20,8 +20,6 @@ const Home: FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  console.log('Blogs on Home Page: ', blogs);
-
   const { user } = useUser();
 
   useEffect(() => {
