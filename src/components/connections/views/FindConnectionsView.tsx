@@ -1,4 +1,6 @@
 'use client';
+
+import React from 'react';
 import { ApiUser } from '@/lib/types/connection';
 import UserCard from '../userCard';
 
@@ -38,7 +40,7 @@ export const FindConnectionsView: React.FC<FindConnectionsViewProps> = ({
               id: user._id,
               name: user.name,
               title: user.designation,
-              avatar: user.profilePicture,
+              profilePicture: user.profilePicture,
             }}
             onConnect={() => onConnect(user._id)}
             onNotInterested={() => onNotInterested(user._id, 'ignore')}

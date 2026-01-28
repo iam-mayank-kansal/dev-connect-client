@@ -1,16 +1,14 @@
 'use client';
 import React, { useState } from 'react';
-import { MoreVertical, UserPlus } from 'lucide-react';
+import { MoreVertical, User, UserPlus } from 'lucide-react';
 import Image from 'next/image';
-import { getImageUrl } from '@/utils/helper/getImageUrl';
 
-// No changes needed to props here as they were already passed correctly
 interface UserCardProps {
   user: {
     id: string;
     name: string;
     title: string;
-    avatar: string;
+    profilePicture?: string;
   };
   onConnect: (userId: string) => void;
   onNotInterested: (userId: string) => void;
@@ -25,19 +23,33 @@ const UserCard: React.FC<UserCardProps> = ({
 }) => {
   const [showMenu, setShowMenu] = useState(false);
 
-  // REMOVED: const { ... } = useConnections(); NO hook call here.
+  // Validate if profilePicture is a valid URL for Next.js Image
+  const isValidImageUrl = (url: string) => {
+    if (!url) return false;
+    return (
+      url.startsWith('/') ||
+      url.startsWith('http://') ||
+      url.startsWith('https://')
+    );
+  };
 
   return (
     <div className="relative p-5 bg-white rounded-lg shadow-sm border border-gray-200 transition-all duration-300 hover:shadow-lg hover:border-gray-300">
       <div className="flex justify-between items-start">
         <div className="flex items-center space-x-4">
-          <Image
-            src={getImageUrl(user.avatar, 'profilePicture')}
-            alt={user.name}
-            width={128}
-            height={128}
-            className="w-16 h-16 rounded-full object-cover ring-2 ring-gray-200"
-          />
+          {user?.profilePicture && isValidImageUrl(user.profilePicture) ? (
+            <Image
+              src={user.profilePicture}
+              alt="Profile"
+              width={128}
+              height={128}
+              className="w-16 h-16 rounded-full object-cover border-4 border-white shadow-md"
+            />
+          ) : (
+            <div className="w-12 p-1 h-12 rounded-full bg-gray-200 flex items-center justify-center border-4 border-white shadow-md">
+              <User size={64} className="text-gray-400" />
+            </div>
+          )}
           <div>
             <h3 className="text-lg font-bold text-gray-900">{user.name}</h3>
             <p className="text-sm text-gray-500 mt-1">{user.title}</p>

@@ -1,16 +1,14 @@
 'use client';
 import React, { useState } from 'react';
-import { MoreVertical } from 'lucide-react';
+import { MoreVertical, User } from 'lucide-react';
 import Image from 'next/image';
-import { getImageUrl } from '@/utils/helper/getImageUrl';
 
-// Update props to accept functions
 interface UserFeedItemProps {
   user: {
     id: string;
     name: string;
     title: string;
-    avatar: string;
+    profilePicture?: string;
   };
   actions: {
     label: string;
@@ -18,7 +16,6 @@ interface UserFeedItemProps {
     primary?: boolean;
   }[];
   showMoreOptions?: boolean;
-  // Make functions optional so this component can be reused
   deleteConnection?: (userId: string) => void;
   handleBlockAndUnblock?: (userId: string, action: 'block' | 'unblock') => void;
 }
@@ -27,23 +24,37 @@ const UserFeedItem: React.FC<UserFeedItemProps> = ({
   user,
   actions,
   showMoreOptions = false,
-  // Receive functions from props
   deleteConnection,
   handleBlockAndUnblock,
 }) => {
-  // REMOVED: const { ... } = useConnections(); NO hook call here.
   const [showMenu, setShowMenu] = useState(false);
+
+  // Validate if profilePicture is a valid URL for Next.js Image
+  const isValidImageUrl = (url: string) => {
+    if (!url) return false;
+    return (
+      url.startsWith('/') ||
+      url.startsWith('http://') ||
+      url.startsWith('https://')
+    );
+  };
 
   return (
     <div className="relative flex items-center justify-between p-4 bg-white rounded-lg shadow-sm transition-shadow hover:shadow-md">
       <div className="flex items-center space-x-4">
-        <Image
-          src={getImageUrl(user.avatar, 'profilePicture')}
-          alt={user.name}
-          width={128}
-          height={128}
-          className="w-12 h-12 rounded-full object-cover ring-2 ring-gray-200"
-        />
+        {user.profilePicture && isValidImageUrl(user.profilePicture) ? (
+          <Image
+            src={user.profilePicture}
+            alt="Profile"
+            width={128}
+            height={128}
+            className="w-16 h-16 rounded-full object-cover border-4 border-white shadow-md"
+          />
+        ) : (
+          <div className="w-12 p-1 h-12 rounded-full bg-gray-200 flex items-center justify-center border-4 border-white shadow-md">
+            <User size={64} className="text-gray-400" />
+          </div>
+        )}
         <div>
           <h3 className="text-lg font-semibold text-gray-900">{user.name}</h3>
           <p className="text-sm text-gray-500">{user.title}</p>
@@ -75,7 +86,6 @@ const UserFeedItem: React.FC<UserFeedItemProps> = ({
               <div className="absolute top-8 right-0 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-10">
                 <button
                   onClick={() => {
-                    // Use the prop function, and ensure it exists before calling
                     handleBlockAndUnblock?.(user.id, 'block');
                     setShowMenu(false);
                   }}
@@ -85,7 +95,6 @@ const UserFeedItem: React.FC<UserFeedItemProps> = ({
                 </button>
                 <button
                   onClick={() => {
-                    // Use the prop function
                     deleteConnection?.(user.id);
                     setShowMenu(false);
                   }}

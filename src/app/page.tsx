@@ -5,8 +5,6 @@ import axios, { AxiosResponse } from 'axios';
 import { Loader2, ServerCrash } from 'lucide-react';
 import BlogPostCard from '@/components/feed/BlogPostCard';
 import { Blog, BlogListApiResponse } from '@/lib/types/blog';
-import { useUser } from '@/utils/context/user-context';
-import Link from 'next/link';
 
 // --- API FUNCTION ---
 async function getAllBlogs(): Promise<AxiosResponse<BlogListApiResponse>> {
@@ -19,8 +17,6 @@ const Home: FC = () => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
-  const { user } = useUser();
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -84,33 +80,10 @@ const Home: FC = () => {
   };
 
   return (
-    <>
-      {!user ? (
-        <div className="min-h-screen bg-gray-900 text-white font-sans flex flex-col items-center justify-center p-8 text-center">
-          <div className="flex-grow flex flex-col items-center justify-center">
-            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold mb-4">
-              Devconnect
-            </h1>
-            <p className="text-base sm:text-lg md:text-xl lg:text-2xl max-w-2xl text-gray-400 mb-8">
-              Your Gateway to the Global Developer Community. Build your
-              professional profile, showcase your projects, and connect with
-              fellow developers.
-            </p>
-            <Link
-              href={'/signup'}
-              className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-colors duration-300"
-            >
-              Join Devconnect
-            </Link>
-          </div>
-        </div>
-      ) : (
-        <div className="min-h-screen bg-gray-100 text-gray-800 font-sans flex flex-col items-center p-4">
-          <header className="w-full max-w-xl text-center my-8"></header>
-          <main className="w-full">{renderContent()}</main>
-        </div>
-      )}
-    </>
+    <div className="min-h-screen bg-gray-100 text-gray-800 font-sans flex flex-col items-center p-4">
+      <header className="w-full max-w-xl text-center my-8"></header>
+      <main className="w-full">{renderContent()}</main>
+    </div>
   );
 };
 

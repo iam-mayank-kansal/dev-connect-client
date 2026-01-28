@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { TabButton } from './tabButton';
 
 interface ConnectionSidebarProps {

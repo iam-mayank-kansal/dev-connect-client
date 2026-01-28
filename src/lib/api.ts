@@ -126,8 +126,9 @@ export async function signUpUserApi(
 }
 export interface VerifyOtpResponse {
   message: string;
-  data: {
-    token: string; // token you’re passing to new-password
+  data?: {
+    token: string;
+    contact: string;
   };
 }
 export async function verifyOtp(

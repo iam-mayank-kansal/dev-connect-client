@@ -1,111 +1,83 @@
 'use client';
-import { useUser } from '@/utils/context/user-context';
-import { useRouter } from 'next/navigation';
+
 import { useEffect, useState } from 'react';
-import useUserProfile from './useUserProfile';
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/store/useAuthStore';
+import { useUserStore } from '@/store/useUserStore';
 import Loader from '@/utils/helper/Loader';
 import ErrorMessageDisplay from '@/utils/helper/ErrorMessageDisplay';
 import UserProfileView from './UserProfileView';
 import UserProfileEdit from './UserProfileEdit';
+import { User as UserEntity } from '@/lib/types/entities';
 
 const UserProfileContainer = ({ userId }: { userId: string | undefined }) => {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
 
-  console.log('👤 [UserProfileContainer] Current userId prop:', userId);
+  // 1. Get Logged In User (Me)
+  const { authUser, isCheckingAuth, checkAuth } = useAuthStore();
 
-  // Get the currently logged-in user
-  const { user: currentUser, isLoading: isAuthLoading } = useUser();
-
-  console.log('🔐 [UserProfileContainer] Auth state:', {
-    isAuthLoading,
-    currentUser: currentUser ? 'Logged in' : 'Not logged in',
-    currentUserId: currentUser?._id,
-  });
-
-  // --- MODIFIED: Get connectionStatus from hook ---
+  // 2. Get Visited Profile (Them)
   const {
     profileUser,
-    connectionStatus, // Added this
-    isLoading: isProfileLoading,
-    error,
-  } = useUserProfile(userId);
-
-  console.log('📊 [UserProfileContainer] Profile state:', {
-    isProfileLoading,
-    profileUser: profileUser ? 'Loaded' : 'Not loaded',
-    connectionStatus, // Added this
-    error,
-  });
-
-  // Handle redirection if user is not logged in
-  useEffect(() => {
-    console.log('🔄 [UserProfileContainer] Checking auth...');
-    if (!isAuthLoading && !currentUser) {
-      console.log('🚫 [UserProfileContainer] No user, redirecting to login');
-      router.push('/login');
-    } else if (currentUser) {
-      console.log(
-        '✅ [UserProfileContainer] User authenticated:',
-        currentUser._id
-      );
-    }
-  }, [isAuthLoading, currentUser, router]);
-
-  // Show loading spinner while auth or profile data is loading
-  if (isAuthLoading || isProfileLoading) {
-    console.log('⏳ [UserProfileContainer] Showing loader');
-    return <Loader />;
-  }
-
-  // Handle profile not found error
-  if (error) {
-    console.log('❌ [UserProfileContainer] Showing error:', error);
-    return <ErrorMessageDisplay message={error} />;
-  }
-
-  // Handle cases where user isn't logged in or profile data couldn't be loaded
-  if (!currentUser || !profileUser || !connectionStatus) {
-    // Added connectionStatus check
-    console.log(
-      '⚠️ [UserProfileContainer] No current user, profile user, or status, showing loader'
-    );
-    return <Loader />;
-  }
-
-  // Check if the logged-in user is the owner of this profile
-  // The API status 'self' is also a good check
-  const isOwner =
-    currentUser._id === profileUser._id || connectionStatus === 'self';
-
-  console.log('👑 [UserProfileContainer] Ownership check:', {
-    currentUserId: currentUser._id,
-    profileUserId: profileUser._id,
     connectionStatus,
-    isOwner,
-  });
+    isLoadingProfile,
+    error,
+    fetchUserProfile,
+    clearProfile,
+    setProfileUser,
+  } = useUserStore();
 
-  console.log('🎬 [UserProfileContainer] Rendering profile view');
+  // 3. Fetch Data on Mount or ID Change
+  useEffect(() => {
+    if (userId) {
+      fetchUserProfile(userId);
+    }
+    // Cleanup when leaving page
+    return () => clearProfile();
+  }, [userId, fetchUserProfile, clearProfile]);
 
+  // 4. Handle Auth Redirects
+  useEffect(() => {
+    if (!isCheckingAuth && !authUser) {
+      router.push('/login');
+    }
+  }, [isCheckingAuth, authUser, router]);
+
+  // 5. Loading & Error States
+  if (isCheckingAuth || isLoadingProfile) return <Loader />;
+  if (error) return <ErrorMessageDisplay message={error} />;
+  if (!profileUser || !authUser) return <Loader />;
+
+  // 6. Ownership Check
+  const isOwner =
+    authUser._id === profileUser._id || connectionStatus === 'self';
+
+  // 7. Render Logic
   if (isOwner && isEditing) {
-    // If they are the owner and clicked "Edit", show the edit component
     return (
       <UserProfileEdit
         user={profileUser}
-        onSaveSuccess={() => setIsEditing(false)}
+        onSaveSuccess={(updatedUser: UserEntity) => {
+          if (setProfileUser) {
+            setProfileUser(updatedUser);
+          } else {
+            fetchUserProfile(userId || authUser._id);
+          }
+          checkAuth();
+          setIsEditing(false);
+        }}
         onCancel={() => setIsEditing(false)}
       />
     );
   }
 
-  // Otherwise, show the view-only component
-  // --- MODIFIED: Pass connectionStatus prop ---
   return (
     <UserProfileView
       user={profileUser}
       isOwner={isOwner}
       onEditClick={() => setIsEditing(true)}
-      connectionStatus={connectionStatus}
+      connectionStatus={connectionStatus || 'not_connected'}
     />
   );
 };

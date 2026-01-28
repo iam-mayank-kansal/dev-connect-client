@@ -1,12 +1,10 @@
 'use client';
-
 import React, { FC } from 'react';
-// Removed MoreHorizontal import
 import { PopulatedUser } from '@/lib/types/blog';
 import Image from 'next/image';
-import { getMediaUrl } from '@/utils/helper/getMediaUrl-blog';
 import { formatDate } from '@/utils/helper/formDate';
 import Link from 'next/link';
+import { User } from 'lucide-react';
 
 interface CardHeaderProps {
   user: PopulatedUser;
@@ -14,21 +12,23 @@ interface CardHeaderProps {
 }
 
 const CardHeader: FC<CardHeaderProps> = ({ user, createdAt }) => {
-  const userProfilePic = user.profilePicture
-    ? getMediaUrl(user.profilePicture, 'profilePicture')
-    : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=e9d5ff&color=7c3aed`;
-
   return (
     <div className="p-4 flex items-center justify-between">
       <div className="flex items-center space-x-3 ">
         <Link href={`/profile/${user._id}`}>
-          <Image
-            src={userProfilePic}
-            width={44}
-            height={44}
-            alt={`${user.name}'s profile`}
-            className="w-11 h-11 rounded-full object-cover"
-          />
+          {user.profilePicture ? (
+            <Image
+              src={user.profilePicture}
+              alt="Profile"
+              width={144}
+              height={144}
+              className="w-36 h-36 rounded-full object-cover border-4 border-white shadow-md"
+            />
+          ) : (
+            <div className="w-36 h-36 rounded-full bg-gray-200 flex items-center justify-center border-4 border-white shadow-md">
+              <User size={64} className="text-gray-400" />
+            </div>
+          )}
         </Link>
 
         <div>
@@ -44,7 +44,6 @@ const CardHeader: FC<CardHeaderProps> = ({ user, createdAt }) => {
       </div>
       <div className="flex items-center space-x-2 text-gray-500">
         <time className="text-xs">{formatDate(createdAt)}</time>
-        {/* --- Removed 3-dot menu button --- */}
       </div>
     </div>
   );

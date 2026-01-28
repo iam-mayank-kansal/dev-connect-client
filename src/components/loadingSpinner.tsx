@@ -8,7 +8,7 @@ const DevconnectLoader = () => {
         The background is transparent so it doesn't feel intrusive.
       */}
       <div
-        className="fixed h-full w-full z-50 flex flex-col items-center justify-center"
+        className=" h-full w-full z-50 flex flex-col items-center justify-center"
         role="status"
         aria-live="polite"
       >

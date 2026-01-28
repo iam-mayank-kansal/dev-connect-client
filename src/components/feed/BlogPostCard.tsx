@@ -9,7 +9,7 @@ import PostMediaGrid from './PostMediaGrid';
 import MediaCarousel from './MediaCarousel';
 import ImageModal from './ImageModal';
 import { Blog } from '@/lib/types/blog';
-import { useUser } from '@/utils/context/user-context';
+import { useAuthStore } from '@/store/useAuthStore';
 import { getMediaUrl } from '@/utils/helper/getMediaUrl-blog';
 
 interface BlogPostCardProps {
@@ -17,7 +17,7 @@ interface BlogPostCardProps {
 }
 
 const BlogPostCard: FC<BlogPostCardProps> = ({ blog }) => {
-  const { user } = useUser();
+  const { authUser } = useAuthStore();
 
   // --- Image Modal State ---
   const [modalState, setModalState] = useState<{
@@ -37,11 +37,11 @@ const BlogPostCard: FC<BlogPostCardProps> = ({ blog }) => {
   );
 
   const getInitialUserReaction = useCallback(() => {
-    if (!user?._id || !blog.reactions) return null;
-    if (blog.reactions.agreed.includes(user._id)) return 'like';
-    if (blog.reactions.disagreed.includes(user._id)) return 'dislike';
+    if (!authUser?._id || !blog.reactions) return null;
+    if (blog.reactions.agreed.includes(authUser._id)) return 'like';
+    if (blog.reactions.disagreed.includes(authUser._id)) return 'dislike';
     return null;
-  }, [user?._id, blog.reactions]);
+  }, [authUser?._id, blog.reactions]);
 
   const [userReaction, setUserReaction] = useState<'like' | 'dislike' | null>(
     getInitialUserReaction

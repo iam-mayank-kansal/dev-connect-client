@@ -3,12 +3,12 @@ import React, { useState } from 'react';
 import { XCircle, ChevronDown, RotateCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { deleteUser } from '@/lib/api';
-import { useUser } from '@/utils/context/user-context';
+import { useAuthStore } from '@/store/useAuthStore';
 import { useRouter } from 'next/navigation';
 import ConfirmationModal from './ConfirmationModal';
 
 export default function AccountDeactivation() {
-  const { logout } = useUser();
+  const { logout } = useAuthStore();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);

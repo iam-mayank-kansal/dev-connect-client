@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next';
+import path from 'path'; // Import the path module
 
 const nextConfig: NextConfig = {
   images: {
@@ -9,7 +10,16 @@ const nextConfig: NextConfig = {
         port: '8080',
         pathname: '/uploads/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'ik.imagekit.io',
+        pathname: '/devconnect/**',
+      },
     ],
+  },
+  // Fix: Move experimental.turbo to turbopack and use an absolute path
+  turbopack: {
+    root: path.resolve(__dirname),
   },
 };
 

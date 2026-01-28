@@ -3,7 +3,7 @@ export interface ApiUser {
   name: string;
   designation: string;
   email: string;
-  profilePicture: string;
+  profilePicture?: string;
 }
 
 export interface ConnectionData {

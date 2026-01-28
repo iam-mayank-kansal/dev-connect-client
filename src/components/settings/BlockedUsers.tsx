@@ -1,25 +1,23 @@
 'use client';
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
-import { useConnections } from '@/hooks/useConnections';
 import Image from 'next/image';
-import { getImageUrl } from '@/utils/helper/getImageUrl';
+import { useConnection } from '@/hooks/useConnections';
+import { User } from 'lucide-react';
+import { User as UserEntity } from '@/lib/types/entities';
 
 export default function BlockedUsers() {
-  const { connectionData, handleBlockAndUnblock } = useConnections();
+  const { blockedUsers, unblockUser } = useConnection(true);
   const [unblockingIds, setUnblockingIds] = useState<Set<string>>(new Set());
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 5;
 
-  // Get blocked users from connectionData
-  const blockedUsers = connectionData.blocked || [];
-
   const handleUnblock = async (userId: string) => {
     try {
       setUnblockingIds((prev) => new Set(prev.add(userId)));
 
-      await handleBlockAndUnblock(userId, 'unblock');
+      await unblockUser(userId);
 
       toast.success('User unblocked successfully');
     } catch (error) {
@@ -36,7 +34,7 @@ export default function BlockedUsers() {
 
   // Filter users based on search term
   const filteredUsers = blockedUsers.filter(
-    (user) =>
+    (user: UserEntity) =>
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.designation.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -112,19 +110,25 @@ export default function BlockedUsers() {
         <>
           {/* Users Grid */}
           <div className="grid gap-3">
-            {currentUsers.map((user) => (
+            {currentUsers.map((user: UserEntity) => (
               <div
                 key={user._id}
                 className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <div className="flex items-center space-x-3 min-w-0 flex-1">
-                  <Image
-                    src={getImageUrl(user.profilePicture, 'profilePicture')}
-                    alt={user.name}
-                    width={128}
-                    height={128}
-                    className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-                  />
+                  {user.profilePicture ? (
+                    <Image
+                      src={user.profilePicture}
+                      alt="Profile"
+                      width={128}
+                      height={128}
+                      className="w-16 h-16 rounded-full object-cover border-4 border-white shadow-md"
+                    />
+                  ) : (
+                    <div className="w-10 p-1 h-10 rounded-full bg-gray-200 flex items-center justify-center border-4 border-white shadow-md">
+                      <User size={64} className="text-gray-400" />
+                    </div>
+                  )}
                   <div className="min-w-0 flex-1">
                     <h3 className="font-medium text-gray-900 truncate text-sm">
                       {user.name}

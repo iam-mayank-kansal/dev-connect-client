@@ -1,4 +1,6 @@
 'use client';
+
+import React from 'react';
 import UserFeedItem from '../UserFeedItem';
 import { ApiUser } from '@/lib/types/connection';
 
@@ -6,7 +8,6 @@ interface ConnectionsViewProps {
   connections: ApiUser[];
   searchTerm: string;
   onSearchChange: (term: string) => void;
-  // Accept functions as props
   deleteConnection: (userId: string) => void;
   handleBlockAndUnblock: (userId: string, action: 'block' | 'unblock') => void;
 }
@@ -43,7 +44,7 @@ export const ConnectionsView: React.FC<ConnectionsViewProps> = ({
                 id: user._id,
                 name: user.name,
                 title: user.designation,
-                avatar: user.profilePicture,
+                profilePicture: user.profilePicture,
               }}
               actions={[
                 {
@@ -52,7 +53,6 @@ export const ConnectionsView: React.FC<ConnectionsViewProps> = ({
                 },
               ]}
               showMoreOptions={true}
-              // Pass the functions down to the item
               deleteConnection={deleteConnection}
               handleBlockAndUnblock={handleBlockAndUnblock}
             />
