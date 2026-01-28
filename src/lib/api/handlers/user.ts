@@ -11,4 +11,11 @@ export const userAPI = {
     const response = await axiosClient.patch('/user/update-user', data);
     return response.data;
   },
+
+  async deleteUser(password: string) {
+    const response = await axiosClient.delete('/user/delete', {
+      data: { password },
+    });
+    return response.data;
+  },
 };

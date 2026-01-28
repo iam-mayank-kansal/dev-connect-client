@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { XCircle, ChevronDown, RotateCw } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { deleteUser } from '@/lib/api';
+import { userService } from '@/services/user/userService';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useRouter } from 'next/navigation';
 import ConfirmationModal from './ConfirmationModal';
@@ -21,7 +21,7 @@ export default function AccountDeactivation() {
     }
     setLoading(true);
     try {
-      await deleteUser(password);
+      await userService.deleteUser(password);
       logout();
       toast.success('Account deleted successfully!');
       router.push('/');

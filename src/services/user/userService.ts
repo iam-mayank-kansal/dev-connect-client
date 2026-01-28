@@ -82,5 +82,15 @@ class UserService {
       throw error;
     }
   }
+
+  async deleteUser(password: string): Promise<{ message: string }> {
+    try {
+      const response = await userAPI.deleteUser(password);
+      return response;
+    } catch (error) {
+      console.error('Delete user failed:', error);
+      throw error;
+    }
+  }
 }
 export const userService = new UserService();

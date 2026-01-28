@@ -58,7 +58,3 @@ export interface UserProfile {
   location: Location;
   connections: ConnectionData;
 }
-
-export interface deleteUserResponse {
-  message: string;
-}
