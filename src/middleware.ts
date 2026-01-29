@@ -2,14 +2,15 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  // Debugging only (check server logs)
-  // console.log('Middleware Path:', request.nextUrl.pathname);
+  const { pathname } = request.nextUrl;
+
+  // Skip API routes - they're proxied to backend
+  if (pathname.startsWith('/api/')) {
+    return NextResponse.next();
+  }
 
   const token = request.cookies.get('devconnect-auth-token')?.value;
-  console.log(
-    `PATH: ${request.nextUrl.pathname} | TOKEN: ${token ? 'FOUND' : 'MISSING'}`
-  );
-  const { pathname } = request.nextUrl;
+  console.log(`PATH: ${pathname} | TOKEN: ${token ? 'FOUND' : 'MISSING'}`);
 
   const protectedRoutes = [
     '/chat',
