@@ -6,6 +6,9 @@ export function middleware(request: NextRequest) {
   // console.log('Middleware Path:', request.nextUrl.pathname);
 
   const token = request.cookies.get('devconnect-auth-token')?.value;
+  console.log(
+    `PATH: ${request.nextUrl.pathname} | TOKEN: ${token ? 'FOUND' : 'MISSING'}`
+  );
   const { pathname } = request.nextUrl;
 
   const protectedRoutes = [
