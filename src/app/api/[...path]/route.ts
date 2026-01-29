@@ -112,6 +112,11 @@ async function proxyRequest(
       }
     });
 
+    // Ensure Content-Type is set for JSON responses
+    if (!nextResponse.headers.has('content-type')) {
+      nextResponse.headers.set('content-type', 'application/json');
+    }
+
     return nextResponse;
   } catch (error) {
     console.error('Proxy error:', error);
