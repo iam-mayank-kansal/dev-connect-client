@@ -8,7 +8,7 @@ import { useAuthStore } from '@/store/useAuthStore';
  * This ensures we check auth only once at startup, not on every route change
  */
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const { checkAuth, isCheckingAuth } = useAuthStore();
+  const { checkAuth } = useAuthStore();
 
   useEffect(() => {
     // Call checkAuth only once on app startup
