@@ -13,7 +13,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Call checkAuth only once on app startup
     checkAuth();
-  }, []); // Empty dependency - runs only once
+  }, [checkAuth]); // Include checkAuth dependency
 
   return <>{children}</>;
 }
