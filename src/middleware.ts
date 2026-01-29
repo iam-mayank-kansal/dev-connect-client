@@ -4,11 +4,6 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Skip API routes - they're proxied to backend
-  if (pathname.startsWith('/api/')) {
-    return NextResponse.next();
-  }
-
   const token = request.cookies.get('devconnect-auth-token')?.value;
   console.log(`PATH: ${pathname} | TOKEN: ${token ? 'FOUND' : 'MISSING'}`);
 
