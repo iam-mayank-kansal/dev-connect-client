@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useCallback } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { Loader2 } from 'lucide-react';
@@ -10,23 +10,18 @@ export default function ProtectedLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { authUser, isCheckingAuth, checkAuth } = useAuthStore();
+  const { authUser, isCheckingAuth } = useAuthStore();
   const router = useRouter();
 
-  const memoizedCheckAuth = useCallback(() => {
-    checkAuth();
-  }, [checkAuth]);
-
   useEffect(() => {
-    memoizedCheckAuth();
-  }, [memoizedCheckAuth]);
-
-  useEffect(() => {
+    // Only redirect if we're done checking AND user is not authenticated
+    // Middleware already blocked unauthed users, but verify again
     if (!isCheckingAuth && !authUser) {
       router.push('/login');
     }
   }, [isCheckingAuth, authUser, router]);
 
+  // Show loading while auth is being verified
   if (isCheckingAuth) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-white">

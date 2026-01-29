@@ -1,8 +1,7 @@
 // useAuth - Custom Hook
 // Provides convenient access to auth state and actions
-// Automatically checks authentication on mount
+// Note: Authentication is checked once by AuthProvider at app startup
 
-import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 
@@ -17,7 +16,6 @@ export function useAuth() {
     isSigningUp,
     isLoggingOut,
     error,
-    checkAuth,
     login,
     signUp,
     logout,
@@ -26,11 +24,6 @@ export function useAuth() {
     changePassword,
     clearError,
   } = useAuthStore();
-
-  // Check authentication on component mount
-  useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
 
   // Convenience flags
   const isAuthenticated = !!authUser;
