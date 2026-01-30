@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { pathname, href } = request.nextUrl;
 
   // Get token from cookies (set by backend or stored in cookies for middleware access)
   let token = request.cookies.get('devconnect-auth-token')?.value;
@@ -70,7 +70,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Case 2: Trying to access login/signup while already logged in -> Home
+  // Case 2: Auth route with token
   if (isAuthRoute && token) {
     console.log(
       '[Middleware] User already authenticated, redirecting from auth page to home'
