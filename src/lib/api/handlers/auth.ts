@@ -10,12 +10,12 @@ class AuthAPI_Handler {
 
   async login(
     credentials: AuthAPI.LoginRequest
-  ): Promise<AuthAPI.LoginResponse['data']> {
+  ): Promise<AuthAPI.LoginResponse> {
     const response = await axiosClient.post<AuthAPI.LoginResponse>(
       '/auth/login',
       credentials
     );
-    return response.data.data;
+    return response.data;
   }
 
   async signUp(

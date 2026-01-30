@@ -13,6 +13,7 @@ export namespace AuthAPI {
     status: string;
     message: string;
     data?: User;
+    token?: string; // JWT token included in response for cross-domain scenarios
   }
 
   // sign up

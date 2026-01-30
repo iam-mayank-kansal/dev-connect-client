@@ -63,7 +63,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
     try {
       const data = await authService.login(email, password);
       // Store token in localStorage for middleware access (important for production cross-domain)
-      if (typeof window !== 'undefined') {
+      if (typeof window !== 'undefined' && data.token) {
         localStorage.setItem('devconnect-auth-token', data.token);
       }
       set({

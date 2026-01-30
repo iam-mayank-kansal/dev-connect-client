@@ -15,11 +15,18 @@ class AuthService {
     }
   }
 
-  async login(email: string, password: string): Promise<{ user: User }> {
+  async login(
+    email: string,
+    password: string
+  ): Promise<{ user: User; token?: string }> {
     try {
-      const data = await authAPI.login({ email, password });
-      if (!data) throw new Error('Login succeeded but no user data received');
-      return { user: data };
+      const response = await authAPI.login({ email, password });
+      if (!response.data)
+        throw new Error('Login succeeded but no user data received');
+      return {
+        user: response.data,
+        token: response.token, // Get token from response
+      };
     } catch (error) {
       console.error('Login failed:', error);
       throw error;
