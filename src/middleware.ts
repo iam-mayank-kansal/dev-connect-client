@@ -13,6 +13,7 @@ export function middleware(request: NextRequest) {
     tokenLength: token?.length || 0,
     timestamp: new Date().toISOString(),
     userAgent: request.headers.get('user-agent')?.substring(0, 50),
+    allCookies: request.cookies.getAll().map((c) => c.name),
   });
 
   const protectedRoutes = [
@@ -47,6 +48,17 @@ export function middleware(request: NextRequest) {
       ? authRoutes.find((route) => pathname.startsWith(route))
       : null,
   });
+
+  // Skip middleware check for public routes and API routes
+  if (
+    pathname === '/' ||
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/_next') ||
+    pathname === '/favicon.ico'
+  ) {
+    console.log('[Middleware] ✓ Public/static route - allowing request');
+    return NextResponse.next();
+  }
 
   // Case 1: Trying to access protected route without token -> Login
   if (isProtectedRoute && !token) {
