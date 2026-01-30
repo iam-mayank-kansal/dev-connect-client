@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  const { pathname, href } = request.nextUrl;
+  const { pathname } = request.nextUrl;
 
   // Get token from cookies (set by backend or stored in cookies for middleware access)
   let token = request.cookies.get('devconnect-auth-token')?.value;
