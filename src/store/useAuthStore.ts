@@ -62,10 +62,6 @@ export const useAuthStore = create<AuthStore>((set) => ({
     set({ isLoggingIn: true, error: null });
     try {
       const data = await authService.login(email, password);
-      // Store token in localStorage for middleware access (important for production cross-domain)
-      if (typeof window !== 'undefined' && data.token) {
-        localStorage.setItem('devconnect-auth-token', data.token);
-      }
       set({
         authUser: data.user,
         error: null,
@@ -103,10 +99,6 @@ export const useAuthStore = create<AuthStore>((set) => ({
     set({ isLoggingOut: true, error: null });
     try {
       await authService.logout();
-      // Clear token from localStorage on logout
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('devconnect-auth-token');
-      }
       set({
         authUser: null,
         error: null,
@@ -114,10 +106,6 @@ export const useAuthStore = create<AuthStore>((set) => ({
       toast.success('Logged out successfully');
     } catch (error: unknown) {
       set({ authUser: null });
-      // Still clear token even if logout fails
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('devconnect-auth-token');
-      }
       toast.error('Failed to logout properly');
       throw error;
     } finally {
