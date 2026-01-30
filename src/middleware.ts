@@ -3,7 +3,15 @@ import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const token = request.cookies.get('devconnect-auth-token')?.value;
+
+  // Get token from cookies (set by backend or stored in cookies for middleware access)
+  let token = request.cookies.get('devconnect-auth-token')?.value;
+
+  // Fallback: check for token stored in request headers if available
+  if (!token) {
+    const authHeader = request.headers.get('authorization');
+    token = authHeader?.replace('Bearer ', '');
+  }
 
   console.log('=== MIDDLEWARE START ===');
   console.log('[Middleware] Request details:', {
