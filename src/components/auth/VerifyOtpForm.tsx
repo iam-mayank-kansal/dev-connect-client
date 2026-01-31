@@ -85,9 +85,8 @@ export default function VerifyOtpForm() {
       } else {
         // // console.error('Verification passed but resetToken is missing in store');
       }
-    } catch (error) {
+    } catch {
       // Toast and error state handled by store
-      // // console.error(error);
     }
   };
 
