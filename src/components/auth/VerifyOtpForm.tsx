@@ -83,11 +83,11 @@ export default function VerifyOtpForm() {
       if (currentToken) {
         router.push('/new-password');
       } else {
-        console.error('Verification passed but resetToken is missing in store');
+        // // console.error('Verification passed but resetToken is missing in store');
       }
     } catch (error) {
       // Toast and error state handled by store
-      console.error(error);
+      // // console.error(error);
     }
   };
 

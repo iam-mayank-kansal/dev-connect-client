@@ -36,7 +36,7 @@ export function useAuth() {
       await login(email, password);
       router.push('/');
     } catch (error) {
-      console.error('Login and redirect failed:', error);
+      // // console.error('Login and redirect failed:', error);
     }
   };
 
@@ -50,7 +50,7 @@ export function useAuth() {
       await signUp(name, email, password);
       router.push('/');
     } catch (error) {
-      console.error('Sign up and redirect failed:', error);
+      // // console.error('Sign up and redirect failed:', error);
     }
   };
 
@@ -60,7 +60,7 @@ export function useAuth() {
       await logout();
       router.push('/login');
     } catch (error) {
-      console.error('Logout and redirect failed:', error);
+      // // console.error('Logout and redirect failed:', error);
     }
   };
 

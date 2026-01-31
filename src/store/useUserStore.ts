@@ -21,7 +21,7 @@ export const useUserStore = create<UserStore>((set) => ({
         isLoadingProfile: false,
       });
     } catch (error: unknown) {
-      console.error('Store Error:', error);
+      // // console.error('Store Error:', error);
       let errorMessage = 'Failed to load profile';
       if (axios.isAxiosError(error)) {
         errorMessage = error.response?.data?.message || errorMessage;
