@@ -67,6 +67,7 @@ export function middleware(request: NextRequest) {
     console.log(
       '[Middleware] User already authenticated, redirecting from auth page to home'
     );
+
     console.log('[Middleware] Current auth page:', pathname);
 
     const homeUrl = new URL('/', request.url);
