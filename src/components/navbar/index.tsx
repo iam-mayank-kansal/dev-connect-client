@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { X, Code } from 'lucide-react';
 
@@ -15,21 +15,14 @@ import AuthSection from './AuthSection';
 import MobileMenu from './MobileMenu';
 
 export default function Navbar() {
-  // ➤ CHANGE 2: Get state directly from the Store
-  const { authUser, logout, isCheckingAuth, checkAuth } = useAuthStore();
+  // ➤ Get state directly from the Store
+  // NOTE: Auth is already checked in AuthProvider, no need to call checkAuth again
+  const { authUser, logout, isCheckingAuth } = useAuthStore();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchExpanded, setSearchExpanded] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
-
-  const memoizedCheckAuth = useCallback(() => {
-    checkAuth();
-  }, [checkAuth]);
-
-  useEffect(() => {
-    memoizedCheckAuth();
-  }, [memoizedCheckAuth]);
 
   // Reset states on route change
   useEffect(() => {
@@ -61,8 +54,15 @@ export default function Navbar() {
   // --- Auth Pages Logic (Hide Navbar content) ---
   if (pathname === '/login' || pathname === '/signup') {
     return (
-      <nav className="w-full bg-white/80 backdrop-blur-md border-b border-gray-100 flex justify-center items-center py-4 px-6 sticky top-0 z-50">
+      <nav className="w-full bg-white/80 backdrop-blur-md border-b border-gray-100 flex justify-between items-center py-4 px-6 sticky top-0 z-50">
         <NavbarLogo />
+        {!authUser && (
+          <AuthSection
+            user={authUser}
+            onLogout={handleLogOut}
+            searchExpanded={searchExpanded}
+          />
+        )}
       </nav>
     );
   }
@@ -81,6 +81,25 @@ export default function Navbar() {
   }
 
   // --- Main Layout ---
+  // Show minimal navbar for unauthenticated users on home page
+  if (!authUser) {
+    return (
+      <nav className="w-full bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100 sticky top-0 z-50">
+        <div className="flex justify-between items-center h-16 px-4 md:px-6 max-w-[1600px] mx-auto">
+          <NavbarLogo searchExpanded={searchExpanded} />
+          <div className="flex items-center gap-3">
+            <AuthSection
+              user={authUser}
+              onLogout={handleLogOut}
+              searchExpanded={searchExpanded}
+            />
+          </div>
+        </div>
+      </nav>
+    );
+  }
+
+  // --- Authenticated Layout ---
   return (
     <nav className="w-full bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100 sticky top-0 z-50">
       <div className="flex justify-between items-center h-16 px-4 md:px-6 max-w-[1600px] mx-auto">

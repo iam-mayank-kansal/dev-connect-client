@@ -25,7 +25,10 @@ const CardFooter: FC<CardFooterProps> = ({
     <div className="p-2">
       <div className="flex justify-around border-t border-gray-100 pt-1">
         <button
-          onClick={() => onReact('like')}
+          onClick={(e) => {
+            e.stopPropagation();
+            onReact('like');
+          }}
           disabled={isSubmitting}
           className={`flex items-center space-x-2 w-full justify-center p-2 rounded-lg transition-colors
             ${
@@ -43,7 +46,10 @@ const CardFooter: FC<CardFooterProps> = ({
           </span>
         </button>
         <button
-          onClick={() => onReact('dislike')}
+          onClick={(e) => {
+            e.stopPropagation();
+            onReact('dislike');
+          }}
           disabled={isSubmitting}
           className={`flex items-center space-x-2 w-full justify-center p-2 rounded-lg transition-colors
             ${

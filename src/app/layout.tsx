@@ -33,7 +33,7 @@ export default function RootLayout({
         <AuthProvider>
           <Navbar />
           {children}
-          <Toaster position="top-center" />
+          <Toaster position="top-center" containerClassName="!z-[50000]" />
         </AuthProvider>
       </body>
     </html>

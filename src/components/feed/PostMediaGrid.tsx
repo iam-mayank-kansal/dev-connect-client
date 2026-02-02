@@ -1,11 +1,11 @@
 'use client';
 
-import { getMediaUrl } from '@/utils/helper/getMediaUrl-blog';
+import { getMediaUrl } from '@/lib/utils/media';
 import Image from 'next/image';
 import React, { FC } from 'react';
 
 interface PostMediaGridProps {
-  photos: string[];
+  photos: (string | { url?: string; fileId?: string })[];
   onImageClick: (imageUrl: string) => void;
 }
 
@@ -20,13 +20,16 @@ const PostMediaGrid: FC<PostMediaGridProps> = ({ photos, onImageClick }) => {
     className = '',
     children,
   }: {
-    src: string;
+    src: string | { url?: string; fileId?: string };
     className?: string;
     children?: React.ReactNode;
   }) => (
     <div
       className={`relative cursor-pointer overflow-hidden bg-gray-100 ${className}`}
-      onClick={() => onImageClick(getMediaUrl(src, 'images'))}
+      onClick={(e) => {
+        e.stopPropagation();
+        onImageClick(getMediaUrl(src, 'images'));
+      }}
     >
       <Image
         src={getMediaUrl(src, 'images')}
@@ -47,7 +50,10 @@ const PostMediaGrid: FC<PostMediaGridProps> = ({ photos, onImageClick }) => {
       // The 'object-contain' is better for single images to show the whole picture without cropping.
       <div
         className="max-h-[550px] w-full overflow-hidden bg-gray-100 flex justify-center items-center cursor-pointer"
-        onClick={() => onImageClick(getMediaUrl(photos[0], 'images'))}
+        onClick={(e) => {
+          e.stopPropagation();
+          onImageClick(getMediaUrl(photos[0], 'images'));
+        }}
       >
         <Image
           src={getMediaUrl(photos[0], 'images')}

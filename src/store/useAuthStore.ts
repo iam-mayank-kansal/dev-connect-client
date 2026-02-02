@@ -1,21 +1,9 @@
 // store/useAuthStore.ts
 import { create } from 'zustand';
 import toast from 'react-hot-toast';
-import axios from 'axios';
 import { AuthStore } from './types';
 import { authService } from '@/services/auth/authService';
-
-const getErrorMessage = (error: unknown): string => {
-  if (axios.isAxiosError(error)) {
-    return (
-      error.response?.data?.message || error.message || 'An error occurred'
-    );
-  }
-  if (error instanceof Error) {
-    return error.message;
-  }
-  return 'An unknown error occurred';
-};
+import { getErrorMessage } from '@/lib/utils/errorHandler';
 
 export const useAuthStore = create<AuthStore>((set) => ({
   // ============= STATE =============

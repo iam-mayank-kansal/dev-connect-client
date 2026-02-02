@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { User, Users, Mail, Phone, MapPin, Globe } from 'lucide-react';
-import SocialIcon from '@/utils/helper/SocialIcons'; // Adjust path
+import SocialIcon from '@/utils/SocialIcons'; // Adjust path
 import SectionCard from '../../SectionCard';
 import { User as UserEntity, SocialLink } from '@/lib/types/entities';
 

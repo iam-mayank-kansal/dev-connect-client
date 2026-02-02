@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { MoreVertical, User, UserPlus } from 'lucide-react';
 import Image from 'next/image';
+import { isValidImageUrl } from '@/lib/utils/media';
 
 interface UserCardProps {
   user: {
@@ -22,16 +23,6 @@ const UserCard: React.FC<UserCardProps> = ({
   onHandleBlock,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
-
-  // Validate if profilePicture is a valid URL for Next.js Image
-  const isValidImageUrl = (url: string) => {
-    if (!url) return false;
-    return (
-      url.startsWith('/') ||
-      url.startsWith('http://') ||
-      url.startsWith('https://')
-    );
-  };
 
   return (
     <div className="relative p-5 bg-white rounded-lg shadow-sm border border-gray-200 transition-all duration-300 hover:shadow-lg hover:border-gray-300">

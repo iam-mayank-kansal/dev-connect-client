@@ -1,407 +1,556 @@
 'use client';
 
-import React, {
-  useState,
-  useRef,
-  ChangeEvent,
-  FormEvent,
-  FC,
-  Dispatch,
-  SetStateAction,
-} from 'react';
-import axios, { AxiosResponse } from 'axios';
-import {
-  FileText,
-  Video,
-  X,
-  Loader2,
-  CheckCircle,
-  AlertTriangle,
-} from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { getErrorMessage } from '@/lib/error-handler';
+import { BlogAPI } from '@/lib/types/api/blog';
+import { blogService } from '@/services/blog/blogService';
+import { imageKitService } from '@/services/imageKit/imageKitService';
+import { useState, useRef, useEffect } from 'react';
+import toast from 'react-hot-toast';
+import { Image as ImageIcon, Video, X, Plus, Check } from 'lucide-react';
+import Image from 'next/image';
 
-// --- Type Definitions ---
-
-// Defines the structure of the data sent to the API function
-interface BlogData {
-  blogTitle: string;
-  blogBody: string;
-  contentPhoto: File[];
-  contentViedo: File[]; // Matches the backend's expected field name
+interface CreateBlogProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+  onBlogCreated?: () => void;
 }
 
-// Defines the expected successful API response (customize as needed)
-interface BlogApiResponse {
-  message: string;
-  data: {
-    // Define the structure of the returned blog object
-    _id: string;
-    blogTitle: string;
-    blogBody: string;
-    // ... other fields
-  };
-}
+// Constants for file limits
+const MAX_IMAGES = 5;
+const MAX_VIDEOS = 5;
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_VIDEO_SIZE = 50 * 1024 * 1024; // 50MB
 
-// --- API Service Function ---
-
-/**
- * Creates a new blog post by sending multipart/form-data to the API.
- * This function is modeled after the provided updateUserProfile example.
- * @param blogData - The blog data including title, body, and files.
- * @returns An AxiosResponse containing the server's response.
- */
-export async function createBlogPost(
-  blogData: BlogData
-): Promise<AxiosResponse<BlogApiResponse>> {
-  const formData = new FormData();
-
-  // Iterate over the blogData and append to FormData
-  Object.entries(blogData).forEach(([key, value]) => {
-    // Handle the file arrays
-    if (key === 'contentPhoto' || key === 'contentViedo') {
-      if (Array.isArray(value)) {
-        value.forEach((file) => {
-          // Append each file with the same key. Multer will interpret this as an array.
-          formData.append(key, file);
-        });
-      }
-    }
-    // Handle primitive string values
-    else if (typeof value === 'string') {
-      formData.append(key, value);
-    }
-  });
-
-  // Note: Using an environment variable for the API URL is a best practice.
-  const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/devconnect/blog/create-blog`;
-
-  return axios.post(apiUrl, formData, {
-    // IMPORTANT: In a real app, you would get the token from your auth context/state management
-    headers: {
-      'Content-Type': 'multipart/form-data',
-      Authorization: `Bearer YOUR_AUTH_TOKEN_HERE`,
-    },
-    withCredentials: true, // If you use cookie-based sessions
-  });
-}
-
-// --- Helper Components (Typed) ---
-
-interface AlertMessageProps {
-  message: string;
-  type: 'error' | 'success';
-}
-
-const AlertMessage: FC<AlertMessageProps> = ({ message, type }) => {
-  if (!message) return null;
-
-  const isError = type === 'error';
-  const bgColor = isError ? 'bg-red-100' : 'bg-green-100';
-  const textColor = isError ? 'text-red-800' : 'text-green-800';
-  const Icon = isError ? AlertTriangle : CheckCircle;
-
-  return (
-    <div
-      className={`${bgColor} ${textColor} p-4 rounded-md flex items-center gap-3 my-4`}
-    >
-      <Icon className="h-5 w-5" />
-      <span className="text-sm font-medium">{message}</span>
-    </div>
+const CreateBlog = ({
+  isOpen: initialOpen = false,
+  onClose: externalOnClose,
+  onBlogCreated,
+}: CreateBlogProps) => {
+  const [isOpen, setIsOpen] = useState(initialOpen);
+  const [blogTitle, setBlogTitle] = useState('');
+  const [blogBody, setBlogBody] = useState('');
+  const [blogPhotos, setBlogPhotos] = useState<FileList | null>(null);
+  const [blogVideos, setBlogVideos] = useState<FileList | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadingFileIndex, setUploadingFileIndex] = useState<{
+    type: 'photo' | 'video';
+    index: number;
+  } | null>(null);
+  const [uploadedPhotoIndexes, setUploadedPhotoIndexes] = useState<Set<number>>(
+    new Set()
   );
-};
-
-interface FilePreviewProps {
-  files: File[];
-  onRemove: (index: number) => void;
-}
-
-const FilePreview: FC<FilePreviewProps> = ({ files, onRemove }) => {
-  // ... implementation remains the same
-  if (files.length === 0) return null;
-  const getFileIcon = (file: File) => {
-    if (file.type.startsWith('image/'))
-      return <FileText className="h-5 w-5 text-blue-500" />;
-    if (file.type.startsWith('video/'))
-      return <Video className="h-5 w-5 text-purple-500" />;
-    return <FileText className="h-5 w-5 text-gray-500" />;
-  };
-  return (
-    <div className="mt-4 space-y-2">
-      {files.map((file, index) => (
-        <div
-          key={index}
-          className="flex items-center justify-between p-2 bg-gray-50 border rounded-md"
-        >
-          <div className="flex items-center gap-3 overflow-hidden">
-            {getFileIcon(file)}
-            <span className="text-sm text-gray-700 font-medium truncate">
-              {file.name}
-            </span>
-            <span className="text-xs text-gray-500 flex-shrink-0">
-              ({(file.size / (1024 * 1024)).toFixed(2)} MB)
-            </span>
-          </div>
-          <button
-            type="button"
-            onClick={() => onRemove(index)}
-            className="text-gray-400 hover:text-red-600 transition-colors flex-shrink-0 ml-2"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-      ))}
-    </div>
+  const [uploadedVideoIndexes, setUploadedVideoIndexes] = useState<Set<number>>(
+    new Set()
   );
-};
-
-// --- Main Component ---
-
-const CreateBlog: FC = () => {
-  const [blogTitle, setBlogTitle] = useState<string>('');
-  const [blogBody, setBlogBody] = useState<string>('');
-  const [contentPhotos, setContentPhotos] = useState<File[]>([]);
-  const [contentVideos, setContentVideos] = useState<File[]>([]);
-
-  const [error, setError] = useState<string>('');
-  const [success, setSuccess] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
-
   const photoInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
 
-  const router = useRouter();
+  const handleClose = () => {
+    setIsOpen(false);
+    if (externalOnClose) externalOnClose();
+  };
 
-  // File handling logic remains the same
-  interface FileValidation {
-    maxCount: number;
-    maxSize: number;
-    type: 'Photo' | 'Video';
-  }
-  const handleFileChange = (
-    e: ChangeEvent<HTMLInputElement>,
-    setFiles: Dispatch<SetStateAction<File[]>>,
-    currentFiles: File[],
-    validation: FileValidation
-  ) => {
-    /* ... same as before */
-    setError('');
-    const newFiles = e.target.files ? Array.from(e.target.files) : [];
-    if (newFiles.length === 0) return;
-    if (currentFiles.length + newFiles.length > validation.maxCount) {
-      setError(
-        `You can only upload a maximum of ${validation.maxCount} ${validation.type}s. You have ${currentFiles.length} selected.`
-      );
-      if (e.target) e.target.value = '';
+  const handleOpen = () => {
+    setIsOpen(true);
+  };
+
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
+  const validateImages = (files: FileList | null) => {
+    if (!files) return;
+
+    if (files.length > MAX_IMAGES) {
+      toast.error(`Maximum ${MAX_IMAGES} images allowed`);
       return;
     }
-    for (const file of newFiles) {
-      if (file.size > validation.maxSize) {
-        setError(
-          `${validation.type} "${file.name}" exceeds the size limit of ${validation.maxSize / (1024 * 1024)}MB.`
-        );
-        if (e.target) e.target.value = '';
+
+    for (let i = 0; i < files.length; i++) {
+      if (files[i].size > MAX_IMAGE_SIZE) {
+        toast.error(`Image "${files[i].name}" exceeds 5MB limit`);
         return;
       }
     }
-    setFiles((prev) => [...prev, ...newFiles]);
-    if (e.target) e.target.value = '';
-  };
-  const removeFile = (
-    index: number,
-    setFiles: Dispatch<SetStateAction<File[]>>
-  ) => {
-    setFiles((prev) => prev.filter((_, i) => i !== index));
+
+    setBlogPhotos(files);
+    setUploadedPhotoIndexes(new Set());
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    setSuccess('');
+  const validateVideos = (files: FileList | null) => {
+    if (!files) return;
 
-    if (blogTitle.trim().length === 0 || blogBody.trim().length === 0) {
-      setError('Blog title and body cannot be empty.');
-      setLoading(false);
+    if (files.length > MAX_VIDEOS) {
+      toast.error(`Maximum ${MAX_VIDEOS} videos allowed`);
       return;
     }
 
-    // Prepare data for the API service function
-    const blogPostData: BlogData = {
-      blogTitle: blogTitle.trim(),
-      blogBody: blogBody.trim(),
-      contentPhoto: contentPhotos,
-      contentViedo: contentVideos,
-    };
+    for (let i = 0; i < files.length; i++) {
+      if (files[i].size > MAX_VIDEO_SIZE) {
+        toast.error(`Video "${files[i].name}" exceeds 50MB limit`);
+        return;
+      }
+    }
+
+    setBlogVideos(files);
+    setUploadedVideoIndexes(new Set());
+  };
+
+  const previewImages = () => {
+    if (!blogPhotos) return [];
+    return Array.from(blogPhotos).map((file) => URL.createObjectURL(file));
+  };
+
+  const previewVideos = () => {
+    if (!blogVideos) return [];
+    return Array.from(blogVideos).map((file) => URL.createObjectURL(file));
+  };
+
+  const removeImages = (index: number) => {
+    if (!blogPhotos) return;
+    const dataTransfer = new DataTransfer();
+    Array.from(blogPhotos).forEach((file, i) => {
+      if (i !== index) dataTransfer.items.add(file);
+    });
+    setBlogPhotos(dataTransfer.files);
+    setUploadedPhotoIndexes((prev) => {
+      const newSet = new Set(prev);
+      newSet.delete(index);
+      return newSet;
+    });
+  };
+
+  const removeVideo = (index: number) => {
+    if (!blogVideos) return;
+    const dataTransfer = new DataTransfer();
+    Array.from(blogVideos).forEach((file, i) => {
+      if (i !== index) dataTransfer.items.add(file);
+    });
+    setBlogVideos(dataTransfer.files);
+    setUploadedVideoIndexes((prev) => {
+      const newSet = new Set(prev);
+      newSet.delete(index);
+      return newSet;
+    });
+  };
+
+  // now this function will upload files and return their data
+  const processFileUploads = async (toastId: string) => {
+    try {
+      const uploadedPhotos = [];
+      const uploadedVideos = [];
+
+      if (blogPhotos) {
+        for (let i = 0; i < blogPhotos.length; i++) {
+          setUploadingFileIndex({ type: 'photo', index: i });
+          toast.loading(`Uploading photo ${i + 1} of ${blogPhotos.length}...`, {
+            id: toastId,
+          });
+          const file = blogPhotos[i];
+          const res = await imageKitService.uploadFile(file, '/blog/images');
+          uploadedPhotos.push({ url: res.url, fileId: res.fileId });
+
+          // Mark this photo as uploaded
+          setUploadedPhotoIndexes((prev) => new Set(prev).add(i));
+        }
+      }
+
+      if (blogVideos) {
+        for (let i = 0; i < blogVideos.length; i++) {
+          setUploadingFileIndex({ type: 'video', index: i });
+          toast.loading(`Uploading video ${i + 1} of ${blogVideos.length}...`, {
+            id: toastId,
+          });
+          const file = blogVideos[i];
+          const res = await imageKitService.uploadFile(file, '/blog/videos');
+          uploadedVideos.push({ url: res.url, fileId: res.fileId });
+
+          // Mark this video as uploaded
+          setUploadedVideoIndexes((prev) => new Set(prev).add(i));
+        }
+      }
+
+      setUploadingFileIndex(null);
+      return { uploadedPhotos, uploadedVideos };
+    } catch (err) {
+      console.error('Error uploading files:', err);
+      setUploadingFileIndex(null);
+      throw err;
+    }
+  };
+
+  const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!blogTitle.trim()) {
+      toast.error('Please enter a blog title');
+      return;
+    }
+    if (!blogBody.trim()) {
+      toast.error('Please enter blog content');
+      return;
+    }
+
+    setIsSubmitting(true);
+    const toastId = 'blog-creation';
 
     try {
-      // Call the dedicated API function
-      const response = await createBlogPost(blogPostData);
+      const fileData = await processFileUploads(toastId);
 
-      setSuccess(response.data.message || 'Blog post created successfully!');
+      const updatedPayload: BlogAPI.CreateBlogRequest = {
+        blogTitle: blogTitle.trim(),
+        blogBody: blogBody.trim(),
+        uploadedPhotos: fileData?.uploadedPhotos || [],
+        uploadedVideos: fileData?.uploadedVideos || [],
+      };
+
+      toast.loading('Creating blog...', { id: toastId });
+      await blogService.createBlog(updatedPayload);
+
+      // Dismiss loading toast
+      toast.dismiss(toastId);
+
+      // Auto-refetch blogs for the creator
+      onBlogCreated?.();
+
+      // Show success toast
+      toast.success('Blog posted successfully! 🎉', {
+        position: 'bottom-right',
+        duration: 3000,
+      });
 
       // Reset form
       setBlogTitle('');
       setBlogBody('');
-      setContentPhotos([]);
-      setContentVideos([]);
-      router.push('/');
-    } catch (err: unknown) {
-      if (axios.isAxiosError(err) && err.response) {
-        // Use the error message from the backend if available
-        setError(
-          err.response.data.message ||
-            'An error occurred while creating the post.'
-        );
-      } else if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unexpected error occurred.');
-      }
+      setBlogPhotos(null);
+      setBlogVideos(null);
+      setUploadedPhotoIndexes(new Set());
+      setUploadedVideoIndexes(new Set());
+      if (photoInputRef.current) photoInputRef.current.value = '';
+      if (videoInputRef.current) videoInputRef.current.value = '';
+
+      // Close modal
+      handleClose();
+    } catch (err) {
+      toast.error(getErrorMessage(err), { id: toastId });
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
+  if (!isOpen) {
+    return (
+      <button
+        onClick={handleOpen}
+        className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground font-medium rounded-lg hover:opacity-90 transition-all"
+      >
+        <Plus size={20} />
+        Create Blog
+      </button>
+    );
+  }
+
   return (
-    <div className="bg-gray-100 min-h-screen">
-      <main className="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <h1 className="text-3xl font-extrabold text-gray-900 mb-2">
-            Create a New Blog Post
-          </h1>
-          <p className="text-gray-500 mb-8">
-            Share your thoughts, stories, and ideas with the community.
-          </p>
+    <>
+      {/* Backdrop with blur covering entire screen */}
+      <div
+        className="fixed inset-0 bg-black/50 backdrop-blur-md z-[9999]"
+        onClick={(e) => {
+          // Only close if clicking directly on the backdrop
+          if (e.target === e.currentTarget) {
+            handleClose();
+          }
+        }}
+      />
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {error && <AlertMessage message={error} type="error" />}
-            {success && <AlertMessage message={success} type="success" />}
-
-            {/* Form fields are unchanged */}
-            <div>
-              <label
-                htmlFor="blogTitle"
-                className="block text-sm font-semibold text-gray-700"
+      {/* Modal */}
+      <div className="fixed inset-0 z-[10000] overflow-y-auto pointer-events-none">
+        <div className="flex min-h-full items-center justify-center p-4 pointer-events-auto">
+          <div
+            className="bg-card border border-border rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="sticky top-0 bg-card border-b border-border px-8 py-6 flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-foreground">
+                  Share Your Story
+                </h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Create an engaging blog post with images and videos
+                </p>
+              </div>
+              <button
+                onClick={handleClose}
+                className="p-2 hover:bg-muted rounded-lg transition-colors"
               >
-                Blog Title
-              </label>
-              <div className="mt-1">
+                <X size={24} className="text-foreground" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <form onSubmit={handleSave} className="p-8 space-y-8">
+              {/* Title Input */}
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-3">
+                  Blog Title <span className="text-destructive">*</span>
+                </label>
                 <input
                   type="text"
-                  id="blogTitle"
+                  placeholder="What's your blog about?"
                   value={blogTitle}
                   onChange={(e) => setBlogTitle(e.target.value)}
                   maxLength={200}
-                  required
-                  className="block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="e.g., My Journey into Web Development"
+                  className="w-full px-4 py-2.5 bg-background border border-input rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring focus:border-transparent transition-all text-sm"
                 />
+                <p className="text-xs text-muted-foreground mt-2">
+                  {blogTitle.length}/200 characters
+                </p>
               </div>
-              <p className="mt-1 text-xs text-gray-500 text-right">
-                {blogTitle.length} / 200
-              </p>
-            </div>
-            <div>
-              <label
-                htmlFor="blogBody"
-                className="block text-sm font-semibold text-gray-700"
-              >
-                Blog Content
-              </label>
-              <div className="mt-1">
+
+              {/* Body Input */}
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-3">
+                  Blog Content <span className="text-destructive">*</span>
+                </label>
                 <textarea
-                  id="blogBody"
-                  rows={10}
+                  placeholder="Share your thoughts, insights, and experiences..."
                   value={blogBody}
                   onChange={(e) => setBlogBody(e.target.value)}
                   maxLength={10000}
-                  required
-                  className="block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Write your blog content here..."
+                  rows={6}
+                  className="w-full px-4 py-2.5 bg-background border border-input rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring focus:border-transparent resize-none transition-all text-sm"
                 />
+                <p className="text-xs text-muted-foreground mt-2">
+                  {blogBody.length}/10000 characters
+                </p>
               </div>
-              <p className="mt-1 text-xs text-gray-500 text-right">
-                {blogBody.length} / 10000
-              </p>
-            </div>
-            <div>
-              <label
-                htmlFor="contentPhoto"
-                className="block text-sm font-semibold text-gray-700"
-              >
-                Add Photos ({contentPhotos.length} / 10)
-              </label>
-              <div className="mt-1">
+
+              {/* Images Section */}
+              <div className="border-t border-border pt-6">
+                <label className="flex text-sm font-semibold text-foreground mb-4 items-center gap-2">
+                  <ImageIcon size={18} className="text-primary" />
+                  Add Images{' '}
+                  <span className="text-xs text-muted-foreground font-normal">
+                    (Max {MAX_IMAGES}, 5MB each)
+                  </span>
+                </label>
+
                 <input
-                  id="contentPhoto"
                   ref={photoInputRef}
                   type="file"
                   multiple
                   accept="image/*"
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                  onChange={(e) =>
-                    handleFileChange(e, setContentPhotos, contentPhotos, {
-                      maxCount: 10,
-                      maxSize: 2 * 1024 * 1024,
-                      type: 'Photo',
-                    })
-                  }
+                  onChange={(e) => validateImages(e.target.files)}
+                  className="hidden"
                 />
+
+                <button
+                  type="button"
+                  onClick={() => photoInputRef.current?.click()}
+                  className="w-full py-6 border-2 border-dashed border-border rounded-lg hover:border-primary hover:bg-primary/5 transition-all flex flex-col items-center justify-center gap-3 group"
+                >
+                  <Plus
+                    size={24}
+                    className="text-muted-foreground group-hover:text-primary transition-colors"
+                  />
+                  <span className="text-foreground font-medium text-sm">
+                    Click to add photos
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    or drag and drop
+                  </span>
+                </button>
+
+                {/* Image Previews */}
+                {blogPhotos && blogPhotos.length > 0 && (
+                  <div className="mt-6 grid grid-cols-3 gap-4">
+                    {previewImages().map((src, index) => {
+                      const isUploading =
+                        uploadingFileIndex?.type === 'photo' &&
+                        uploadingFileIndex?.index === index;
+                      const isUploaded = uploadedPhotoIndexes.has(index);
+
+                      return (
+                        <div key={index} className="relative group">
+                          <Image
+                            src={src}
+                            alt={`Preview ${index + 1}`}
+                            width={112}
+                            height={112}
+                            className="w-full h-28 object-cover rounded-lg border border-border group-hover:border-primary transition-colors"
+                          />
+
+                          {/* Loading Overlay */}
+                          {isUploading && (
+                            <div className="absolute inset-0 bg-white/60 backdrop-blur-sm rounded-lg flex items-center justify-center">
+                              <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
+                            </div>
+                          )}
+
+                          {/* Uploaded Checkmark */}
+                          {isUploaded && !isUploading && (
+                            <div className="absolute inset-0 bg-green-500/30 backdrop-blur-sm rounded-lg flex items-center justify-center">
+                              <Check size={24} className="text-green-600" />
+                            </div>
+                          )}
+
+                          {/* Remove Button - Only show when not uploading */}
+                          {!isUploading && (
+                            <button
+                              type="button"
+                              onClick={() => removeImages(index)}
+                              className="absolute -top-2 -right-2 bg-destructive rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                            >
+                              <X
+                                size={12}
+                                className="text-primary-foreground"
+                              />
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+                {blogPhotos && (
+                  <p className="text-xs text-muted-foreground mt-3">
+                    {blogPhotos.length} image(s) selected
+                  </p>
+                )}
               </div>
-              <FilePreview
-                files={contentPhotos}
-                onRemove={(index) => removeFile(index, setContentPhotos)}
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="contentViedo"
-                className="block text-sm font-semibold text-gray-700"
-              >
-                Add Videos ({contentVideos.length} / 2)
-              </label>
-              <div className="mt-1">
+
+              {/* Videos Section */}
+              <div className="border-t border-border pt-6">
+                <label className="flex text-sm font-semibold text-foreground mb-4 items-center gap-2">
+                  <Video size={18} className="text-primary" />
+                  Add Videos{' '}
+                  <span className="text-xs text-muted-foreground font-normal">
+                    (Max {MAX_VIDEOS}, 50MB each)
+                  </span>
+                </label>
+
                 <input
-                  id="contentViedo"
                   ref={videoInputRef}
                   type="file"
                   multiple
                   accept="video/*"
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
-                  onChange={(e) =>
-                    handleFileChange(e, setContentVideos, contentVideos, {
-                      maxCount: 2,
-                      maxSize: 70 * 1024 * 1024,
-                      type: 'Video',
-                    })
-                  }
+                  onChange={(e) => validateVideos(e.target.files)}
+                  className="hidden"
                 />
-              </div>
-              <FilePreview
-                files={contentVideos}
-                onRemove={(index) => removeFile(index, setContentVideos)}
-              />
-            </div>
-            <div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-400 disabled:cursor-not-allowed"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />{' '}
-                    Publishing...
-                  </>
-                ) : (
-                  'Publish Post'
+
+                <button
+                  type="button"
+                  onClick={() => videoInputRef.current?.click()}
+                  className="w-full py-6 border-2 border-dashed border-border rounded-lg hover:border-primary hover:bg-primary/5 transition-all flex flex-col items-center justify-center gap-3 group"
+                >
+                  <Plus
+                    size={24}
+                    className="text-muted-foreground group-hover:text-primary transition-colors"
+                  />
+                  <span className="text-foreground font-medium text-sm">
+                    Click to add videos
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    or drag and drop
+                  </span>
+                </button>
+
+                {/* Video Previews */}
+                {blogVideos && blogVideos.length > 0 && (
+                  <div className="mt-6 grid grid-cols-2 gap-4">
+                    {previewVideos().map((src, index) => {
+                      const isUploading =
+                        uploadingFileIndex?.type === 'video' &&
+                        uploadingFileIndex?.index === index;
+                      const isUploaded = uploadedVideoIndexes.has(index);
+
+                      return (
+                        <div key={index} className="relative group">
+                          <video
+                            src={src}
+                            controls
+                            className="w-full h-32 object-cover rounded-lg border border-border bg-muted group-hover:border-primary transition-colors"
+                          />
+
+                          {/* Loading Overlay */}
+                          {isUploading && (
+                            <div className="absolute inset-0 bg-white/60 backdrop-blur-sm rounded-lg flex items-center justify-center">
+                              <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
+                            </div>
+                          )}
+
+                          {/* Uploaded Checkmark */}
+                          {isUploaded && !isUploading && (
+                            <div className="absolute inset-0 bg-green-500/30 backdrop-blur-sm rounded-lg flex items-center justify-center">
+                              <Check size={24} className="text-green-600" />
+                            </div>
+                          )}
+
+                          {/* Remove Button - Only show when not uploading */}
+                          {!isUploading && (
+                            <button
+                              type="button"
+                              onClick={() => removeVideo(index)}
+                              className="absolute -top-2 -right-2 bg-destructive rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                            >
+                              <X
+                                size={12}
+                                className="text-primary-foreground"
+                              />
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                 )}
-              </button>
-            </div>
-          </form>
+                {blogVideos && (
+                  <p className="text-xs text-muted-foreground mt-3">
+                    {blogVideos.length} video(s) selected
+                  </p>
+                )}
+              </div>
+
+              {/* Submit Button */}
+              <div className="border-t border-border pt-6 flex gap-3">
+                <button
+                  type="button"
+                  onClick={handleClose}
+                  className="flex-1 py-2.5 px-6 bg-muted text-foreground font-medium rounded-lg hover:opacity-80 disabled:opacity-50 transition-all text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={
+                    isSubmitting || !blogTitle.trim() || !blogBody.trim()
+                  }
+                  className="flex-1 py-2.5 px-6 bg-primary text-primary-foreground font-medium rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 text-sm"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+                      Publishing...
+                    </>
+                  ) : (
+                    'Publish Blog'
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </>
   );
 };
 

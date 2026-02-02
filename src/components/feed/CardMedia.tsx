@@ -3,7 +3,7 @@
 import React, { FC } from 'react';
 import MediaCarousel from './MediaCarousel';
 import Image from 'next/image';
-import { getMediaUrl } from '@/utils/helper/getMediaUrl-blog';
+import { getMediaUrl } from '@/lib/utils/media';
 
 interface CardMediaProps {
   photos: string[];

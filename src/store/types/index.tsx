@@ -31,7 +31,6 @@ export interface AuthStore {
     newPassword: string
   ) => Promise<void>;
 }
-
 export interface UserStore {
   profileUser: User | null;
   connectionStatus:
@@ -62,7 +61,6 @@ export interface UserStore {
       | null
   ) => void;
 }
-
 export interface ConnectionStore {
   // states
   connected?: User[];

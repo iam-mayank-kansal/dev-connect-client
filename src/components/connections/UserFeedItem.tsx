@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { MoreVertical, User } from 'lucide-react';
 import Image from 'next/image';
+import { isValidImageUrl } from '@/lib/utils/media';
 
 interface UserFeedItemProps {
   user: {
@@ -28,16 +29,6 @@ const UserFeedItem: React.FC<UserFeedItemProps> = ({
   handleBlockAndUnblock,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
-
-  // Validate if profilePicture is a valid URL for Next.js Image
-  const isValidImageUrl = (url: string) => {
-    if (!url) return false;
-    return (
-      url.startsWith('/') ||
-      url.startsWith('http://') ||
-      url.startsWith('https://')
-    );
-  };
 
   return (
     <div className="relative flex items-center justify-between p-4 bg-white rounded-lg shadow-sm transition-shadow hover:shadow-md">

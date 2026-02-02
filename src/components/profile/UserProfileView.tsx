@@ -9,6 +9,7 @@ import ViewExperience from './sections/view/ViewExperience';
 import ViewEducation from './sections/view/ViewEducation';
 import ViewCertifications from './sections/view/ViewCertifications';
 import ViewResume from './sections/view/ViewResume';
+import UserBlogsSlider from './UserBlogsSlider';
 
 // Sub-components
 
@@ -55,6 +56,12 @@ const UserProfileView = ({
           <ViewCertifications certification={user.certification} />
 
           <ViewResume resume={user.resume} />
+
+          {/* Blogs Section */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Blogs</h2>
+            <UserBlogsSlider userId={user._id} />
+          </div>
         </div>
       </div>
     </div>

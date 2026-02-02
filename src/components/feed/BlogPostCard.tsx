@@ -2,6 +2,7 @@
 
 import React, { FC, useState, useCallback, useEffect } from 'react';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 import CardHeader from './CardHeader';
 import CardBody from './CardBody';
 import CardFooter from './CardFooter';
@@ -10,7 +11,7 @@ import MediaCarousel from './MediaCarousel';
 import ImageModal from './ImageModal';
 import { Blog } from '@/lib/types/blog';
 import { useAuthStore } from '@/store/useAuthStore';
-import { getMediaUrl } from '@/utils/helper/getMediaUrl-blog';
+import { getMediaUrl } from '@/lib/utils/media';
 
 interface BlogPostCardProps {
   blog: Blog;
@@ -18,6 +19,7 @@ interface BlogPostCardProps {
 
 const BlogPostCard: FC<BlogPostCardProps> = ({ blog }) => {
   const { authUser } = useAuthStore();
+  const router = useRouter();
 
   // --- Image Modal State ---
   const [modalState, setModalState] = useState<{
@@ -62,22 +64,16 @@ const BlogPostCard: FC<BlogPostCardProps> = ({ blog }) => {
       process.env.NEXT_PUBLIC_API_BASE_URL || ''
     }/devconnect/blog/react-blog`;
 
-    // We capture the UI's state *before* the API call to correctly determine if it's an undo action.
     const currentReactionState = userReaction;
     let apiReactionToSend;
 
-    // If the user clicks the same button again, they are taking back their reaction.
     if (currentReactionState === reactionType) {
-      // We will send an empty string to signify this.
-      // NOTE: This requires a change in the backend validation to accept an empty 'reaction' field.
       apiReactionToSend = '';
     } else {
-      // Otherwise, it's a new reaction or a switch from like to dislike.
       apiReactionToSend = reactionType === 'like' ? 'agree' : 'disagree';
     }
 
     try {
-      // The backend needs to handle the case where 'reaction' is an empty string.
       const response = await axios.put(
         apiUrl,
         {
@@ -87,28 +83,22 @@ const BlogPostCard: FC<BlogPostCardProps> = ({ blog }) => {
         { withCredentials: true }
       );
 
-      // The backend is the single source of truth for the counts.
       const { agreedCount, disagreedCount } = response.data.data;
       setLikes(agreedCount);
       setDislikes(disagreedCount);
 
-      // After a successful API call, we update the UI state.
-      // If the user clicked the button that was already active, it's an "undo".
       if (currentReactionState === reactionType) {
-        setUserReaction(null); // This clears the reaction, making the button "empty".
+        setUserReaction(null);
       } else {
-        // Otherwise, it's a new reaction or a switch from like to dislike (or vice versa).
         setUserReaction(reactionType);
       }
     } catch (error) {
       console.error('Failed to submit reaction:', error);
-      // Optional: Add logic here to revert the UI state on API failure.
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // --- Image Modal Functions ---
   const openImageModal = useCallback(
     (startingImageUrl: string) => {
       const allPhotos = blog.blogPhoto || [];
@@ -134,21 +124,34 @@ const BlogPostCard: FC<BlogPostCardProps> = ({ blog }) => {
     setModalState((prev) => ({ ...prev, currentIndex: newIndex }));
   }, []);
 
+  const handleBlogClick = useCallback(() => {
+    router.push(`/blog/${blog._id}`);
+  }, [router, blog._id]);
+
   const hasVideos = blog.blogViedo && blog.blogViedo.length > 0;
 
   return (
     <>
-      <article className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+      <article
+        className="bg-card border border-border rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 hover:border-border/80 cursor-pointer"
+        onClick={handleBlogClick}
+      >
         <CardHeader user={blog.userId} createdAt={blog.createdAt} />
-        <CardBody title={blog.blogTitle} body={blog.blogBody} />
+        <div className="cursor-pointer hover:opacity-90 transition-opacity">
+          <CardBody title={blog.blogTitle} body={blog.blogBody} />
+        </div>
 
-        <PostMediaGrid
-          photos={blog.blogPhoto || []}
-          onImageClick={openImageModal}
-        />
+        {blog.blogPhoto && blog.blogPhoto.length > 0 && (
+          <div className="border-t border-border/40">
+            <PostMediaGrid
+              photos={blog.blogPhoto || []}
+              onImageClick={openImageModal}
+            />
+          </div>
+        )}
 
         {hasVideos && (
-          <div className="mt-1">
+          <div className="mt-0 border-t border-border/40">
             <MediaCarousel>
               {blog.blogViedo.map((video) => (
                 <div
@@ -170,13 +173,15 @@ const BlogPostCard: FC<BlogPostCardProps> = ({ blog }) => {
           </div>
         )}
 
-        <CardFooter
-          likesCount={likes}
-          dislikesCount={dislikes}
-          userReaction={userReaction}
-          onReact={handleReaction}
-          isSubmitting={isSubmitting}
-        />
+        <div className="border-t border-border/40">
+          <CardFooter
+            likesCount={likes}
+            dislikesCount={dislikes}
+            userReaction={userReaction}
+            onReact={handleReaction}
+            isSubmitting={isSubmitting}
+          />
+        </div>
       </article>
 
       {modalState.isOpen && (

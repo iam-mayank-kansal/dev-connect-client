@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 
 // Services & API
 import { userService } from '@/services/user/userService';
+import { imageKitService } from '@/services/imageKit/imageKitService';
 import {
   User as UserEntity,
   Education,
@@ -65,10 +66,10 @@ const UserProfileEdit = ({
     if (profilePicFile) {
       if (user.profilePictureId) {
         toast.loading('Cleaning up old profile picture...', { id: toastId });
-        await userService.deleteImageKitResource(user.profilePictureId);
+        await imageKitService.deleteImageKitResource(user.profilePictureId);
       }
       toast.loading('Uploading profile picture...', { id: toastId });
-      const res = await userService.uploadFile(
+      const res = await imageKitService.uploadFile(
         profilePicFile,
         '/profilePicture'
       );
@@ -80,10 +81,10 @@ const UserProfileEdit = ({
     if (resumeFile) {
       if (user.resumeId) {
         toast.loading('Cleaning up old resume...', { id: toastId });
-        await userService.deleteImageKitResource(user.resumeId);
+        await imageKitService.deleteImageKitResource(user.resumeId);
       }
       toast.loading('Uploading new resume...', { id: toastId });
-      const res = await userService.uploadFile(resumeFile, '/resume');
+      const res = await imageKitService.uploadFile(resumeFile, '/resume');
       resume = res.url;
       resumeId = res.fileId;
     }
