@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { BlogAPI } from '@/lib/types/api/blog';
 import { axiosInstanace } from '../client';
 import { Blog } from '@/lib/types/blog';
@@ -31,10 +32,29 @@ class BlogAPI_Handler {
     page: number = 1,
     limit: number = 10
   ): Promise<BlogAPI.FetchUserBlogsResponse['data']> {
-    const response = await axiosInstanace.get<BlogAPI.FetchUserBlogsResponse>(
-      `/blog/fetch-user-blogs/${userId}?page=${page}&limit=${limit}`
-    );
-    return response.data.data;
+    try {
+      const response = await axiosInstanace.get<BlogAPI.FetchUserBlogsResponse>(
+        `/blog/fetch-user-blogs/${userId}?page=${page}&limit=${limit}`
+      );
+      return response.data.data;
+    } catch (error: unknown) {
+      // Handle empty blogs case - return empty array instead of throwing error
+      if (
+        axios.isAxiosError(error) &&
+        (error.response?.status === 400 || error.response?.status === 404)
+      ) {
+        return {
+          blogs: [],
+          pagination: {
+            currentPage: page,
+            limit,
+            totalCount: 0,
+            totalPages: 0,
+          },
+        };
+      }
+      throw error;
+    }
   }
 
   // READ - Single Blog by ID

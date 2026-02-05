@@ -3,6 +3,7 @@
 import React from 'react';
 import UserFeedItem from '../UserFeedItem';
 import { ApiUser } from '@/lib/types/connection';
+import { useRouter } from 'next/navigation';
 
 interface ConnectionsViewProps {
   connections: ApiUser[];
@@ -26,6 +27,7 @@ export const ConnectionsView: React.FC<ConnectionsViewProps> = ({
       user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const router = useRouter();
   return (
     <>
       <input
@@ -49,7 +51,9 @@ export const ConnectionsView: React.FC<ConnectionsViewProps> = ({
               actions={[
                 {
                   label: 'Message',
-                  onClick: () => console.log(`Message ${user._id}`),
+                  onClick: () => {
+                    router.push(`/chat/${user._id}`);
+                  },
                 },
               ]}
               showMoreOptions={true}

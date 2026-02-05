@@ -21,6 +21,9 @@ export function middleware(request: NextRequest) {
     '/create-blog',
     '/profile',
     '/settings',
+    '/blog',
+    '/blogs',
+    '/feed',
   ];
 
   const authRoutes = [

@@ -1,4 +1,5 @@
 import { User } from '@/lib/types/entities';
+import { Socket } from 'socket.io-client';
 
 export interface AuthStore {
   // STATE
@@ -12,6 +13,8 @@ export interface AuthStore {
   isChangingPassword: boolean;
   isSettingNewPassword: boolean;
   resetToken: string | null;
+  socket: Socket | null;
+  onlineUsers: string[];
   error: string | null;
 
   // ACTIONS
@@ -25,11 +28,13 @@ export interface AuthStore {
     newPassword: string,
     confirmPassword: string
   ) => Promise<void>;
-  clearError: () => void;
   setNewPassword: (
     currentPassword: string,
     newPassword: string
   ) => Promise<void>;
+  connectToSocket: () => void;
+  disconnectFromSocket: () => void;
+  clearError: () => void;
 }
 export interface UserStore {
   profileUser: User | null;

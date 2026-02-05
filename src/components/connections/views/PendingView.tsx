@@ -26,7 +26,7 @@ export const PendingView: React.FC<PendingViewProps> = ({
       <div className="flex space-x-4 mb-6 border-b border-gray-200">
         <button
           onClick={() => onTabChange('received')}
-          className={`py-2 px-4 text-lg font-semibold transition-colors ${
+          className={`py-2 px-4 text-lg font-semibold transition-colors cursor-pointer ${
             activeTab === 'received'
               ? 'text-blue-600 border-b-2 border-blue-600'
               : 'text-gray-500 hover:text-gray-700'
@@ -36,7 +36,7 @@ export const PendingView: React.FC<PendingViewProps> = ({
         </button>
         <button
           onClick={() => onTabChange('sent')}
-          className={`py-2 px-4 text-lg font-semibold transition-colors ${
+          className={`py-2 px-4 text-lg font-semibold transition-colors cursor-pointer ${
             activeTab === 'sent'
               ? 'text-blue-600 border-b-2 border-blue-600'
               : 'text-gray-500 hover:text-gray-700'

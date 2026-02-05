@@ -4,8 +4,9 @@ import toast from 'react-hot-toast';
 import { AuthStore } from './types';
 import { authService } from '@/services/auth/authService';
 import { getErrorMessage } from '@/lib/utils/errorHandler';
+import { io } from 'socket.io-client';
 
-export const useAuthStore = create<AuthStore>((set) => ({
+export const useAuthStore = create<AuthStore>((set, get) => ({
   // ============= STATE =============
   authUser: null,
   isCheckingAuth: true,
@@ -17,6 +18,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
   isChangingPassword: false,
   isSettingNewPassword: false,
   resetToken: null,
+  socket: null,
+  onlineUsers: [],
 
   error: null,
 
@@ -32,6 +35,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
           authUser: data.user,
           error: null,
         });
+        get().connectToSocket();
       } else {
         set({ authUser: null });
       }
@@ -54,6 +58,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
         authUser: data.user,
         error: null,
       });
+      get().connectToSocket();
       toast.success('Logged in successfully');
     } catch (error: unknown) {
       const errorMessage = getErrorMessage(error);
@@ -71,6 +76,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
     try {
       const data = await authService.signUp(name, email, password);
       set({ authUser: data.user, error: null });
+      get().connectToSocket();
       toast.success('Account created successfully');
     } catch (error: unknown) {
       const errorMessage = getErrorMessage(error);
@@ -91,6 +97,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
         authUser: null,
         error: null,
       });
+      get().disconnectFromSocket();
       toast.success('Logged out successfully');
     } catch (error: unknown) {
       set({ authUser: null });
@@ -139,6 +146,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
     set({ isSettingNewPassword: true, error: null });
     try {
       await authService.setNewPassword(resetToken, newPassword);
+      set({ resetToken: null });
       toast.success('Password updated successfully. Please login.');
     } catch (error: unknown) {
       const errorMessage = getErrorMessage(error);
@@ -154,6 +162,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
     set({ isChangingPassword: true, error: null });
     try {
       await authService.changePassword(currentPassword, newPassword);
+
       toast.success('Password changed successfully');
     } catch (error: unknown) {
       const errorMessage = getErrorMessage(error);
@@ -162,6 +171,31 @@ export const useAuthStore = create<AuthStore>((set) => ({
       throw error;
     } finally {
       set({ isChangingPassword: false });
+    }
+  },
+
+  // when we login we need to connect to socket server
+  connectToSocket: () => {
+    if (get()?.socket?.connected || !get()?.authUser) return;
+
+    const socket = io(process.env.NEXT_PUBLIC_API_BASE_URL, {
+      query: {
+        userId: get()?.authUser?._id,
+      },
+    });
+    socket.connect();
+    set({ socket: socket });
+
+    socket.on('getOnlineUsers', (userIds) => {
+      set({ onlineUsers: userIds });
+    });
+  },
+
+  // and when we logout we need to disconnect from socket server
+  disconnectFromSocket: () => {
+    if (get()?.socket?.connected) {
+      get()?.socket?.disconnect();
+      set({ socket: null, onlineUsers: [] });
     }
   },
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { FC, useState, useCallback, useEffect } from 'react';
-import axios from 'axios';
+import { axiosInstanace } from '@/lib/api/client';
 import { useRouter } from 'next/navigation';
 import CardHeader from './CardHeader';
 import CardBody from './CardBody';
@@ -50,7 +50,6 @@ const BlogPostCard: FC<BlogPostCardProps> = ({ blog }) => {
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Sync state if the user logs in/out or the blog data changes
   useEffect(() => {
     setUserReaction(getInitialUserReaction());
   }, [getInitialUserReaction]);
@@ -59,10 +58,6 @@ const BlogPostCard: FC<BlogPostCardProps> = ({ blog }) => {
   const handleReaction = async (reactionType: 'like' | 'dislike') => {
     if (isSubmitting) return;
     setIsSubmitting(true);
-
-    const apiUrl = `${
-      process.env.NEXT_PUBLIC_API_BASE_URL || ''
-    }/devconnect/blog/react-blog`;
 
     const currentReactionState = userReaction;
     let apiReactionToSend;
@@ -74,14 +69,10 @@ const BlogPostCard: FC<BlogPostCardProps> = ({ blog }) => {
     }
 
     try {
-      const response = await axios.put(
-        apiUrl,
-        {
-          blogId: blog._id,
-          reaction: apiReactionToSend,
-        },
-        { withCredentials: true }
-      );
+      const response = await axiosInstanace.put(`/blog/react-blog`, {
+        blogId: blog._id,
+        reaction: apiReactionToSend,
+      });
 
       const { agreedCount, disagreedCount } = response.data.data;
       setLikes(agreedCount);
@@ -128,15 +119,23 @@ const BlogPostCard: FC<BlogPostCardProps> = ({ blog }) => {
     router.push(`/blog/${blog._id}`);
   }, [router, blog._id]);
 
+  const handleHeaderClick = useCallback(
+    (e: React.MouseEvent) => {
+      // Stop propagation to prevent unwanted behavior
+      e.stopPropagation();
+      handleBlogClick();
+    },
+    [handleBlogClick]
+  );
+
   const hasVideos = blog.blogViedo && blog.blogViedo.length > 0;
 
   return (
     <>
-      <article
-        className="bg-card border border-border rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 hover:border-border/80 cursor-pointer"
-        onClick={handleBlogClick}
-      >
-        <CardHeader user={blog.userId} createdAt={blog.createdAt} />
+      <article className="bg-card border border-border rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 hover:border-border/80">
+        <div onClick={handleHeaderClick} className="cursor-pointer">
+          <CardHeader user={blog.userId} createdAt={blog.createdAt} />
+        </div>
         <div className="cursor-pointer hover:opacity-90 transition-opacity">
           <CardBody title={blog.blogTitle} body={blog.blogBody} />
         </div>

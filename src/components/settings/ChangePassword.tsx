@@ -133,7 +133,7 @@ export default function ChangePassword() {
             <button
               type="submit"
               disabled={isChangingPassword}
-              className={`inline-flex items-center px-6 py-2.5 text-sm font-medium rounded-lg shadow-sm text-white transition-all duration-200 ${
+              className={`inline-flex items-center px-6 py-2.5 text-sm font-medium rounded-lg shadow-sm text-white transition-all duration-200 cursor-pointer ${
                 isChangingPassword
                   ? 'bg-blue-400 cursor-not-allowed'
                   : 'bg-blue-600 hover:bg-blue-700 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'

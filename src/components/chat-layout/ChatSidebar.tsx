@@ -64,7 +64,7 @@ export default function ChatSidebar({ onOpenModal }: ChatSidebarProps) {
           {/* 3. The Plus Button is back */}
           <button
             onClick={onOpenModal}
-            className="p-2 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 hover:scale-105 transition-all shadow-sm"
+            className="p-2 bg-blue-50 text-blue-600 cursor-pointer rounded-full hover:bg-blue-100 hover:scale-105 transition-all shadow-sm"
             title="New Chat"
           >
             <Plus size={20} />

@@ -1,5 +1,6 @@
 'use client';
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { MoreVertical, User, UserPlus } from 'lucide-react';
 import Image from 'next/image';
 import { isValidImageUrl } from '@/lib/utils/media';
@@ -27,7 +28,10 @@ const UserCard: React.FC<UserCardProps> = ({
   return (
     <div className="relative p-5 bg-white rounded-lg shadow-sm border border-gray-200 transition-all duration-300 hover:shadow-lg hover:border-gray-300">
       <div className="flex justify-between items-start">
-        <div className="flex items-center space-x-4">
+        <Link
+          href={`/profile/${user.id}`}
+          className="flex items-center space-x-4 flex-1 hover:opacity-80 transition-opacity"
+        >
           {user?.profilePicture && isValidImageUrl(user.profilePicture) ? (
             <Image
               src={user.profilePicture}
@@ -45,12 +49,12 @@ const UserCard: React.FC<UserCardProps> = ({
             <h3 className="text-lg font-bold text-gray-900">{user.name}</h3>
             <p className="text-sm text-gray-500 mt-1">{user.title}</p>
           </div>
-        </div>
+        </Link>
 
         <div className="relative z-10">
           <button
             onClick={() => setShowMenu(!showMenu)}
-            className="p-2 text-gray-500 rounded-full hover:bg-gray-100 transition-colors"
+            className="p-2 text-gray-500 rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
           >
             <MoreVertical size={20} />
           </button>
@@ -61,7 +65,7 @@ const UserCard: React.FC<UserCardProps> = ({
                   onHandleBlock(user.id);
                   setShowMenu(false);
                 }}
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
               >
                 Block
               </button>
@@ -70,7 +74,7 @@ const UserCard: React.FC<UserCardProps> = ({
                   onNotInterested(user.id);
                   setShowMenu(false);
                 }}
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
               >
                 Not Interested
               </button>
@@ -81,7 +85,7 @@ const UserCard: React.FC<UserCardProps> = ({
 
       <button
         onClick={() => onConnect(user.id)}
-        className="mt-5 w-full flex items-center justify-center px-4 py-2.5 rounded-full bg-blue-600 text-white font-semibold shadow-sm hover:bg-blue-700 transition-colors"
+        className="mt-5 w-full flex items-center justify-center px-4 py-2.5 rounded-full bg-blue-600 text-white font-semibold shadow-sm hover:bg-blue-700 transition-colors cursor-pointer"
       >
         <UserPlus size={18} className="mr-2" />
         Connect

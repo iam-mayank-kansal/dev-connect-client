@@ -12,11 +12,15 @@ interface CardHeaderProps {
 }
 
 const CardHeader: FC<CardHeaderProps> = ({ user, createdAt }) => {
+  const handleProfileClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
   return (
     <div className="p-4 flex items-center justify-between border-b border-border/40">
       <div className="flex items-center space-x-3">
-        <Link href={`/profile/${user._id}`}>
-          {user.profilePicture ? (
+        {user.profilePicture ? (
+          <Link href={`/profile/${user._id}`} onClick={handleProfileClick}>
             <Image
               src={user.profilePicture}
               alt="Profile"
@@ -24,16 +28,18 @@ const CardHeader: FC<CardHeaderProps> = ({ user, createdAt }) => {
               height={48}
               className="w-12 h-12 rounded-full object-cover border-2 border-border shadow-sm"
             />
-          ) : (
+          </Link>
+        ) : (
+          <Link href={`/profile/${user._id}`} onClick={handleProfileClick}>
             <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center border-2 border-border shadow-sm">
               <User size={20} className="text-muted-foreground" />
             </div>
-          )}
-        </Link>
+          </Link>
+        )}
 
         <div>
-          <Link href={`/profile/${user._id}`}>
-            <p className="font-semibold text-foreground text-sm hover:text-primary transition-colors">
+          <Link href={`/profile/${user._id}`} onClick={handleProfileClick}>
+            <p className="font-semibold text-foreground text-sm hover:text-primary transition-colors hover:underline">
               {user.name || 'Anonymous'}
             </p>
           </Link>

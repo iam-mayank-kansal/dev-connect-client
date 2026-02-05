@@ -48,7 +48,7 @@ const CreatePostSection: FC<CreatePostSectionProps> = ({
       <div className="flex gap-2 pt-3 border-t border-border">
         <button
           onClick={onCreateClick}
-          className="flex items-center justify-center gap-2 flex-1 px-3 py-2.5 text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-lg transition-all text-sm font-medium group"
+          className="flex items-center justify-center gap-2 flex-1 px-3 py-2.5 text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-lg transition-all text-sm font-medium group cursor-pointer"
         >
           <ImageIcon
             size={18}
@@ -58,7 +58,7 @@ const CreatePostSection: FC<CreatePostSectionProps> = ({
         </button>
         <button
           onClick={onCreateClick}
-          className="flex items-center justify-center gap-2 flex-1 px-3 py-2.5 text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-lg transition-all text-sm font-medium group"
+          className="flex items-center justify-center gap-2 flex-1 px-3 py-2.5 text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-lg transition-all text-sm font-medium group cursor-pointer"
         >
           <VideoIcon
             size={18}
@@ -68,7 +68,7 @@ const CreatePostSection: FC<CreatePostSectionProps> = ({
         </button>
         <button
           onClick={onCreateClick}
-          className="flex items-center justify-center gap-2 flex-1 px-3 py-2.5 text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-lg transition-all text-sm font-medium group"
+          className="flex items-center justify-center gap-2 flex-1 px-3 py-2.5 text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-lg transition-all text-sm font-medium group cursor-pointer"
         >
           <PenTool
             size={18}

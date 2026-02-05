@@ -5,6 +5,7 @@ import Link from 'next/link';
 import useDebounce from '@/hooks/useDebounce';
 import Image from 'next/image';
 import { User } from 'lucide-react';
+import { searchAPI } from '@/lib/api/handlers/search';
 
 // Interface to match your API data
 interface UserResult {
@@ -31,22 +32,14 @@ export default function LiveSearch({ onResultClick }: LiveSearchProps) {
     e.preventDefault();
   }
 
-  // Fetch Search Results (using your API path)
+  // Fetch Search Results using the search handler
   useEffect(() => {
     if (debouncedSearchQuery.trim()) {
       const fetchResults = async () => {
         try {
-          const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL}/devconnect/user/search?q=${debouncedSearchQuery}`
-          );
-          if (res.ok) {
-            const data = await res.json();
-            setResults(data);
-            setIsSearchOpen(true);
-          } else {
-            setResults([]);
-            setIsSearchOpen(false);
-          }
+          const data = await searchAPI.searchUsers(debouncedSearchQuery);
+          setResults(data);
+          setIsSearchOpen(true);
         } catch (error) {
           console.error('Error fetching search:', error);
           setResults([]);

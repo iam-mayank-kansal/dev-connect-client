@@ -78,7 +78,7 @@ export default function NewChatModal({ onClose }: NewChatModalProps) {
               <button
                 key={user._id}
                 onClick={() => handleSelectUser(user)}
-                className="w-full flex items-center gap-3 p-3 hover:bg-blue-50 rounded-xl transition-all group text-left"
+                className="w-full flex items-center cursor-pointer gap-3 p-3 hover:bg-blue-50 rounded-xl transition-all group text-left"
               >
                 {user?.profilePicture ? (
                   <Image

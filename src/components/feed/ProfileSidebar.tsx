@@ -37,26 +37,33 @@ const ProfileSidebar: FC<ProfileSidebarProps> = ({
           <div className="flex justify-center">
             {profileUser?.profilePicture &&
             isValidImageUrl(profileUser?.profilePicture) ? (
-              <Image
-                src={profileUser?.profilePicture}
-                alt="Profile"
-                width={100}
-                height={100}
-                className="w-24 h-24 rounded-full object-cover border-4 border-primary/20 shadow-lg"
-              />
+              <Link href={`/profile/${profileUser._id}`}>
+                <Image
+                  src={profileUser?.profilePicture}
+                  alt="Profile"
+                  width={100}
+                  height={100}
+                  className="w-24 h-24 rounded-full object-cover border-4 border-primary/20 shadow-lg"
+                />
+              </Link>
             ) : (
-              <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center border-4 border-primary/20 shadow-lg">
+              <Link
+                href={`/profile/${profileUser?._id || authUser?._id}`}
+                className="w-24 h-24 rounded-full bg-muted flex items-center justify-center border-4 border-primary/20 shadow-lg"
+              >
                 <User size={40} className="text-muted-foreground" />
-              </div>
+              </Link>
             )}
           </div>
         </div>
 
         {/* Profile Info */}
         <div className="text-center px-5 pb-5 border-b border-border/50">
-          <h3 className="font-bold text-foreground text-lg line-clamp-2">
-            {profileUser?.name || authUser?.name || 'User'}
-          </h3>
+          <Link href={`/profile/${profileUser?._id || authUser?._id}`}>
+            <h3 className="font-bold text-foreground text-lg line-clamp-2 hover:text-blue-900  hover:underline">
+              {profileUser?.name || authUser?.name || 'User'}
+            </h3>
+          </Link>
           <p className="text-sm text-muted-foreground mt-1.5 line-clamp-1">
             {profileUser?.designation || authUser?.designation || 'Developer'}
           </p>
@@ -64,22 +71,28 @@ const ProfileSidebar: FC<ProfileSidebarProps> = ({
 
         {/* Stats Section */}
         <div className="p-5 space-y-3 border-b border-border/50">
-          <div className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-blue-500/10 to-blue-400/5 border border-blue-500/10 hover:border-blue-500/20 transition-all group cursor-default">
+          <Link
+            href={`/connections`}
+            className="cursor-pointer flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-blue-500/10 to-blue-400/5 border border-blue-500/10 hover:border-blue-500/20 transition-all group"
+          >
             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
               Connections
             </span>
             <span className="text-xl font-bold text-blue-600 group-hover:scale-110 transition-transform">
               {profileUser?.connections?.connected?.length || 0}
             </span>
-          </div>
-          <div className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-emerald-500/10 to-emerald-400/5 border border-emerald-500/10 hover:border-emerald-500/20 transition-all group cursor-default">
+          </Link>
+          <Link
+            href={`/blogs/${profileUser?._id || authUser?._id}`}
+            className="cursor-pointer flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-emerald-500/10 to-emerald-400/5 border border-emerald-500/10 hover:border-emerald-500/20 transition-all group"
+          >
             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
               Posts
             </span>
             <span className="text-xl font-bold text-emerald-600 group-hover:scale-110 transition-transform">
               {profileUser?.blogs?.length || 0}
             </span>
-          </div>
+          </Link>
         </div>
 
         {/* View Profile Button */}

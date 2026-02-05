@@ -1,4 +1,5 @@
 'use client';
+import { useAuthStore } from '@/store/useAuthStore';
 import { User } from 'lucide-react';
 import Image from 'next/image';
 
@@ -18,6 +19,8 @@ export default function SidebarItem({
   onClick,
   isActive,
 }: SidebarItemProps) {
+  const { onlineUsers } = useAuthStore();
+
   return (
     <button
       onClick={onClick}
@@ -26,7 +29,7 @@ export default function SidebarItem({
         ${isActive ? 'bg-blue-50 text-blue-700' : 'hover:bg-gray-50 text-gray-700'}
       `}
     >
-      <div className="relative shrink-0">
+      <div className="relative shrink-0 ">
         {user?.profilePicture ? (
           <Image
             src={user.profilePicture}
@@ -41,7 +44,11 @@ export default function SidebarItem({
           </div>
         )}
         {/* Online Status Indicator (Optional) */}
-        <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white bg-green-500"></span>
+        {onlineUsers.length > 0
+          ? onlineUsers.includes(user._id) && (
+              <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white bg-green-500"></span>
+            )
+          : null}
       </div>
 
       <div className="flex-1 min-w-0">

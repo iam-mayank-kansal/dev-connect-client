@@ -1,4 +1,4 @@
-import { axiosClient } from '@/lib/api/client';
+import { axiosClient } from '../client';
 
 export const uploadAPI = {
   // Generic upload function for any file (image or pdf)

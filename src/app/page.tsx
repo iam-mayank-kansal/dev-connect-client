@@ -8,9 +8,11 @@ import { useBlogFeed } from '@/hooks/useBlogFeed';
 import { useUserStore } from '@/store/useUserStore';
 import { isValidImageUrl } from '@/lib/utils/media';
 import UnauthenticatedView from '@/components/feed/UnauthenticatedView';
+import { useAuthStore } from '@/store/useAuthStore';
 
 function Home() {
   const { isAuthChecking, authUser } = useAuthInitialization();
+  const { onlineUsers } = useAuthStore();
   const { profileUser } = useUserStore();
   const blogFeed = useBlogFeed(authUser?._id);
 
@@ -21,6 +23,8 @@ function Home() {
   if (!authUser?._id) {
     return <UnauthenticatedView />;
   }
+
+  console.log('Online Users in Home Page:', onlineUsers);
 
   return (
     <div className="min-h-screen bg-muted/30 text-foreground font-sans">

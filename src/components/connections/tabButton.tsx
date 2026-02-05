@@ -8,7 +8,7 @@ export const TabButton = ({
   children,
 }: TabButtonInterface) => {
   const baseClasses =
-    'flex items-center px-4 py-3 rounded-lg w-full text-left transition-colors duration-200';
+    'flex items-center px-4 py-3 rounded-lg w-full text-left transition-colors duration-200 cursor-pointer';
   const activeClasses = 'bg-blue-100 text-blue-800 font-semibold';
   const inactiveClasses = 'text-gray-600 hover:bg-gray-100';
 

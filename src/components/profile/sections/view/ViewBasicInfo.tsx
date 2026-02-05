@@ -1,6 +1,5 @@
 import Image from 'next/image';
-import Link from 'next/link';
-import { User, Users, Mail, Phone, MapPin, Globe } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Globe } from 'lucide-react';
 import SocialIcon from '@/utils/SocialIcons'; // Adjust path
 import SectionCard from '../../SectionCard';
 import { User as UserEntity, SocialLink } from '@/lib/types/entities';
@@ -32,19 +31,6 @@ export default function ViewBasicInfo({ user }: { user: UserEntity }) {
           <h2 className="text-3xl font-bold text-gray-900">{user.name}</h2>
           {user.designation && (
             <p className="text-xl text-gray-600 mt-1">{user.designation}</p>
-          )}
-          {user.connections && (
-            <div className="flex items-center justify-center md:justify-start gap-2 text-gray-500 mt-2">
-              <Users size={18} />
-              <Link
-                href="/connections"
-                className="hover:underline hover:text-blue-600"
-              >
-                <span className="font-medium text-sm">
-                  {user.connections.connected.length} connection
-                </span>
-              </Link>
-            </div>
           )}
           {user.bio && (
             <p className="text-gray-700 mt-4 text-base">{user.bio}</p>

@@ -1,8 +1,9 @@
+import axios from 'axios';
 import { create } from 'zustand';
 import toast from 'react-hot-toast';
-import axios from 'axios';
-import { axiosInstanace } from '@/lib/axios';
+import { axiosInstanace } from '@/lib/api/client';
 import { Message, User } from '@/lib/types/chat';
+import { useAuthStore } from './useAuthStore';
 
 interface ChatStore {
   messages: Message[];
@@ -19,6 +20,8 @@ interface ChatStore {
     receiverId: string
   ) => Promise<void>;
   setSelectedUser: (user: User | null) => void;
+  subscribeToNewMessages: () => void;
+  unSubscribeFromNewMessages: () => void;
 }
 
 export const useChatStore = create<ChatStore>((set, get) => ({
@@ -73,6 +76,15 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       );
       // Optimistically update UI
       set({ messages: [...get().messages, res.data.data] });
+
+      // Add user to the users list if not already there (for sidebar)
+      const currentUsers = get().users;
+      const selectedUser = get().selectedUser;
+      const userExists = currentUsers.find((u) => u._id === receiverId);
+
+      if (!userExists && selectedUser && selectedUser._id === receiverId) {
+        set({ users: [...currentUsers, selectedUser] });
+      }
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         toast.error(err.response?.data?.message || 'Error sending message');
@@ -80,6 +92,31 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     } finally {
       set({ isSendingMessage: false });
     }
+  },
+
+  subscribeToNewMessages: () => {
+    if (!get().selectedUser) return;
+
+    const socket = useAuthStore.getState().socket;
+    if (!socket) return;
+
+    socket.on('newMessage', (newMessage: Message) => {
+      const selectedUser = get().selectedUser;
+      // Only add message if it's from/to the selected user
+      if (
+        newMessage.senderId === selectedUser?._id ||
+        newMessage.receiverId === selectedUser?._id
+      ) {
+        set({ messages: [...get().messages, newMessage] });
+      }
+    });
+  },
+
+  unSubscribeFromNewMessages: () => {
+    const socket = useAuthStore.getState().socket;
+    if (!socket) return;
+
+    socket.off('newMessage');
   },
 
   setSelectedUser: (selectedUser) => set({ selectedUser }),

@@ -1,4 +1,8 @@
+'use client';
+
+import { useEffect, useRef } from 'react';
 import { Message } from '@/lib/types/chat';
+import { formatDate } from '@/lib/utils/dateFormatter';
 
 interface MessageListProps {
   messages: Message[];
@@ -13,7 +17,15 @@ export default function MessageList({
   partnerId,
   partnerName,
 }: MessageListProps) {
-  // Skeleton Loading
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
   if (isLoading) {
     return (
       <div className="flex-1 px-4 md:px-6 py-4 space-y-4 bg-gray-50/50 custom-scrollbar animate-pulse">
@@ -45,7 +57,6 @@ export default function MessageList({
   return (
     <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 space-y-4 bg-gray-50/50 custom-scrollbar">
       {messages.map((msg) => {
-        // Logic: If sender is NOT the partner, then it is Me.
         const isMe = msg.senderId !== partnerId;
 
         return (
@@ -64,12 +75,13 @@ export default function MessageList({
               <span
                 className={`text-[10px] block mt-1 ${isMe ? 'text-blue-100' : 'text-gray-400'}`}
               >
-                10:00 AM
+                {formatDate(msg.createdAt)}
               </span>
             </div>
           </div>
         );
       })}
+      <div ref={messagesEndRef} />
     </div>
   );
 }

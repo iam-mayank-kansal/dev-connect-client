@@ -1,5 +1,6 @@
 'use client';
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { MoreVertical, User } from 'lucide-react';
 import Image from 'next/image';
 import { isValidImageUrl } from '@/lib/utils/media';
@@ -32,7 +33,10 @@ const UserFeedItem: React.FC<UserFeedItemProps> = ({
 
   return (
     <div className="relative flex items-center justify-between p-4 bg-white rounded-lg shadow-sm transition-shadow hover:shadow-md">
-      <div className="flex items-center space-x-4">
+      <Link
+        href={`/profile/${user.id}`}
+        className="flex items-center space-x-4 flex-1 hover:opacity-80 transition-opacity"
+      >
         {user.profilePicture && isValidImageUrl(user.profilePicture) ? (
           <Image
             src={user.profilePicture}
@@ -50,13 +54,13 @@ const UserFeedItem: React.FC<UserFeedItemProps> = ({
           <h3 className="text-lg font-semibold text-gray-900">{user.name}</h3>
           <p className="text-sm text-gray-500">{user.title}</p>
         </div>
-      </div>
+      </Link>
       <div className="flex items-center space-x-2">
         {actions.map((action, index) => (
           <button
             key={index}
             onClick={action.onClick}
-            className={`px-4 py-2 text-sm rounded-full transition-colors ${
+            className={`px-4 py-2 text-sm rounded-full transition-colors cursor-pointer ${
               action.primary
                 ? 'bg-blue-600 text-white hover:bg-blue-700'
                 : 'border border-gray-300 text-gray-700 hover:bg-gray-100'
@@ -69,7 +73,7 @@ const UserFeedItem: React.FC<UserFeedItemProps> = ({
           <div className="relative">
             <button
               onClick={() => setShowMenu(!showMenu)}
-              className="p-2 text-gray-500 hover:text-gray-800 transition-colors"
+              className="p-2 text-gray-500 hover:text-gray-800 transition-colors cursor-pointer"
             >
               <MoreVertical size={20} />
             </button>
@@ -80,7 +84,7 @@ const UserFeedItem: React.FC<UserFeedItemProps> = ({
                     handleBlockAndUnblock?.(user.id, 'block');
                     setShowMenu(false);
                   }}
-                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
                 >
                   Block
                 </button>
@@ -89,7 +93,7 @@ const UserFeedItem: React.FC<UserFeedItemProps> = ({
                     deleteConnection?.(user.id);
                     setShowMenu(false);
                   }}
-                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
                 >
                   Remove
                 </button>

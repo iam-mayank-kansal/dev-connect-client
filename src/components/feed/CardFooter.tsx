@@ -1,7 +1,7 @@
 'use client';
 
 import React, { FC } from 'react';
-import { ThumbsUp, ThumbsDown } from 'lucide-react'; // Updated icons
+import { ThumbsUp, ThumbsDown } from 'lucide-react';
 
 interface CardFooterProps {
   likesCount: number;
@@ -22,28 +22,25 @@ const CardFooter: FC<CardFooterProps> = ({
   const isDisliked = userReaction === 'dislike';
 
   return (
-    <div className="p-2">
-      <div className="flex justify-around border-t border-gray-100 pt-1">
+    <div className="p-3">
+      <div className="flex gap-2 border-t border-gray-100 pt-3">
         <button
           onClick={(e) => {
             e.stopPropagation();
             onReact('like');
           }}
           disabled={isSubmitting}
-          className={`flex items-center space-x-2 w-full justify-center p-2 rounded-lg transition-colors
+          className={`flex items-center gap-2 flex-1 justify-center px-4 py-2 rounded-lg font-medium transition-all cursor-pointer
             ${
               isLiked
-                ? 'text-blue-600 bg-blue-50'
-                : 'text-gray-600 hover:bg-gray-100'
+                ? 'bg-blue-100 text-blue-700 border border-blue-300'
+                : 'text-gray-600 border border-gray-200 hover:border-blue-300 hover:bg-blue-50'
             }
             ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}
           `}
         >
-          <ThumbsUp size={18} fill={isLiked ? 'currentColor' : 'none'} />
-          {/* The count is now displayed directly next to the icon for a cleaner look. */}
-          <span className="font-medium text-sm tabular-nums">
-            {likesCount.toLocaleString()}
-          </span>
+          <ThumbsUp size={16} fill={isLiked ? 'currentColor' : 'none'} />
+          <span className="text-sm">Agree ({likesCount})</span>
         </button>
         <button
           onClick={(e) => {
@@ -51,20 +48,17 @@ const CardFooter: FC<CardFooterProps> = ({
             onReact('dislike');
           }}
           disabled={isSubmitting}
-          className={`flex items-center space-x-2 w-full justify-center p-2 rounded-lg transition-colors
+          className={`flex items-center gap-2 flex-1 justify-center px-4 py-2 rounded-lg font-medium transition-all cursor-pointer
             ${
               isDisliked
-                ? 'text-red-600 bg-red-50'
-                : 'text-gray-600 hover:bg-gray-100'
+                ? 'bg-orange-100 text-orange-700 border border-orange-300'
+                : 'text-gray-600 border border-gray-200 hover:border-orange-300 hover:bg-orange-50'
             }
             ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}
           `}
         >
-          <ThumbsDown size={18} fill={isDisliked ? 'currentColor' : 'none'} />
-          {/* The count is now displayed directly next to the icon for a cleaner look. */}
-          <span className="font-medium text-sm tabular-nums">
-            {dislikesCount.toLocaleString()}
-          </span>
+          <ThumbsDown size={16} fill={isDisliked ? 'currentColor' : 'none'} />
+          <span className="text-sm">Disagree ({dislikesCount})</span>
         </button>
       </div>
     </div>

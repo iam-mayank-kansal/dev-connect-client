@@ -1,17 +1,17 @@
 import { AuthAPI } from '@/lib/types/api/auth';
-import { axiosClient } from '../client';
+import { axiosInstanace } from '../client';
 
 class AuthAPI_Handler {
   async checkAuth(): Promise<AuthAPI.CheckAuthResponse['data']> {
     const response =
-      await axiosClient.get<AuthAPI.CheckAuthResponse>('/auth/check-auth');
+      await axiosInstanace.get<AuthAPI.CheckAuthResponse>('/auth/check-auth');
     return response.data.data;
   }
 
   async login(
     credentials: AuthAPI.LoginRequest
   ): Promise<AuthAPI.LoginResponse> {
-    const response = await axiosClient.post<AuthAPI.LoginResponse>(
+    const response = await axiosInstanace.post<AuthAPI.LoginResponse>(
       '/auth/login',
       credentials
     );
@@ -21,7 +21,7 @@ class AuthAPI_Handler {
   async signUp(
     data: AuthAPI.SignUpRequest
   ): Promise<AuthAPI.SignUpResponse['data']> {
-    const response = await axiosClient.post<AuthAPI.SignUpResponse>(
+    const response = await axiosInstanace.post<AuthAPI.SignUpResponse>(
       '/auth/sign-up',
       data
     );
@@ -30,14 +30,14 @@ class AuthAPI_Handler {
 
   async logout(): Promise<AuthAPI.LogoutResponse> {
     const response =
-      await axiosClient.post<AuthAPI.LogoutResponse>('/auth/logout');
+      await axiosInstanace.post<AuthAPI.LogoutResponse>('/auth/logout');
     return response.data;
   }
 
   async sendOTP(
     data: AuthAPI.SendOTPRequest
   ): Promise<AuthAPI.SendOTPResponse> {
-    const response = await axiosClient.post<AuthAPI.SendOTPResponse>(
+    const response = await axiosInstanace.post<AuthAPI.SendOTPResponse>(
       '/otp/send-otp',
       data
     );
@@ -47,7 +47,7 @@ class AuthAPI_Handler {
   async verifyOTP(
     data: AuthAPI.VerifyOTPRequest
   ): Promise<AuthAPI.VerifyOTPResponse> {
-    const response = await axiosClient.post<AuthAPI.VerifyOTPResponse>(
+    const response = await axiosInstanace.post<AuthAPI.VerifyOTPResponse>(
       '/otp/verify-otp',
       data
     );
@@ -57,7 +57,7 @@ class AuthAPI_Handler {
   async setNewPassword(
     data: AuthAPI.setNewPasswordRequest
   ): Promise<AuthAPI.setNewPasswordResponse> {
-    const response = await axiosClient.patch<AuthAPI.setNewPasswordResponse>(
+    const response = await axiosInstanace.patch<AuthAPI.setNewPasswordResponse>(
       '/auth/set-new-password',
       data
     );
@@ -67,7 +67,7 @@ class AuthAPI_Handler {
   async changePassword(
     data: AuthAPI.ChangePasswordRequest
   ): Promise<AuthAPI.ChangePasswordResponse> {
-    const response = await axiosClient.patch<AuthAPI.ChangePasswordResponse>(
+    const response = await axiosInstanace.patch<AuthAPI.ChangePasswordResponse>(
       '/auth/reset-password',
       data
     );
@@ -75,7 +75,7 @@ class AuthAPI_Handler {
   }
 
   async getImageKitAuth(): Promise<AuthAPI.ImageKitAuthResponse> {
-    const response = await axiosClient.get<AuthAPI.ImageKitAuthResponse>(
+    const response = await axiosInstanace.get<AuthAPI.ImageKitAuthResponse>(
       '/auth/imageKit-access'
     );
     return response.data;
@@ -84,10 +84,11 @@ class AuthAPI_Handler {
   async deleteImageKitResource(
     data: AuthAPI.DeleteImageKitRequest
   ): Promise<AuthAPI.DeleteImageKitResponse> {
-    const response = await axiosClient.delete<AuthAPI.DeleteImageKitResponse>(
-      '/auth/imagekit-delete',
-      { data }
-    );
+    const response =
+      await axiosInstanace.delete<AuthAPI.DeleteImageKitResponse>(
+        '/auth/imagekit-delete',
+        { data }
+      );
     return response.data;
   }
 }

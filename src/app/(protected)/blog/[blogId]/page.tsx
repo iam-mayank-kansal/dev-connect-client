@@ -1,17 +1,18 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import { axiosInstanace } from '@/lib/axios';
+import { useParams, useRouter } from 'next/navigation';
+import { axiosInstanace } from '@/lib/api/client';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, Loader2, Heart, MessageCircle } from 'lucide-react';
+import { ArrowLeft, Loader2, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { Blog } from '@/lib/types/blog';
 import { getMediaUrl } from '@/lib/utils/media';
 import { useAuthStore } from '@/store/useAuthStore';
 
 export default function BlogDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const blogId = Array.isArray(params?.blogId)
     ? params.blogId[0]
     : params?.blogId;
@@ -69,10 +70,6 @@ export default function BlogDetailPage() {
 
     setIsSubmitting(true);
     try {
-      const apiUrl = `${
-        process.env.NEXT_PUBLIC_API_BASE_URL || ''
-      }/devconnect/blog/react-blog`;
-
       const currentReactionState = userReaction;
       let apiReactionToSend;
 
@@ -82,14 +79,10 @@ export default function BlogDetailPage() {
         apiReactionToSend = reactionType === 'like' ? 'agree' : 'disagree';
       }
 
-      const response = await axiosInstanace.put(
-        apiUrl,
-        {
-          blogId: blog?._id,
-          reaction: apiReactionToSend,
-        },
-        { withCredentials: true }
-      );
+      const response = await axiosInstanace.put(`/blog/react-blog`, {
+        blogId: blog?._id,
+        reaction: apiReactionToSend,
+      });
 
       const { agreedCount, disagreedCount } = response.data.data;
       setLikes(agreedCount);
@@ -129,13 +122,13 @@ export default function BlogDetailPage() {
           <p className="text-gray-600 mb-6">
             {error || 'The blog you are looking for does not exist.'}
           </p>
-          <Link
-            href="/"
+          <button
+            onClick={() => router.back()}
             className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors"
           >
             <ArrowLeft size={18} />
-            Back to Feed
-          </Link>
+            Go Back
+          </button>
         </div>
       </div>
     );
@@ -145,19 +138,22 @@ export default function BlogDetailPage() {
     blog.userId && typeof blog.userId === 'object' ? blog.userId : null;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Back Button */}
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 mb-6 font-medium"
+        <button
+          onClick={() => router.back()}
+          className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 mb-8 font-medium transition-colors group"
         >
-          <ArrowLeft size={18} />
-          Back to Feed
-        </Link>
+          <ArrowLeft
+            size={18}
+            className="group-hover:-translate-x-1 transition-transform"
+          />
+          Go Back
+        </button>
 
         {/* Blog Container */}
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 hover:shadow-2xl transition-shadow duration-300">
           {/* Header Image */}
           {blog.blogPhoto && blog.blogPhoto.length > 0 && (
             <div className="relative w-full h-96 bg-gray-200">
@@ -177,70 +173,73 @@ export default function BlogDetailPage() {
           )}
 
           {/* Content */}
-          <div className="p-8">
+          <div className="p-6 sm:p-8 lg:p-10">
             {/* Title */}
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight">
               {blog.blogTitle}
             </h1>
 
             {/* Author & Meta Info */}
             {author && (
-              <div className="flex items-center gap-4 py-4 border-b border-gray-200 mb-6">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 py-6 border-b border-gray-200 mb-8">
                 {author.profilePicture && (
-                  <div className="relative w-12 h-12">
-                    <Image
-                      src={author.profilePicture}
-                      alt={author.name}
-                      fill
-                      className="object-cover rounded-full"
-                    />
-                  </div>
+                  <Link
+                    href={`/profile/${author._id}`}
+                    className="hover:opacity-80 transition-opacity"
+                  >
+                    <div className="relative w-14 h-14">
+                      <Image
+                        src={author.profilePicture}
+                        alt={author.name}
+                        fill
+                        className="object-cover rounded-full"
+                      />
+                    </div>
+                  </Link>
                 )}
                 <div className="flex-1">
                   <Link
                     href={`/profile/${author._id}`}
-                    className="font-semibold text-gray-900 hover:text-blue-600"
+                    className="font-semibold text-gray-900 hover:text-blue-600 transition-colors text-lg inline-block"
                   >
                     {author.name}
                   </Link>
                   <p className="text-sm text-gray-600">{author.designation}</p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {new Date(blog.createdAt).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </p>
                 </div>
-                <p className="text-sm text-gray-500">
-                  {new Date(blog.createdAt).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })}
-                </p>
               </div>
             )}
 
             {/* Description */}
-            <div className="prose prose-lg max-w-none mb-8">
-              <p className="text-gray-700 whitespace-pre-wrap">
-                {blog.blogBody}
-              </p>
+            <div className="mb-10 text-gray-700 text-lg leading-relaxed whitespace-pre-wrap">
+              {blog.blogBody}
             </div>
 
             {/* Images Gallery */}
             {blog.blogPhoto && blog.blogPhoto.length > 1 && (
-              <div className="mb-8">
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                  Images
+              <div className="mb-10">
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">
+                  Gallery
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {blog.blogPhoto.slice(1).map((photo, index) => {
                     const imageUrl = getMediaUrl(photo, 'images');
                     return imageUrl ? (
                       <div
                         key={index}
-                        className="relative w-full h-64 bg-gray-200 rounded-lg overflow-hidden"
+                        className="relative w-full h-72 bg-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow group cursor-pointer"
                       >
                         <Image
                           src={imageUrl}
                           alt={`Blog image ${index + 2}`}
                           fill
-                          className="object-cover"
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
                           unoptimized
                         />
                       </div>
@@ -252,22 +251,23 @@ export default function BlogDetailPage() {
 
             {/* Videos */}
             {blog.blogViedo && blog.blogViedo.length > 0 && (
-              <div className="mb-8">
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">
+              <div className="mb-10">
+                <h3 className="text-2xl font-semibold text-gray-900 mb-6">
                   Videos
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {blog.blogViedo.map((video, index) => {
                     const videoUrl = getMediaUrl(video, 'videos');
                     return videoUrl ? (
-                      <video
+                      <div
                         key={index}
-                        controls
-                        className="w-full rounded-lg bg-black"
+                        className="rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow"
                       >
-                        <source src={videoUrl} />
-                        Your browser does not support the video tag.
-                      </video>
+                        <video controls className="w-full rounded-xl bg-black">
+                          <source src={videoUrl} />
+                          Your browser does not support the video tag.
+                        </video>
+                      </div>
                     ) : null;
                   })}
                 </div>
@@ -275,53 +275,59 @@ export default function BlogDetailPage() {
             )}
 
             {/* Engagement Stats */}
-            <div className="flex items-center gap-6 pt-6 border-t border-gray-200">
+            <div className="flex flex-wrap gap-3 pt-8 border-t border-gray-200">
               <button
                 onClick={() => handleReaction('like')}
                 disabled={isSubmitting}
-                className={`flex items-center gap-2 transition-colors ${
+                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${
                   userReaction === 'like'
-                    ? 'text-red-500'
-                    : 'text-gray-600 hover:text-red-500'
-                } disabled:opacity-50`}
+                    ? 'bg-blue-100 text-blue-700 border border-blue-300'
+                    : 'text-gray-600 border border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
-                <Heart
-                  size={20}
+                <ThumbsUp
+                  size={18}
                   fill={userReaction === 'like' ? 'currentColor' : 'none'}
                 />
-                <span className="text-sm font-medium">{likes} Agrees</span>
+                <span>Agree ({likes})</span>
               </button>
               <button
                 onClick={() => handleReaction('dislike')}
                 disabled={isSubmitting}
-                className={`flex items-center gap-2 transition-colors ${
+                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${
                   userReaction === 'dislike'
-                    ? 'text-blue-600'
-                    : 'text-gray-600 hover:text-blue-600'
-                } disabled:opacity-50`}
+                    ? 'bg-orange-100 text-orange-700 border border-orange-300'
+                    : 'text-gray-600 border border-gray-200 hover:border-orange-300 hover:bg-orange-50'
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
-                <MessageCircle
-                  size={20}
+                <ThumbsDown
+                  size={18}
                   fill={userReaction === 'dislike' ? 'currentColor' : 'none'}
                 />
-                <span className="text-sm font-medium">
-                  {dislikes} Disagrees
-                </span>
+                <span>Disagree ({dislikes})</span>
               </button>
             </div>
           </div>
         </div>
 
         {/* Related Blogs Section */}
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            More from this author
+        <div className="mt-16">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8">
+            More from {author?.name || 'this author'}
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* This could be populated with related blogs */}
-            <div className="text-center py-8 text-gray-500">
-              <p>Check out more blogs on their profile</p>
-            </div>
+          <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 text-center">
+            <p className="text-gray-600 text-lg">
+              Visit their profile to see more blogs
+            </p>
+            {author && (
+              <Link
+                href={`/blogs/${author._id}`}
+                className="inline-flex items-center gap-2 mt-6 bg-blue-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+              >
+                View All Blogs
+                <ArrowLeft size={18} className="rotate-180" />
+              </Link>
+            )}
           </div>
         </div>
       </div>

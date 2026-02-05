@@ -80,5 +80,5 @@ export default function ProtectedLayout({
   console.log(
     '[ProtectedLayout] Rendering: Protected content (user authenticated)'
   );
-  return <div className="min-h-screen bg-gray-50">{children}</div>;
+  return <div className="bg-gray-50">{children}</div>;
 }

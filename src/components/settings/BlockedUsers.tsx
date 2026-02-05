@@ -1,5 +1,6 @@
 'use client';
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
 import { useConnection } from '@/hooks/useConnections';
@@ -115,7 +116,10 @@ export default function BlockedUsers() {
                 key={user._id}
                 className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                <div className="flex items-center space-x-3 min-w-0 flex-1">
+                <Link
+                  href={`/profile/${user._id}`}
+                  className="flex items-center space-x-3 min-w-0 flex-1 hover:opacity-80 transition-opacity"
+                >
                   {user.profilePicture ? (
                     <Image
                       src={user.profilePicture}
@@ -137,11 +141,11 @@ export default function BlockedUsers() {
                       {user.designation}
                     </p>
                   </div>
-                </div>
+                </Link>
                 <button
                   onClick={() => handleUnblock(user._id)}
                   disabled={unblockingIds.has(user._id)}
-                  className="ml-3 px-3 py-1.5 bg-red-50 text-red-700 rounded text-xs font-medium hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex-shrink-0"
+                  className="ml-3 px-3 py-1.5 bg-red-50 text-red-700 rounded text-xs font-medium hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex-shrink-0 cursor-pointer"
                 >
                   {unblockingIds.has(user._id) ? (
                     <span className="flex items-center">
