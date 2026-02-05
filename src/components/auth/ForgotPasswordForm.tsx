@@ -13,7 +13,7 @@ import { sendOTPSchema } from '@/lib/validation/auth';
 import { AuthHeader } from '../ui/AuthHeader';
 import { AuthCard } from '../ui/AuthCard';
 import { AuthInput } from '../ui/AuthInput';
-import { getErrorMessage } from '@/lib/error-handler';
+import { getErrorMessage } from '@/lib/utils/errorHandler';
 
 export default function ForgotPasswordForm() {
   const router = useRouter();

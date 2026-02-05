@@ -1,6 +1,6 @@
 'use client';
 
-import { getErrorMessage } from '@/lib/error-handler';
+import { getErrorMessage } from '@/lib/utils/errorHandler';
 import { BlogAPI } from '@/lib/types/api/blog';
 import { blogService } from '@/services/blog/blogService';
 import { imageKitService } from '@/services/imageKit/imageKitService';

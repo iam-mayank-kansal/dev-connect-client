@@ -17,7 +17,7 @@ import {
 import { AuthInput } from '@/components/ui/AuthInput';
 import { PasswordInput } from '@/components/ui/PasswordInput';
 import toast from 'react-hot-toast';
-import { getErrorMessage } from '@/lib/error-handler';
+import { getErrorMessage } from '@/lib/utils/errorHandler';
 
 export function LoginForm() {
   const router = useRouter();

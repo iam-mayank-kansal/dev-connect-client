@@ -1,7 +1,7 @@
 'use client';
 
 import React, { FC, useState, useCallback, useEffect } from 'react';
-import { axiosInstanace } from '@/lib/api/client';
+import { axiosClient } from '@/lib/api/client';
 import { useRouter } from 'next/navigation';
 import CardHeader from './CardHeader';
 import CardBody from './CardBody';
@@ -69,7 +69,7 @@ const BlogPostCard: FC<BlogPostCardProps> = ({ blog }) => {
     }
 
     try {
-      const response = await axiosInstanace.put(`/blog/react-blog`, {
+      const response = await axiosClient.put(`/blog/react-blog`, {
         blogId: blog._id,
         reaction: apiReactionToSend,
       });

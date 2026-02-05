@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { BlogAPI } from '@/lib/types/api/blog';
-import { axiosInstanace } from '../client';
+import { axiosClient } from '../client';
 import { Blog } from '@/lib/types/blog';
 
 class BlogAPI_Handler {
@@ -8,7 +8,7 @@ class BlogAPI_Handler {
   async createBlog(
     data: BlogAPI.CreateBlogRequest
   ): Promise<BlogAPI.CreateBlogResponse['data']> {
-    const response = await axiosInstanace.post<BlogAPI.CreateBlogResponse>(
+    const response = await axiosClient.post<BlogAPI.CreateBlogResponse>(
       '/blog/create-blog',
       data
     );
@@ -20,7 +20,7 @@ class BlogAPI_Handler {
     page: number = 1,
     limit: number = 10
   ): Promise<BlogAPI.FetchBlogsResponse['data']> {
-    const response = await axiosInstanace.get<BlogAPI.FetchBlogsResponse>(
+    const response = await axiosClient.get<BlogAPI.FetchBlogsResponse>(
       `/blog/fetch-blogs?page=${page}&limit=${limit}`
     );
     return response.data.data;
@@ -33,7 +33,7 @@ class BlogAPI_Handler {
     limit: number = 10
   ): Promise<BlogAPI.FetchUserBlogsResponse['data']> {
     try {
-      const response = await axiosInstanace.get<BlogAPI.FetchUserBlogsResponse>(
+      const response = await axiosClient.get<BlogAPI.FetchUserBlogsResponse>(
         `/blog/fetch-user-blogs/${userId}?page=${page}&limit=${limit}`
       );
       return response.data.data;
@@ -59,7 +59,7 @@ class BlogAPI_Handler {
 
   // READ - Single Blog by ID
   async getBlogById(blogId: string): Promise<Blog> {
-    const response = await axiosInstanace.get<BlogAPI.FetchBlogByIdResponse>(
+    const response = await axiosClient.get<BlogAPI.FetchBlogByIdResponse>(
       `/blog/fetch-blog/${blogId}`
     );
     return response.data.data;
@@ -71,7 +71,7 @@ class BlogAPI_Handler {
     data: Partial<Blog>
   ): Promise<BlogAPI.EditBlogResponse['data']> {
     const payload = { ...data, blogId };
-    const response = await axiosInstanace.patch<BlogAPI.EditBlogResponse>(
+    const response = await axiosClient.patch<BlogAPI.EditBlogResponse>(
       '/blog/edit-blog',
       payload
     );
@@ -82,7 +82,7 @@ class BlogAPI_Handler {
   async deleteBlog(
     blogId: string
   ): Promise<BlogAPI.DeleteBlogResponse['data']> {
-    const response = await axiosInstanace.patch<BlogAPI.DeleteBlogResponse>(
+    const response = await axiosClient.patch<BlogAPI.DeleteBlogResponse>(
       '/blog/delete-blog',
       { blogId }
     );
@@ -94,7 +94,7 @@ class BlogAPI_Handler {
     blogId: string,
     reaction: 'agree' | 'disagree' | ''
   ): Promise<BlogAPI.ReactBlogResponse['data']> {
-    const response = await axiosInstanace.put<BlogAPI.ReactBlogResponse>(
+    const response = await axiosClient.put<BlogAPI.ReactBlogResponse>(
       '/blog/react-blog',
       { blogId, reaction }
     );

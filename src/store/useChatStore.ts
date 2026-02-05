@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { create } from 'zustand';
 import toast from 'react-hot-toast';
-import { axiosInstanace } from '@/lib/api/client';
+import { axiosClient } from '@/lib/api/client';
 import { Message, User } from '@/lib/types/chat';
 import { useAuthStore } from './useAuthStore';
 
@@ -37,7 +37,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 
     set({ isUsersLoading: true });
     try {
-      const res = await axiosInstanace.get('/message/chats');
+      const res = await axiosClient.get('/message/chats');
       set({ users: res.data.data.users });
     } catch (err: unknown) {
       console.error('Error fetching users:', err);
@@ -53,9 +53,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   getConversationMessages: async (otherUserId) => {
     set({ isMessagesLoading: true });
     try {
-      const res = await axiosInstanace.get(
-        `/message/conversation/${otherUserId}`
-      );
+      const res = await axiosClient.get(`/message/conversation/${otherUserId}`);
       set({ messages: res.data.data });
     } catch (err: unknown) {
       console.error('Error fetching messages:', err);
@@ -70,7 +68,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   sendMessage: async (messageData, receiverId) => {
     set({ isSendingMessage: true });
     try {
-      const res = await axiosInstanace.post(
+      const res = await axiosClient.post(
         `/message/send-message/${receiverId}`,
         messageData
       );

@@ -17,7 +17,7 @@ import {
 // Components
 import { AuthInput } from '@/components/ui/AuthInput';
 import { PasswordInput } from '@/components/ui/PasswordInput';
-import { getErrorMessage } from '@/lib/error-handler';
+import { getErrorMessage } from '@/lib/utils/errorHandler';
 
 export function SignupForm() {
   const router = useRouter();

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { axiosInstanace } from '@/lib/api/client';
+import { axiosClient } from '@/lib/api/client';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, Loader2, ThumbsUp, ThumbsDown } from 'lucide-react';
@@ -34,7 +34,7 @@ export default function BlogDetailPage() {
 
       try {
         setLoading(true);
-        const response = await axiosInstanace.get(`/blog/fetch-blog/${blogId}`);
+        const response = await axiosClient.get(`/blog/fetch-blog/${blogId}`);
         const blogData = response.data.data;
         setBlog(blogData);
 
@@ -79,7 +79,7 @@ export default function BlogDetailPage() {
         apiReactionToSend = reactionType === 'like' ? 'agree' : 'disagree';
       }
 
-      const response = await axiosInstanace.put(`/blog/react-blog`, {
+      const response = await axiosClient.put(`/blog/react-blog`, {
         blogId: blog?._id,
         reaction: apiReactionToSend,
       });

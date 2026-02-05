@@ -1,4 +1,4 @@
-import { axiosInstanace } from '../client';
+import { axiosClient } from '../client';
 
 interface SearchUser {
   _id: string;
@@ -10,7 +10,7 @@ interface SearchUser {
 class SearchAPI_Handler {
   async searchUsers(query: string): Promise<SearchUser[]> {
     try {
-      const response = await axiosInstanace.get<SearchUser[]>(
+      const response = await axiosClient.get<SearchUser[]>(
         `/user/search?q=${encodeURIComponent(query)}`
       );
       return response.data;

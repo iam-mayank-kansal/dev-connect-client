@@ -1,9 +1,9 @@
 import { ImageKitAPI } from '@/lib/types/api/imageKit';
-import { axiosInstanace } from '../client';
+import { axiosClient } from '../client';
 
 class ImageKitAPI_Handler {
   async getImageKitAuth(): Promise<ImageKitAPI.ImageKitAuthResponse> {
-    const response = await axiosInstanace.get<ImageKitAPI.ImageKitAuthResponse>(
+    const response = await axiosClient.get<ImageKitAPI.ImageKitAuthResponse>(
       '/auth/imageKit-access'
     );
     return response.data;
@@ -13,7 +13,7 @@ class ImageKitAPI_Handler {
     data: ImageKitAPI.DeleteImageKitRequest
   ): Promise<ImageKitAPI.DeleteImageKitResponse> {
     const response =
-      await axiosInstanace.delete<ImageKitAPI.DeleteImageKitResponse>(
+      await axiosClient.delete<ImageKitAPI.DeleteImageKitResponse>(
         '/auth/imagekit-delete',
         { data }
       );

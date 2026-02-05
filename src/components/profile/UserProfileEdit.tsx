@@ -14,7 +14,7 @@ import {
   Certification,
   SocialLink,
 } from '@/lib/types/entities';
-import { getErrorMessage } from '@/lib/error-handler';
+import { getErrorMessage } from '@/lib/utils/errorHandler';
 
 // Sub-components
 import EditBasicInfo from './sections/edit/EditBasicInfo';

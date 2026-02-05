@@ -6,6 +6,3 @@ export const axiosClient: AxiosInstance = axios.create({
   withCredentials: true,
   timeout: 10000,
 });
-
-// For backward compatibility
-export const axiosInstanace = axiosClient;
